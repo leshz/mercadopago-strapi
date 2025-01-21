@@ -1,0 +1,70 @@
+{
+  "kind": "collectionType",
+  "collectionName": "orders",
+  "info": {
+    "singularName": "order",
+    "pluralName": "orders",
+    "displayName": "Ordenes de compra"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "products": {
+      
+      "require": true,
+      "type": "json"
+    },
+    "payment_link": {
+      "require": true,
+      "type": "string"
+    },
+    "collector_id": {
+      "require": true,
+      "type": "string"
+    },
+    "total_discount": {
+      "type": "integer",
+      "default": 0
+    },
+    "total": {
+      "required": true,
+      "default": 0,
+      "type": "integer"
+    },
+    "paid_with": {
+      "type": "string"
+    },
+    "preference_id": {
+      "type": "string",
+      "required": false
+    },
+    "payment_status": {
+      "type": "enumeration",
+      "required": true,
+      "enum": [
+        "initial",
+        "approved",
+        "authorized",
+        "in_process",
+        "in_mediation",
+        "pending",
+        "cancelled",
+        "rejected",
+        "refunded",
+        "charged_back"
+      ]
+    },
+    "shipping_status": {
+      "type": "enumeration",
+      "enum": [
+        "initial",
+        "in_process",
+        "on_delivery",
+        "delivered",
+        "cancelled",
+        "refunded"
+      ]
+    }
+  }
+}

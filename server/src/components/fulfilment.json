@@ -1,0 +1,67 @@
+{
+  "collectionName": "components_mercadopago_fulfilment",
+  "info": {
+    "displayName": "fulfilment",
+    "icon": "exit",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "department": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "city": {
+      "type": "string",
+      "required": true
+    },
+    "address": {
+      "type": "string",
+      "required": true
+    },
+    "postal_code": {
+      "type": "biginteger"
+    },
+    "message": {
+      "type": "text"
+    }
+  },
+  "__filename__": "fulfilment.json",
+  "__schema__": {
+    "collectionName": "components_mercadopago_fulfilment",
+    "info": {
+      "displayName": "fulfilment",
+      "icon": "exit",
+      "description": ""
+    },
+    "options": {},
+    "attributes": {
+      "department": {
+        "type": "string",
+        "required": true,
+        "unique": false
+      },
+      "city": {
+        "type": "string",
+        "required": true
+      },
+      "address": {
+        "type": "string",
+        "required": true
+      },
+      "postal_code": {
+        "type": "biginteger"
+      },
+      "message": {
+        "type": "text"
+      }
+    },
+    "__filename__": "fulfilment.json"
+  },
+  "uid": "mercadopago.fulfilment",
+  "category": "mercadopago",
+  "modelType": "component",
+  "modelName": "fulfilment",
+  "globalId": "ComponentMercadopagoFulfilment"
+}

@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_mercadopago_product_information",
+  "info": {
+    "displayName": "information",
+    "icon": "bell",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "information": {
+      "type": "blocks",
+      "required": true
+    }
+  }
+}

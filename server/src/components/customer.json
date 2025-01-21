@@ -1,0 +1,67 @@
+{
+  "collectionName": "components_mercadopago_customer",
+  "info": {
+    "displayName": "Customer",
+    "icon": "emotionHappy"
+  },
+  "options": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "last_name": {
+      "type": "string",
+      "required": true
+    },
+    "dni": {
+      "type": "biginteger",
+      "required": true
+    },
+    "phone": {
+      "type": "biginteger",
+      "required": true
+    },
+    "email": {
+      "type": "email",
+      "required": true
+    }
+  },
+  "__filename__": "customer.json",
+  "__schema__": {
+    "collectionName": "components_mercadopago_customer",
+    "info": {
+      "displayName": "Customer",
+      "icon": "emotionHappy"
+    },
+    "options": {},
+    "attributes": {
+      "name": {
+        "type": "string",
+        "required": true
+      },
+      "last_name": {
+        "type": "string",
+        "required": true
+      },
+      "dni": {
+        "type": "biginteger",
+        "required": true
+      },
+      "phone": {
+        "type": "biginteger",
+        "required": true
+      },
+      "email": {
+        "type": "email",
+        "required": true
+      }
+    },
+    "__filename__": "customer.json"
+  },
+  "uid": "mercadopago.customer",
+  "category": "mercadopago",
+  "modelType": "component",
+  "modelName": "customer",
+  "globalId": "ComponentMercadopagoCustomer"
+}
