@@ -18,7 +18,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       case NOTIFICATION_TYPES.PAYMENT:
         strapi.log.info("Payment Action");
         await strapi
-          .service("plugin::mercadopago.mercadopago")
+          .service("plugin::strapi-mercadopago.mercadopago")
           .paymentHook(payload, config);
         return ctx.send();
 

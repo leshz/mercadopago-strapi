@@ -14,7 +14,7 @@ import {
 } from "../helpers";
 
 export default factories.createCoreService(
-  "plugin::mercadopago.order",
+  "plugin::strapi-mercadopago.order",
   ({ strapi }) => ({
     async createInitialOrder({
       shipping,
@@ -31,7 +31,7 @@ export default factories.createCoreService(
     }) {
       try {
         const formatedProducts = await strapi
-          .service("plugin::mercadopago.mercadopago")
+          .service("plugin::strapi-mercadopago.mercadopago")
           .meliProduct(products, config);
         const productsWithShipment = mergeShipmentAtProducts(
           formatedProducts,
@@ -41,7 +41,7 @@ export default factories.createCoreService(
         const total = calculateWithShipment(subtotal, shipment);
 
         const savedata = await strapi?.entityService?.create(
-          "plugin::mercadopago.invoice",
+          "plugin::strapi-mercadopago.invoice",
           {
             data: {
               payment_status: INVOICES_STATUS.INITIAL,
@@ -67,7 +67,7 @@ export default factories.createCoreService(
     updateInvoice: async ({ id, data }) => {
       try {
         const savedata = await strapi.entityService?.update(
-          "plugin::mercadopago.invoice",
+          "plugin::strapi-mercadopago.invoice",
           id,
           { data }
         );

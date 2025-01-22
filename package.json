@@ -59,12 +59,12 @@
   },
   "strapi": {
     "kind": "plugin",
-    "name": "mercadopago",
-    "displayName": "mercadopago",
-    "description": "mercadopago payments to use with strapi  5 "
+    "name": "strapi-mercadopago",
+    "displayName": "strapi-mercadopago",
+    "description": "mercadopago payments to use with strapi  5"
   },
-  "name": "mercadopago",
-  "description": "mercadopago payments to use with strapi  5 ",
+  "name": "strapi-mercadopago",
+  "description": "mercadopago payments to use with strapi  5",
   "license": "MIT",
   "author": "Jeff Barragan <leshz@me.com>",
   "main": "index.js"

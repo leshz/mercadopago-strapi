@@ -11,7 +11,7 @@ export default {
       path: "/products/:slug",
       handler: "product.findOne",
       config: {
-        middlewares: ["plugin::mercadopago.populating"],
+        middlewares: ["plugin::strapi-mercadopago.populating"],
       },
     },
     {
@@ -19,7 +19,7 @@ export default {
       path: "/products",
       handler: "product.find",
       config: {
-        middlewares: ["plugin::mercadopago.populating"],
+        middlewares: ["plugin::strapi-mercadopago.populating"],
       },
     },
   ],

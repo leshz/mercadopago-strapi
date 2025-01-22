@@ -4,4 +4,4 @@
 
 import { factories } from '@strapi/strapi';
 
-export default factories.createCoreService('plugin::mercadopago.product');
+export default factories.createCoreService('plugin::strapi-mercadopago.product');

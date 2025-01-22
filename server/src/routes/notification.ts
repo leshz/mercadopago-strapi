@@ -9,8 +9,8 @@ export default {
       handler: "notification.notification",
       config: {
         middlewares: [
-          "plugin::mercadopago.loadConfig",
-          "plugin::mercadopago.verifySign",
+          "plugin::strapi-mercadopago.loadConfig",
+          "plugin::strapi-mercadopago.verifySign",
         ],
         auth: false,
       },

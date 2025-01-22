@@ -3,4 +3,9 @@ import product from "./product";
 import order from "./order";
 import mercadopago from "./mercadopago";
 
-export default {};
+export default {
+  category,
+  product,
+  order,
+  mercadopago,
+};

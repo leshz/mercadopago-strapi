@@ -1,7 +1,7 @@
 const loadConfig = (options, { strapi }) => {
   return async (ctx, next) => {
     const config = await strapi.db
-      .query("plugin::mercadopago.configuration")
+      .query("plugin::strapi-mercadopago.configuration")
       .findOne({
         select: [
           "active",

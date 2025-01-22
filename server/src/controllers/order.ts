@@ -4,4 +4,4 @@
 
 import { factories } from '@strapi/strapi'
 
-export default factories.createCoreController('plugin::mercadopago.order');
+export default factories.createCoreController('plugin::strapi-mercadopago.order');

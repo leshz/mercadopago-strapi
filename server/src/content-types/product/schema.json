@@ -96,7 +96,7 @@
     "categories": {
       "type": "relation",
       "relation": "oneToMany",
-      "target": "plugin::mercadopago.category"
+      "target": "plugin::strapi-mercadopago.category"
     },
     "middle_description": {
       "pluginOptions": {

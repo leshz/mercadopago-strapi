@@ -60,7 +60,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     const sku = items.map(({ sku = "" }) => ({ sku }));
 
     const results: any[] = await strapi.db
-      .query("plugin::mercadopago.product")
+      .query("plugin::strapi-mercadopago.product")
       .findMany({
         select: attibutes,
         where: { $or: sku },
@@ -119,7 +119,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
     if (includeShipment) {
       const shipment = await strapi
-        .query("plugin::mercadopago.shipment")
+        .query("plugin::strapi-mercadopago.shipment")
         .findOne({
           select: ["*"],
           where: { code: shippingType },
@@ -216,7 +216,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     const { items = [], ip_address } = additional_info || {};
 
     const invoice = await strapi
-      .query("plugin::mercadopago.invoice")
+      .query("plugin::strapi-mercadopago.invoice")
       .findOne({
         select: ["*"],
         where: { id: invoiceId },
@@ -237,7 +237,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       // UPDATE STATUS FROM PAYMENT SERVICE
       strapi.log.info(`TO THE MOON 🚀`);
       await strapi
-        .query("plugin::mercadopago.invoice")
+        .query("plugin::strapi-mercadopago.invoice")
         .update({
           where: { id: invoiceId },
           data: {
@@ -252,13 +252,13 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
       await items.forEach(async (product) => {
         const dbproduct = await strapi
-          .query("plugin::mercadopago.product")
+          .query("plugin::strapi-mercadopago.product")
           .findOne({ where: { sku: product.id } });
 
         if (dbproduct) {
           const newStock = Number(dbproduct.stock) - Number(product.quantity);
           await strapi
-            .query("plugin::mercadopago.product")
+            .query("plugin::strapi-mercadopago.product")
             .update({
               where: { sku: product.id },
               data: {
@@ -283,7 +283,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       }
     } else {
       await strapi
-        .query("plugin::mercadopago.invoice")
+        .query("plugin::strapi-mercadopago.invoice")
         .update({
           where: { id: invoiceId },
           data: {

@@ -8,7 +8,7 @@ export default {
       path: URLS.CHECKOUT,
       handler: "checkout.checkout",
       config: {
-        middlewares: ["plugin::mercadopago.loadConfig"],
+        middlewares: ["plugin::strapi-mercadopago.loadConfig"],
       },
     },
   ],

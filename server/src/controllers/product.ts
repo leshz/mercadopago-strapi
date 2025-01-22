@@ -8,7 +8,7 @@ import { factories } from "@strapi/strapi";
 import { errors } from "@strapi/utils";
 
 export default factories.createCoreController(
-  "plugin::mercadopago.product",
+  "plugin::strapi-mercadopago.product",
   ({ strapi }: { strapi: Core.Strapi }) => ({
     async findOne(ctx) {
       await this.validateQuery(ctx);
@@ -18,7 +18,7 @@ export default factories.createCoreController(
         throw new errors.ApplicationError("Service not Available");
 
       const entity = await strapi.db
-        .query("plugin::mercadopago.product")
+        .query("plugin::strapi-mercadopago.product")
         .findOne({
           where: { slug },
           populate: true,

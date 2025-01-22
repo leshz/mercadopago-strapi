@@ -17,19 +17,19 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
     try {
       const products = await strapi
-        .service("plugin::mercadopago.mercadopago")
+        .service("plugin::strapi-mercadopago.mercadopago")
         .products(items, config);
 
       const buyerData: buyerMeli = await strapi
-        .service("plugin::mercadopago.mercadopago")
+        .service("plugin::strapi-mercadopago.mercadopago")
         .buyer(buyer, ship);
 
       const shipment = await strapi
-        .service("plugin::mercadopago.mercadopago")
+        .service("plugin::strapi-mercadopago.mercadopago")
         .shipment(ship, products);
 
       const initInvoice = await strapi
-        .service("plugin::mercadopago.order")
+        .service("plugin::strapi-mercadopago.order")
         .createInitialOrder({
           shipping: ship,
           shopper: buyer,
@@ -45,7 +45,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       }
 
       const preference = await strapi
-        .service("plugin::mercadopago.mercadopago")
+        .service("plugin::strapi-mercadopago.mercadopago")
         .createPreference(
           {
             products,
@@ -58,7 +58,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
       const { id, init_point, collector_id } = preference;
       const updatedInvoice = await strapi
-        .service("plugin::mercadopago.order")
+        .service("plugin::strapi-mercadopago.order")
         .updateInvoice({
           id: initInvoice.id,
           data: {
