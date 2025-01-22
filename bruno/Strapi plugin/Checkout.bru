@@ -1,0 +1,15 @@
+meta {
+  name: Checkout
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{enviroment}}/api/strapi-mercadopago/checkout
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

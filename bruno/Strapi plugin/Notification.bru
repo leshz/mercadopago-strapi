@@ -1,0 +1,15 @@
+meta {
+  name: Notification
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{enviroment}}/api/strapi-mercadopago/notifications
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

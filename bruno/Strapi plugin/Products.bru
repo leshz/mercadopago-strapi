@@ -1,0 +1,15 @@
+meta {
+  name: Products
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{enviroment}}/api/strapi-mercadopago/products
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
