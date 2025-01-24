@@ -2,6 +2,7 @@ import { getTranslation } from './utils/getTranslation';
 import { PLUGIN_ID } from './pluginId';
 import { Initializer } from './components/Initializer';
 import { PluginIcon } from './components/PluginIcon';
+import { SettingsPage } from "./pages/Settings";
 
 export default {
   register(app: any) {
@@ -10,7 +11,7 @@ export default {
       icon: PluginIcon,
       intlLabel: {
         id: `${PLUGIN_ID}.plugin.name`,
-        defaultMessage: PLUGIN_ID,
+        defaultMessage: "Mercadopago",
       },
       Component: async () => {
         const { App } = await import('./pages/App');
@@ -18,6 +19,29 @@ export default {
         return App;
       },
     });
+
+    const settingsBaseName = `${PLUGIN_ID}-configuracion`;
+
+    app.createSettingSection({
+      id: settingsBaseName,
+      intlLabel: {
+        id: `${settingsBaseName}.links-header`,
+        defaultMessage: "Mercadopago",
+      },
+
+    }, [
+      {
+        id: `${settingsBaseName}.links-header`,
+        to: `plugins/${PLUGIN_ID}/configuracion`,
+        intlLabel: {
+          id: `${settingsBaseName}.links-header`,
+          defaultMessage: "Configuracion",
+        },
+        Component: async () => {
+          return SettingsPage;
+        }
+      },
+    ]);
 
     app.registerPlugin({
       id: PLUGIN_ID,
@@ -27,6 +51,10 @@ export default {
     });
   },
 
+  boostrap(app: any) {
+    app.getPlugin('content-manager').injectComponent('editView', 'right-links', { name: 'prueba', Component: () => SettingsPage })
+
+  },
   async registerTrads({ locales }: { locales: string[] }) {
     return Promise.all(
       locales.map(async (locale) => {

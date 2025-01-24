@@ -1,3 +1,4 @@
-# mercadopago
+# Mercadopago Payments for Strapi 5
 
-mercadopago payments to use with strapi 5
+
+# WIP
