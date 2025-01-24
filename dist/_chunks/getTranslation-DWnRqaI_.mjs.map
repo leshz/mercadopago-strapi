@@ -1,0 +1,1 @@
+{"version":3,"file":"getTranslation-DWnRqaI_.mjs","sources":["../../admin/src/utils/getTranslation.ts"],"sourcesContent":["import { PLUGIN_ID } from '../pluginId';\n\nconst getTranslation = (id: string) => `${PLUGIN_ID}.${id}`;\n\nexport { getTranslation };\n"],"names":[],"mappings":";AAEA,MAAM,iBAAiB,CAAC,OAAe,GAAG,SAAS,IAAI,EAAE;"}

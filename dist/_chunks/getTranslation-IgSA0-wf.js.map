@@ -1,0 +1,1 @@
+{"version":3,"file":"getTranslation-IgSA0-wf.js","sources":["../../admin/src/utils/getTranslation.ts"],"sourcesContent":["import { PLUGIN_ID } from '../pluginId';\n\nconst getTranslation = (id: string) => `${PLUGIN_ID}.${id}`;\n\nexport { getTranslation };\n"],"names":["PLUGIN_ID"],"mappings":";;AAEA,MAAM,iBAAiB,CAAC,OAAe,GAAGA,MAAAA,SAAS,IAAI,EAAE;;"}
