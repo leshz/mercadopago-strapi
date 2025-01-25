@@ -18,8 +18,11 @@ declare const _default: {
     }) => {
         notification(ctx: any): Promise<any>;
     };
-    configuration: ({ strapi, }: {
+    configuration: ({ strapi }: {
         strapi: import("@strapi/types/dist/core").Strapi;
-    }) => Partial<import("@strapi/types/dist/core/core-api/controller").Base> & import("@strapi/types/dist/core/core-api/controller").Generic & import("@strapi/types/dist/core/core-api/controller").Base;
+    }) => {
+        get(ctx: any): Promise<any>;
+        update(ctx: any): Promise<any>;
+    };
 };
 export default _default;

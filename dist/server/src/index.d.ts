@@ -32,9 +32,12 @@ declare const _default: {
         }) => {
             notification(ctx: any): Promise<any>;
         };
-        configuration: ({ strapi, }: {
+        configuration: ({ strapi }: {
             strapi: import("@strapi/types/dist/core").Strapi;
-        }) => Partial<import("@strapi/types/dist/core/core-api/controller").Base> & import("@strapi/types/dist/core/core-api/controller").Generic & import("@strapi/types/dist/core/core-api/controller").Base;
+        }) => {
+            get(ctx: any): Promise<any>;
+            update(ctx: any): Promise<any>;
+        };
     };
     routes: {
         category: import("@strapi/types/dist/core/core-api/router").Router;
@@ -78,7 +81,9 @@ declare const _default: {
             routes: {
                 method: string;
                 path: string;
-                handler: string;
+                handler: string; /**
+                 * Plugin server methods
+                 */
                 config: {
                     auth: boolean;
                 };
@@ -130,9 +135,6 @@ declare const _default: {
             }, config: import("./types").config) => Promise<import("mercadopago/dist/clients/preference/commonTypes").PreferenceResponse>;
             paymentHook: (payload: import("./types").PaymentPayload, config: import("./types").config) => Promise<void>;
         };
-        configuration: ({ strapi, }: {
-            strapi: import("@strapi/types/dist/core").Strapi;
-        }) => Partial<import("@strapi/types/dist/core/core-api/service").Base> & import("@strapi/types/dist/core/core-api/service").Generic & import("@strapi/types/dist/core/core-api/service").Base;
     };
     contentTypes: {
         order: {
@@ -346,76 +348,6 @@ declare const _default: {
                             };
                         };
                         component: string;
-                    };
-                };
-            };
-        };
-        configuration: {
-            schema: {
-                kind: string;
-                collectionName: string;
-                info: {
-                    singularName: string;
-                    pluralName: string;
-                    displayName: string;
-                };
-                options: {
-                    draftAndPublish: boolean;
-                    comment: string;
-                };
-                pluginOptions: {
-                    "content-manager": {
-                        visible: boolean;
-                    };
-                    "content-type-builder": {
-                        visible: boolean;
-                    };
-                };
-                attributes: {
-                    active: {
-                        type: string;
-                        default: boolean;
-                        required: boolean;
-                    };
-                    token: {
-                        type: string;
-                        required: boolean;
-                        private: boolean;
-                    };
-                    default_currency: {
-                        type: string;
-                        required: boolean;
-                        private: boolean;
-                    };
-                    back_urls: {
-                        type: string;
-                        required: boolean;
-                        private: boolean;
-                    };
-                    webhook_pass: {
-                        type: string;
-                        required: boolean;
-                        private: boolean;
-                    };
-                    notification_url: {
-                        type: string;
-                        required: boolean;
-                        private: boolean;
-                    };
-                    bussiness_description: {
-                        type: string;
-                        required: boolean;
-                        private: boolean;
-                    };
-                    send_emails: {
-                        type: string;
-                        required: boolean;
-                        private: boolean;
-                    };
-                    email: {
-                        type: string;
-                        required: boolean;
-                        private: boolean;
                     };
                 };
             };

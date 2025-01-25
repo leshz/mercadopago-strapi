@@ -43,8 +43,5 @@ declare const _default: {
         }, config: import("../types").config) => Promise<import("mercadopago/dist/clients/preference/commonTypes").PreferenceResponse>;
         paymentHook: (payload: import("../types").PaymentPayload, config: import("../types").config) => Promise<void>;
     };
-    configuration: ({ strapi, }: {
-        strapi: import("@strapi/types/dist/core").Strapi;
-    }) => Partial<import("@strapi/types/dist/core/core-api/service").Base> & import("@strapi/types/dist/core/core-api/service").Generic & import("@strapi/types/dist/core/core-api/service").Base;
 };
 export default _default;

@@ -4,7 +4,15 @@ export default {
     {
       method: 'GET',
       path: '/configuration',
-      handler: 'configuration.find',
+      handler: 'configuration.get',
+      config: {
+        auth: false
+      },
+    },
+    {
+      method: 'POST',
+      path: '/configuration',
+      handler: 'configuration.update',
       config: {
         auth: false
       },

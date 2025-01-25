@@ -1,5 +1,6 @@
 {
-    "mercadopago.plugin.name": "Mercado Pago translation",
-    "mercadopago.setting.header.title": "Mercado Pago",
-    "mercadopago.setting.header.subtitle": "Configure your Mercado Pago settings"
+  "mercadopago.plugin.name": "Mercado Pago",
+  "mercadopago.setting.header.title": "Mercado Pago",
+  "mercadopago.setting.header.subtitle": "Mercado Pago's settings",
+  "mercadopago.setting.header.action": "Save"
 }

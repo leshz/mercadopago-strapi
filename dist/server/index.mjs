@@ -16,13 +16,13 @@ const bootstrap = ({ strapi: strapi2 }) => {
 };
 const destroy = ({ strapi: strapi2 }) => {
 };
-const collectionName$7 = "components_mercadopago_customer";
-const info$7 = {
+const collectionName$6 = "components_mercadopago_customer";
+const info$6 = {
   displayName: "Customer",
   icon: "emotionHappy"
 };
-const options$7 = {};
-const attributes$7 = {
+const options$6 = {};
+const attributes$6 = {
   name: {
     type: "string",
     required: true
@@ -82,10 +82,10 @@ const modelType$1 = "component";
 const modelName$1 = "customer";
 const globalId$1 = "ComponentMercadopagoCustomer";
 const customerSchema = {
-  collectionName: collectionName$7,
-  info: info$7,
-  options: options$7,
-  attributes: attributes$7,
+  collectionName: collectionName$6,
+  info: info$6,
+  options: options$6,
+  attributes: attributes$6,
   __filename__: __filename__$1,
   __schema__: __schema__$1,
   uid: uid$1,
@@ -94,14 +94,14 @@ const customerSchema = {
   modelName: modelName$1,
   globalId: globalId$1
 };
-const collectionName$6 = "components_mercadopago_fulfilment";
-const info$6 = {
+const collectionName$5 = "components_mercadopago_fulfilment";
+const info$5 = {
   displayName: "fulfilment",
   icon: "exit",
   description: ""
 };
-const options$6 = {};
-const attributes$6 = {
+const options$5 = {};
+const attributes$5 = {
   department: {
     type: "string",
     required: true,
@@ -160,10 +160,10 @@ const modelType = "component";
 const modelName = "fulfilment";
 const globalId = "ComponentMercadopagoFulfilment";
 const fulfilmentSchema = {
-  collectionName: collectionName$6,
-  info: info$6,
-  options: options$6,
-  attributes: attributes$6,
+  collectionName: collectionName$5,
+  info: info$5,
+  options: options$5,
+  attributes: attributes$5,
   __filename__,
   __schema__,
   uid,
@@ -172,14 +172,14 @@ const fulfilmentSchema = {
   modelName,
   globalId
 };
-const collectionName$5 = "components_mercadopago_promotion";
-const info$5 = {
+const collectionName$4 = "components_mercadopago_promotion";
+const info$4 = {
   displayName: "Promotion",
   icon: "walk",
   description: ""
 };
-const options$5 = {};
-const attributes$5 = {
+const options$4 = {};
+const attributes$4 = {
   with_discount: {
     type: "boolean",
     "default": false
@@ -204,19 +204,19 @@ const attributes$5 = {
   }
 };
 const promotionSchema = {
-  collectionName: collectionName$5,
-  info: info$5,
-  options: options$5,
-  attributes: attributes$5
+  collectionName: collectionName$4,
+  info: info$4,
+  options: options$4,
+  attributes: attributes$4
 };
-const collectionName$4 = "components_mercadopago_product_information";
-const info$4 = {
+const collectionName$3 = "components_mercadopago_product_information";
+const info$3 = {
   displayName: "information",
   icon: "bell",
   description: ""
 };
-const options$4 = {};
-const attributes$4 = {
+const options$3 = {};
+const attributes$3 = {
   title: {
     type: "string",
     required: true
@@ -227,10 +227,10 @@ const attributes$4 = {
   }
 };
 const informationSchema = {
-  collectionName: collectionName$4,
-  info: info$4,
-  options: options$4,
-  attributes: attributes$4
+  collectionName: collectionName$3,
+  info: info$3,
+  options: options$3,
+  attributes: attributes$3
 };
 const register = ({ strapi: strapi2 }) => {
   const fulfilment = strapi2.components["mercadopago.fulfilment"];
@@ -277,17 +277,17 @@ const config = {
   validator() {
   }
 };
-const kind$3 = "collectionType";
-const collectionName$3 = "orders";
-const info$3 = {
+const kind$2 = "collectionType";
+const collectionName$2 = "orders";
+const info$2 = {
   singularName: "order",
   pluralName: "orders",
   displayName: "Ordenes de compra"
 };
-const options$3 = {
+const options$2 = {
   draftAndPublish: false
 };
-const attributes$3 = {
+const attributes$2 = {
   products: {
     require: true,
     type: "json"
@@ -344,31 +344,31 @@ const attributes$3 = {
     ]
   }
 };
-const schema$4 = {
-  kind: kind$3,
-  collectionName: collectionName$3,
-  info: info$3,
-  options: options$3,
-  attributes: attributes$3
+const schema$3 = {
+  kind: kind$2,
+  collectionName: collectionName$2,
+  info: info$2,
+  options: options$2,
+  attributes: attributes$2
 };
-const order$2 = { schema: schema$4 };
-const kind$2 = "collectionType";
-const collectionName$2 = "categories";
-const info$2 = {
+const order$2 = { schema: schema$3 };
+const kind$1 = "collectionType";
+const collectionName$1 = "categories";
+const info$1 = {
   singularName: "category",
   pluralName: "categories",
   displayName: "Categorias",
   description: ""
 };
-const options$2 = {
+const options$1 = {
   draftAndPublish: false
 };
-const pluginOptions$2 = {
+const pluginOptions$1 = {
   i18n: {
     localized: true
   }
 };
-const attributes$2 = {
+const attributes$1 = {
   name: {
     pluginOptions: {
       i18n: {
@@ -387,32 +387,32 @@ const attributes$2 = {
     targetField: "name"
   }
 };
-const schema$3 = {
-  kind: kind$2,
-  collectionName: collectionName$2,
-  info: info$2,
-  options: options$2,
-  pluginOptions: pluginOptions$2,
-  attributes: attributes$2
+const schema$2 = {
+  kind: kind$1,
+  collectionName: collectionName$1,
+  info: info$1,
+  options: options$1,
+  pluginOptions: pluginOptions$1,
+  attributes: attributes$1
 };
-const category$3 = { schema: schema$3 };
-const kind$1 = "collectionType";
-const collectionName$1 = "products";
-const info$1 = {
+const category$3 = { schema: schema$2 };
+const kind = "collectionType";
+const collectionName = "products";
+const info = {
   singularName: "product",
   pluralName: "products",
   displayName: "Productos",
   description: ""
 };
-const options$1 = {
+const options = {
   draftAndPublish: true
 };
-const pluginOptions$1 = {
+const pluginOptions = {
   i18n: {
     localized: true
   }
 };
-const attributes$1 = {
+const attributes = {
   name: {
     pluginOptions: {
       i18n: {
@@ -517,81 +517,6 @@ const attributes$1 = {
     component: "mercadopago.information"
   }
 };
-const schema$2 = {
-  kind: kind$1,
-  collectionName: collectionName$1,
-  info: info$1,
-  options: options$1,
-  pluginOptions: pluginOptions$1,
-  attributes: attributes$1
-};
-const product$3 = { schema: schema$2 };
-const kind = "singleType";
-const collectionName = "configurations";
-const info = {
-  singularName: "configuration",
-  pluralName: "configurations",
-  displayName: "Mercadopago Config"
-};
-const options = {
-  draftAndPublish: false,
-  comment: ""
-};
-const pluginOptions = {
-  "content-manager": {
-    visible: false
-  },
-  "content-type-builder": {
-    visible: false
-  }
-};
-const attributes = {
-  active: {
-    type: "boolean",
-    "default": false,
-    required: true
-  },
-  token: {
-    type: "string",
-    required: true,
-    "private": true
-  },
-  default_currency: {
-    type: "string",
-    required: true,
-    "private": true
-  },
-  back_urls: {
-    type: "string",
-    required: true,
-    "private": true
-  },
-  webhook_pass: {
-    type: "string",
-    required: true,
-    "private": true
-  },
-  notification_url: {
-    type: "string",
-    required: true,
-    "private": true
-  },
-  bussiness_description: {
-    type: "string",
-    required: true,
-    "private": true
-  },
-  send_emails: {
-    type: "boolean",
-    required: true,
-    "private": true
-  },
-  email: {
-    type: "string",
-    required: true,
-    "private": true
-  }
-};
 const schema$1 = {
   kind,
   collectionName,
@@ -600,8 +525,8 @@ const schema$1 = {
   pluginOptions,
   attributes
 };
-const configuration$3 = { schema: schema$1 };
-const contentTypes = { order: order$2, category: category$3, product: product$3, configuration: configuration$3 };
+const product$3 = { schema: schema$1 };
+const contentTypes = { order: order$2, category: category$3, product: product$3 };
 const category$2 = factories.createCoreController("plugin::strapi-mercadopago.category");
 var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
 function getDefaultExportFromCjs(x) {
@@ -25668,14 +25593,58 @@ const notification$1 = ({ strapi: strapi2 }) => ({
     }
   }
 });
-const configuration$2 = factories.createCoreController("plugin::strapi-mercadopago.configuration");
+const configuration$1 = ({ strapi: strapi2 }) => ({
+  async get(ctx) {
+    const pluginStore = strapi2.store({
+      environment: strapi2.config.environment,
+      type: "plugin",
+      name: "strapi-mercadopago"
+    });
+    const response = await pluginStore.get({ key: "mercadopagoSetting" });
+    return ctx.send({ ok: true, data: response });
+  },
+  async update(ctx) {
+    const { data } = ctx.request.body;
+    const {
+      isActive,
+      mercadoPagoToken,
+      defaultCurrency,
+      backUrls,
+      webhookPass,
+      notificationUrl,
+      bussinessDescription,
+      canSendMails,
+      adminEmail
+    } = data;
+    const pluginStore = strapi2.store({
+      environment: strapi2.config.environment,
+      type: "plugin",
+      name: "strapi-mercadopago"
+    });
+    const response = await pluginStore.set({
+      key: "mercadopagoSetting",
+      value: {
+        isActive,
+        mercadoPagoToken,
+        defaultCurrency,
+        backUrls,
+        webhookPass,
+        notificationUrl,
+        bussinessDescription,
+        canSendMails,
+        adminEmail
+      }
+    });
+    return ctx.send({ ok: true, response });
+  }
+});
 const controllers = {
   category: category$2,
   product: product$2,
   order: order$1,
   checkout: checkout$1,
   notification: notification$1,
-  configuration: configuration$2
+  configuration: configuration$1
 };
 const loadConfig = (options2, { strapi: strapi2 }) => {
   return async (ctx, next) => {
@@ -25891,13 +25860,21 @@ const notification = {
     }
   ]
 };
-const configuration$1 = {
+const configuration = {
   type: "admin",
   routes: [
     {
       method: "GET",
       path: "/configuration",
-      handler: "configuration.find",
+      handler: "configuration.get",
+      config: {
+        auth: false
+      }
+    },
+    {
+      method: "POST",
+      path: "/configuration",
+      handler: "configuration.update",
       config: {
         auth: false
       }
@@ -25910,7 +25887,7 @@ const routes = {
   invoice,
   checkout,
   notification,
-  configuration: configuration$1
+  configuration
 };
 const category = factories.createCoreService("plugin::strapi-mercadopago.category");
 const product = factories.createCoreService("plugin::strapi-mercadopago.product");
@@ -26294,13 +26271,11 @@ const mercadopago = ({ strapi: strapi2 }) => ({
     }
   }
 });
-const configuration = factories.createCoreService("plugin::strapi-mercadopago.configuration");
 const services = {
   category,
   product,
   order,
-  mercadopago,
-  configuration
+  mercadopago
 };
 const index = {
   register,
