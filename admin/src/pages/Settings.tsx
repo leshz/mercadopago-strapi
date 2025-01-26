@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Main, Flex, Box, Toggle, Button } from '@strapi/design-system';
-import { Layouts, ContentBox } from '@strapi/admin/strapi-admin';
+import {
+  Main, Field, Box, Toggle, Button, SingleSelect,
+  SingleSelectOption
+} from '@strapi/design-system';
+import { Layouts } from '@strapi/admin/strapi-admin';
 import { getTranslation } from '../utils/getTranslation';
-import { Check } from '@strapi/icons';
+import { Check, Eye, EyeStriked } from '@strapi/icons';
 
-import { getConfig, setConfig } from '../api/getconfig';
+import { getConfig, setConfig } from '../api';
 
 type Configuration = {
   isActive: boolean,
@@ -21,7 +24,9 @@ type Configuration = {
 
 const SettingsPage = () => {
   const { formatMessage } = useIntl();
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [showToken, setShowToken] = useState<boolean>(false);
+  const [showSignWh, setShowSignWh] = useState<boolean>(false);
 
   const [data, setData] = useState<Configuration>({
     isActive: false,
@@ -48,10 +53,7 @@ const SettingsPage = () => {
     setConfig(data).then(() => {
       setIsLoading(false)
     })
-
   }
-
-  console.log(data)
 
   return (
 
@@ -72,29 +74,98 @@ const SettingsPage = () => {
         }
       />
 
-
       <Box padding={8}>
-        <Flex gap={{
-          initial: 1,
-          medium: 2,
-          large: 2
-        }} direction={{
-          initial: 'column',
-          medium: 'row'
-        }} alignItems={{
-          initial: 'center',
-          medium: 'flex-start'
-        }}>
+        <Toggle
+          onLabel="Encendido"
+          offLabel="Apagado"
+          checked={data.isActive}
+          onChange={() => { setData({ ...data, isActive: !data.isActive }) }}
+        />
+        <Field.Root>
+          <Field.Label>Mercadopago Token</Field.Label>
+          <Field.Input
+            name="token"
+            type={showToken ? "text" : "password"}
+            value={data.mercadoPagoToken}
+            onChange={(ev: any) => {
+              setData({ ...data, mercadoPagoToken: ev.target.value })
+            }}
+            endAction={showToken ? <Eye onClick={() => setShowToken(false)} /> : <EyeStriked onClick={() => setShowToken(true)} />}
+          />
+        </Field.Root>
 
-          <Toggle
-            onLabel="Encendido"
-            offLabel="Apagado"
-            checked={data.isActive} onChange={() => { setData({ ...data, isActive: !data.isActive }) }} />
-        </Flex>
-      </Box>
+        <Field.Root>
+          <Field.Label>Divisa</Field.Label>
+          <SingleSelect
+            value={data.defaultCurrency}
+            onChange={(ev: any) => {
+              setData({ ...data, defaultCurrency: ev })
+            }}>
+            <SingleSelectOption value="ARS">Peso argentino</SingleSelectOption>
+            <SingleSelectOption value="BRL" >Real brasileño</SingleSelectOption>
+            <SingleSelectOption value="CLP">Peso chileno</SingleSelectOption>
+            <SingleSelectOption value="MXN">Peso mexicano</SingleSelectOption>
+            <SingleSelectOption value="COP"> Peso colombiano </SingleSelectOption>
+            <SingleSelectOption value="PEN"> Sol peruano </SingleSelectOption>
+            <SingleSelectOption value="UYU" >Peso uruguayo</SingleSelectOption>
+          </SingleSelect>
+        </Field.Root>
+
+        <Field.Root>
+          <Field.Label>URLS de retorno</Field.Label>
+          <Field.Input
+            name="token"
+            type="text"
+            value={data.backUrls}
+            onChange={(ev: any) => {
+              setData({ ...data, backUrls: ev.target.value })
+            }}
+
+          />
+        </Field.Root>
+
+        <Field.Root>
+          <Field.Label>Firma Webhook</Field.Label>
+          <Field.Input
+            name="webhook"
+            type={showSignWh ? "text" : "password"}
+            value={data.webhookPass}
+            onChange={(ev: any) => {
+              setData({ ...data, webhookPass: ev.target.value })
+            }}
+            endAction={showToken ? <Eye onClick={() => setShowSignWh(false)} /> : <EyeStriked onClick={() => setShowSignWh(true)} />}
+          />
+        </Field.Root>
+
+        <Field.Root>
+          <Field.Label>URL de notificacion</Field.Label>
+          <Field.Input
+            name="webhook"
+            type="text"
+            value={data.notificationUrl}
+            onChange={(ev: any) => {
+              setData({ ...data, notificationUrl: ev.target.value })
+            }}
+          />
+        </Field.Root>
+
+        <Field.Root>
+          <Field.Label>Descripcion del negocio</Field.Label>
+          <Field.Input
+            name="bussinessDescription"
+            type="text"
+            value={data.bussinessDescription}
+            onChange={(ev: any) => {
+              setData({ ...data, bussinessDescription: ev.target.value })
+            }}
+          />
+        </Field.Root>
 
 
-    </Main>
+      </Box >
+
+
+    </Main >
 
 
   );

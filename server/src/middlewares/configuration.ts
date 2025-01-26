@@ -1,24 +1,16 @@
 const loadConfig = (options, { strapi }) => {
   return async (ctx, next) => {
-    const config = await strapi.db
-      .query("plugin::strapi-mercadopago.configuration")
-      .findOne({
-        select: [
-          "active",
-          "token",
-          "webhook_pass",
-          "default_currency",
-          "back_urls",
-          "bussiness_description",
-          "notification_url",
-          "send_emails",
-          "email",
-        ],
-      });
 
-    const { active = false, token = "" } = config || {};
-    if (active && token) {
-      ctx.state.config = config;
+    const pluginStore = strapi.store({
+      environment: strapi.config.environment,
+      type: 'plugin',
+      name: 'strapi-mercadopago',
+    });
+    const response = await pluginStore.get({ key: 'mercadopagoSetting', });
+
+    const { isActive = false, mercadoPagoToken = "" } = response || {};
+    if (isActive && mercadoPagoToken) {
+      ctx.state.config = response;
       return next();
     }
     return ctx.serviceUnavailable("Service Unavailable");

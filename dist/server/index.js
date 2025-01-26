@@ -25538,7 +25538,7 @@ var TYPE_OF_PRODUCTS = /* @__PURE__ */ ((TYPE_OF_PRODUCTS2) => {
 const checkout$1 = ({ strapi: strapi2 }) => ({
   async checkout(ctx, next) {
     const { config: config2 } = ctx.state;
-    const { items, buyer, ship } = ctx.request.body || {};
+    const { items = [], buyer, ship } = ctx.request.body || {};
     if (items.length === 0) return ctx.badRequest();
     try {
       const products = await strapi2.service("plugin::strapi-mercadopago.mercadopago").products(items, config2);
@@ -25661,22 +25661,15 @@ const controllers = {
 };
 const loadConfig = (options2, { strapi: strapi2 }) => {
   return async (ctx, next) => {
-    const config2 = await strapi2.db.query("plugin::strapi-mercadopago.configuration").findOne({
-      select: [
-        "active",
-        "token",
-        "webhook_pass",
-        "default_currency",
-        "back_urls",
-        "bussiness_description",
-        "notification_url",
-        "send_emails",
-        "email"
-      ]
+    const pluginStore = strapi2.store({
+      environment: strapi2.config.environment,
+      type: "plugin",
+      name: "strapi-mercadopago"
     });
-    const { active = false, token = "" } = config2 || {};
-    if (active && token) {
-      ctx.state.config = config2;
+    const response = await pluginStore.get({ key: "mercadopagoSetting" });
+    const { isActive = false, mercadoPagoToken = "" } = response || {};
+    if (isActive && mercadoPagoToken) {
+      ctx.state.config = response;
       return next();
     }
     return ctx.serviceUnavailable("Service Unavailable");

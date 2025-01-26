@@ -11,7 +11,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     const { config }: { config: config } = ctx.state;
 
     //TODO : Add validation
-    const { items, buyer, ship }: request = ctx.request.body || {};
+    const { items = [], buyer, ship }: request = ctx.request.body || {};
     if (items.length === 0) return ctx.badRequest();
 
     try {
