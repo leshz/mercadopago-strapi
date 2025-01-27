@@ -3,22 +3,22 @@ export type Reqproduct = {
   quaity: number;
 };
 
-export type Reqbuyer = {
+export type ReqCustomer = {
   dni: number;
   name: string;
   lastName: string;
   email: string;
   phone: number;
 };
-export type Reqship = {
+export type Reqfulfillment = {
   address: string;
   department: string;
   city: string;
   postalCode?: string;
   message?: string;
 };
-export type request = {
-  buyer: Reqbuyer;
-  ship: Reqship;
+export type CheckoutBody = {
+  customer: ReqCustomer;
+  fulfillment: Reqfulfillment;
   items: Reqproduct[];
 };

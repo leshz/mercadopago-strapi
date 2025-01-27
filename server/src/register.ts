@@ -1,49 +1,24 @@
 import type { Core } from '@strapi/strapi';
 
 import customerSchema from "./components/customer.json";
-import fulfilmentSchema from "./components/fulfilment.json";
+import fulfillmentSchema from "./components/fulfillment.json";
 import promotionSchema from "./components/promotion.json";
 import informationSchema from "./components/information.json";
 
 const register = ({ strapi }: { strapi: Core.Strapi }) => {
-  const fulfilment = strapi.components["mercadopago.fulfilment"];
+  const fulfillment = strapi.components["mercadopago.fulfilment"];
   const customer = strapi.components["mercadopago.customer"];
   const promotion = strapi.components["mercadopago.promotion"];
   const information = strapi.components["mercadopago.information"];
 
-  if (!(fulfilment && customer && promotion && information)) {
+
+  if (!(fulfillment && customer && promotion && information)) {
     strapi.log.warn("Register new components");
-    strapi
-      .plugin("content-type-builder")
-      .services.components.createComponent({
-        component: {
-          category: "mercadopago",
-          displayName: fulfilmentSchema.info.displayName,
-          icon: fulfilmentSchema.info.icon,
-          attributes: fulfilmentSchema.attributes,
-        },
-        components: [
-          {
-            tmpUID: "mercadopago.customer",
-            category: "mercadopago",
-            displayName: customerSchema.info.displayName,
-            icon: customerSchema.info.icon,
-            attributes: customerSchema.attributes,
-          }, {
-            tmpUID: "mercadopago.promotion",
-            category: "mercadopago",
-            displayName: promotionSchema.info.displayName,
-            icon: promotionSchema.info.icon,
-            attributes: promotionSchema.attributes,
-          }, {
-            tmpUID: "mercadopago.information",
-            category: "mercadopago",
-            displayName: informationSchema.info.displayName,
-            icon: informationSchema.info.icon,
-            attributes: informationSchema.attributes,
-          }
-        ],
-      });
+
+    strapi.components["mercadopago.fulfillment"] = fulfillmentSchema as any;
+    strapi.components["mercadopago.customer"] = customerSchema as any;
+    strapi.components["mercadopago.promotion"] = promotionSchema as any;
+    strapi.components["mercadopago.information"] = informationSchema as any;
   }
 };
 

@@ -2,14 +2,14 @@
  *  controller
  */
 import type { Core } from '@strapi/strapi';
-import type { config } from "../types";
+import type { ConfigType } from "../types";
 
 import { NOTIFICATION_TYPES } from "../constants";
 
 export default ({ strapi }: { strapi: Core.Strapi }) => ({
   async notification(ctx) {
     const payload = ctx?.request?.body || {};
-    const { config }: { config: config } = ctx.state;
+    const { config }: { config: ConfigType } = ctx.state;
     const { type = "", action = "" } = payload;
 
     strapi.log.info("Notification activated!");

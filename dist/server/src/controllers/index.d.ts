@@ -11,7 +11,7 @@ declare const _default: {
     checkout: ({ strapi }: {
         strapi: import("@strapi/types/dist/core").Strapi;
     }) => {
-        checkout(ctx: any, next: any): Promise<any>;
+        checkout(ctx: any): Promise<any>;
     };
     notification: ({ strapi }: {
         strapi: import("@strapi/types/dist/core").Strapi;

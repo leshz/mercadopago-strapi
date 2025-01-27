@@ -1,4 +1,4 @@
-export type shipping = {
+export type fulfillment = {
     address: string;
     department: string;
     city: string;

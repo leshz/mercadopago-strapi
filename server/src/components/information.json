@@ -15,5 +15,30 @@
       "type": "blocks",
       "required": true
     }
-  }
+  },
+  "__filename__": "information.json",
+  "__schema__": {
+    "collectionName": "components_mercadopago_product_information",
+    "info": {
+      "displayName": "information",
+      "icon": "bell",
+      "description": ""
+    },
+    "options": {},
+    "attributes": {
+      "title": {
+        "type": "string",
+        "required": true
+      },
+      "information": {
+        "type": "blocks",
+        "required": true
+      }
+    }
+  },
+  "uid": "mercadopago.information",
+  "category": "mercadopago",
+  "modelType": "component",
+  "modelName": "information",
+  "globalId": "ComponentMercadopagoInformation"
 }

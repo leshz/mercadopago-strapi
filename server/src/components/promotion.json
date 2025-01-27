@@ -1,4 +1,37 @@
 {
+  "collectionName": "components_mercadopago_promotion",
+  "info": {
+    "displayName": "Promotion",
+    "icon": "walk",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "with_discount": {
+      "type": "boolean",
+      "default": false
+    },
+    "price_with_discount": {
+      "type": "integer"
+    },
+    "recommended": {
+      "type": "boolean",
+      "default": false
+    },
+    "best_seller": {
+      "type": "boolean",
+      "default": false
+    },
+    "new": {
+      "type": "boolean",
+      "default": false
+    },
+    "discount_tag": {
+      "type": "string"
+    }
+  },
+  "__filename__": "promotion.json",
+  "__schema__": {
     "collectionName": "components_mercadopago_promotion",
     "info": {
       "displayName": "Promotion",
@@ -30,5 +63,10 @@
         "type": "string"
       }
     }
-  }
-  
+  },
+  "uid": "mercadopago.promotion",
+  "category": "mercadopago",
+  "modelType": "component",
+  "modelName": "promotion",
+  "globalId": "ComponentMercadopagoPromotion"
+}

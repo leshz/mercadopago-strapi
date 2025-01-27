@@ -1,10 +1,10 @@
 import type { Core } from "@strapi/strapi";
 
 import crypto from "crypto";
-import { config } from "../types";
+import { ConfigType } from "../types";
 
 
-const verifySign = (option, { strapi }: { strapi: Core.Strapi  }) => {
+const verifySign = ({ strapi }: { strapi: Core.Strapi }) => {
   return async (ctx, next) => {
     try {
       strapi.log.info("VERIFY SIGN");
@@ -20,8 +20,8 @@ const verifySign = (option, { strapi }: { strapi: Core.Strapi  }) => {
       const dataID = queryParams?.["data.id"] || "";
 
       const {
-        config: { webhook_pass },
-      }: { config: config } = ctx.state;
+        config: { webhookPass },
+      }: { config: ConfigType } = ctx.state;
       let ts = "";
       let hash = "";
 
@@ -41,10 +41,10 @@ const verifySign = (option, { strapi }: { strapi: Core.Strapi  }) => {
         });
       }
 
-      console.debug({ ts, hash, dataID, xRequestId, webhook_pass });
+      console.debug({ ts, hash, dataID, xRequestId, webhookPass });
 
       if (ts && hash && dataID && xRequestId) {
-        const secret = webhook_pass;
+        const secret = webhookPass;
         const manifest = `id:${dataID};request-id:${xRequestId};ts:${ts};`;
 
         const hmac = crypto.createHmac("sha256", secret);

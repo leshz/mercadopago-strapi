@@ -1,8 +1,7 @@
 /**
  *  service
  */
-
-import type { buildedProduct, Reqbuyer, Reqship, config } from "../types";
+import type { buildedProduct, fulfillment, Reqfulfillment, ConfigType, resCustomer } from "../types";
 
 import { factories } from "@strapi/strapi";
 import { errors } from "@strapi/utils";
@@ -13,6 +12,14 @@ import {
   productsPricesSummary,
 } from "../helpers";
 
+type CreateInitialOrder = {
+  shipping: Reqfulfillment;
+  shopper: resCustomer;
+  products: buildedProduct[];
+  shipment: fulfillment;
+  config: ConfigType;
+}
+
 export default factories.createCoreService(
   "plugin::strapi-mercadopago.order",
   ({ strapi }) => ({
@@ -22,36 +29,38 @@ export default factories.createCoreService(
       shopper,
       shipment,
       config,
-    }: {
-      shipping: Reqship;
-      shopper: Reqbuyer;
-      products: buildedProduct[];
-      shipment: any;
-      config: config;
-    }) {
+    }: CreateInitialOrder) {
       try {
         const formatedProducts = await strapi
           .service("plugin::strapi-mercadopago.mercadopago")
           .meliProduct(products, config);
-        const productsWithShipment = mergeShipmentAtProducts(
-          formatedProducts,
-          shipment
-        );
-        const { total: subtotal, totalDiscounted } = productsPricesSummary(products);
-        const total = calculateWithShipment(subtotal, shipment);
+
+        const { total, totalDiscounted } = productsPricesSummary(products);
+
+        const data = {
+          payment_status: INVOICES_STATUS.INITIAL,
+          total: total,
+          total_discount: totalDiscounted,
+          products: formatedProducts,
+          payment_link: "",
+          shipping_status: SHIPPING_STATUS.INITIAL,
+          customer: { ...shopper, last_name: shopper.lastName },
+          fulfillment: { ...shipping, postal_code: shipping.postalCode || 0 },
+        };
+        console.log(data)
 
         const savedata = await strapi?.entityService?.create(
-          "plugin::strapi-mercadopago.invoice",
+          "plugin::strapi-mercadopago.order",
           {
             data: {
               payment_status: INVOICES_STATUS.INITIAL,
               total: total,
               total_discount: totalDiscounted,
-              products: productsWithShipment,
+              products: formatedProducts,
               payment_link: "",
               shipping_status: SHIPPING_STATUS.INITIAL,
-              shopper: { ...shopper, last_name: shopper.lastName },
-              shipping: { ...shipping, postal_code: shipping.postalCode || 0 },
+              customer: { ...shopper, last_name: shopper.lastName },
+              fulfillment: { ...shipping, postal_code: shipping.postalCode || 0 },
             },
           }
         );

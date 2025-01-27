@@ -30,4 +30,3 @@ const App = () => {
   ] });
 };
 exports.App = App;
-//# sourceMappingURL=App-BWVWLfJ_.js.map

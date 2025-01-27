@@ -1,17 +1,18 @@
 /**
  *  service
  */
-import type { buildedProduct, Reqbuyer, Reqship, config } from "../types";
+import type { buildedProduct, fulfillment, Reqfulfillment, ConfigType, resCustomer } from "../types";
+type CreateInitialOrder = {
+    shipping: Reqfulfillment;
+    shopper: resCustomer;
+    products: buildedProduct[];
+    shipment: fulfillment;
+    config: ConfigType;
+};
 declare const _default: ({ strapi, }: {
     strapi: import("@strapi/types/dist/core").Strapi;
 }) => {
-    createInitialOrder: ({ shipping, products, shopper, shipment, config, }: {
-        shipping: Reqship;
-        shopper: Reqbuyer;
-        products: buildedProduct[];
-        shipment: any;
-        config: config;
-    }) => Promise<{
+    createInitialOrder: ({ shipping, products, shopper, shipment, config, }: CreateInitialOrder) => Promise<{
         id: import("@strapi/types/dist/data").ID;
     } & {
         [key: string]: any;

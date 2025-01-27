@@ -20435,4 +20435,3 @@ const index = {
 };
 exports.getTranslation = getTranslation;
 exports.index = index;
-//# sourceMappingURL=index-WVrFGn-X.js.map

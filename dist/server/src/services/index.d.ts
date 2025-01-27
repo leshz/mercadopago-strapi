@@ -9,11 +9,11 @@ declare const _default: {
         strapi: import("@strapi/types/dist/core").Strapi;
     }) => {
         createInitialOrder: ({ shipping, products, shopper, shipment, config, }: {
-            shipping: import("../types").Reqship;
-            shopper: import("../types").Reqbuyer;
+            shipping: import("../types").Reqfulfillment;
+            shopper: import("../types").resCustomer;
             products: import("../types").buildedProduct[];
-            shipment: any;
-            config: import("../types").config;
+            shipment: import("../types").fulfillment;
+            config: import("../types").ConfigType;
         }) => Promise<{
             id: import("@strapi/types/dist/data").ID;
         } & {
@@ -32,16 +32,16 @@ declare const _default: {
         strapi: import("@strapi/types/dist/core").Strapi;
     }) => {
         meliProduct: (product: any, config: any) => import("../types").buildedProduct[];
-        products: (items: import("../types").reqProduct[]) => Promise<any[]>;
-        buyer: (buyer: import("../types").buyer, ship: import("../types").shipping) => Promise<import("../types").buyerMeli>;
-        shipment: (shipping: import("../types").shipping, products: any) => Promise<any>;
+        products: (items: import("../types").reqProduct[]) => Promise<import("../types").buildedProduct[]>;
+        parserCustomer: (customer: import("../types").resCustomer, fulfillment: import("../types").fulfillment) => Promise<import("../types").meliCustomer>;
+        shipment: (shipping: import("../types").fulfillment) => Promise<import("../types").fulfillment>;
         createPreference: ({ products, payer, internalInvoiceId, shipment }: {
             products: any;
             payer: any;
             internalInvoiceId: any;
             shipment: any;
-        }, config: import("../types").config) => Promise<import("mercadopago/dist/clients/preference/commonTypes").PreferenceResponse>;
-        paymentHook: (payload: import("../types").PaymentPayload, config: import("../types").config) => Promise<void>;
+        }, config: import("../types").ConfigType) => Promise<import("mercadopago/dist/clients/preference/commonTypes").PreferenceResponse>;
+        paymentHook: (payload: import("../types").PaymentPayload, config: import("../types").ConfigType) => Promise<void>;
     };
 };
 export default _default;

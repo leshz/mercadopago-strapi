@@ -11,7 +11,6 @@
   },
   "attributes": {
     "products": {
-      
       "require": true,
       "type": "json"
     },
@@ -65,6 +64,18 @@
         "cancelled",
         "refunded"
       ]
+    },
+    "fulfillment": {
+      "type": "component",
+      "repeatable": false,
+      "component": "mercadopago.fulfillment",
+      "required": true
+    },
+    "customer": {
+      "type": "component",
+      "repeatable": false,
+      "component": "mercadopago.customer",
+      "required": true
     }
   }
 }

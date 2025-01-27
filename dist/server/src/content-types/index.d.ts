@@ -49,6 +49,18 @@ declare const _default: {
                     type: string;
                     enum: string[];
                 };
+                fulfillment: {
+                    type: string;
+                    repeatable: boolean;
+                    component: string;
+                    required: boolean;
+                };
+                customer: {
+                    type: string;
+                    repeatable: boolean;
+                    component: string;
+                    required: boolean;
+                };
             };
         };
     };

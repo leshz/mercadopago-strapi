@@ -1,23 +1,24 @@
 import type { Core } from "@strapi/strapi";
 import type {
-  config,
+  ConfigType,
   reqProduct,
   buildedProduct,
-  buyer,
-  buyerMeli,
-  shipping,
+  resCustomer,
+  meliCustomer,
+  fulfillment,
   PaymentPayload,
+
 } from "../types";
 
 import { MercadoPagoConfig, Preference, Payment } from "mercadopago";
 
 import { purchase } from "../templates/admin-purchase";
 import { errors } from "@strapi/utils";
-import { INVOICES_STATUS, TYPE_OF_PRODUCTS } from "../constants";
+import { INVOICES_STATUS } from "../constants";
 import { mergeShipmentAtProducts } from "../helpers";
 
-const productFormatter = (products, config: config): buildedProduct[] => {
-  const { default_currency } = config;
+const productFormatter = (products, config: ConfigType): buildedProduct[] => {
+  const { defaultCurrency } = config;
 
   return products.map((product) => {
     const { pictures, promotion, categories, price } = product;
@@ -32,7 +33,7 @@ const productFormatter = (products, config: config): buildedProduct[] => {
       description: product.short_description,
       picture_url: urlImage,
       quantity: product.quantity,
-      currency_id: default_currency,
+      currency_id: defaultCurrency,
       unit_price: finalPriceProduct,
       category_id: categoryId,
     };
@@ -40,10 +41,8 @@ const productFormatter = (products, config: config): buildedProduct[] => {
 };
 
 export default ({ strapi }: { strapi: Core.Strapi }) => ({
-  meliProduct: (product, config) => {
-    return productFormatter(product, config);
-  },
-  products: async (items: reqProduct[]): Promise<any[]> => {
+  meliProduct: (product, config) => productFormatter(product, config),
+  products: async (items: reqProduct[]): Promise<buildedProduct[]> => {
     const attibutes = [
       "id",
       "name",
@@ -51,7 +50,6 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       "short_description",
       "slug",
       "stock",
-      "type",
       "sku",
     ];
 
@@ -87,9 +85,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       };
     });
   },
-  buyer: async (buyer: buyer, ship: shipping): Promise<buyerMeli> => {
-    const { dni, email, lastName, name, phone } = buyer;
-    const { postalCode = "", address, city, department } = ship;
+  parserCustomer: async (customer: resCustomer, fulfillment: fulfillment): Promise<meliCustomer> => {
+    const { dni, email, lastName, name, phone } = customer;
+    const { postalCode = "", address, city, department } = fulfillment;
     const payer = {
       name,
       surname: lastName,
@@ -111,46 +109,23 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
     return payer;
   },
-  shipment: async (shipping: shipping, products): Promise<any> => {
-    const { type: shippingType = "SW01" } = shipping;
-    const includeShipment = products.some(({ type }) => {
-      return type === TYPE_OF_PRODUCTS.PRODUCT;
-    });
-
-    if (includeShipment) {
-      const shipment = await strapi
-        .query("plugin::strapi-mercadopago.shipment")
-        .findOne({
-          select: ["*"],
-          where: { code: shippingType },
-        });
-
-      if (!shipment) {
-        return {};
-      }
-
-      return {
-        id: shipment.code,
-        title: "Cargo de envio",
-        description: "Cargo de envio",
-        quantity: 1,
-        unit_price: shipment.price,
-        currency_id: "COP",
-      };
-    }
-    return {};
-  },
+  shipment: async (shipping: fulfillment): Promise<fulfillment> => shipping,
   createPreference: async (
     { products, payer, internalInvoiceId, shipment },
-    config: config
+    config: ConfigType
   ) => {
-    const { token, back_urls, bussiness_description, notification_url } =
-      config;
+
+    const {
+      mercadoPagoToken,
+      backUrls,
+      bussinessDescription,
+      notificationUrl
+    } = config;
 
     const productsFormmated = productFormatter(products, config);
     const items = mergeShipmentAtProducts(productsFormmated, shipment);
     const client = new MercadoPagoConfig({
-      accessToken: token,
+      accessToken: mercadoPagoToken,
       options: { timeout: 5000, idempotencyKey: "abc" },
     });
 
@@ -160,18 +135,18 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     const metadata = {};
     const body = {
       back_urls: {
-        failure: back_urls,
-        pending: back_urls,
-        success: back_urls,
+        failure: backUrls,
+        pending: backUrls,
+        success: backUrls,
       },
       binary_mode: true,
       external_reference: internalInvoiceId,
       items,
       metadata,
-      notification_url,
+      notificationUrl,
       payer,
       payment_methods,
-      statement_descriptor: bussiness_description,
+      statement_descriptor: bussinessDescription,
     };
     try {
       const response = await preference.create({ body });
@@ -182,8 +157,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       });
     }
   },
-  paymentHook: async (payload: PaymentPayload, config: config) => {
-    const { token = "", send_emails, email } = config;
+  paymentHook: async (payload: PaymentPayload, config: ConfigType) => {
+    const { mercadoPagoToken = "", canSendMails, adminEmail } = config;
     const {
       data: { id = "" },
     } = payload;
@@ -193,7 +168,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     const client = new MercadoPagoConfig({
-      accessToken: token,
+      accessToken: mercadoPagoToken,
       options: { timeout: 5000, idempotencyKey: "abc" },
     });
 
@@ -273,9 +248,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         }
       });
       // TODO : move to service
-      if (send_emails) {
+      if (canSendMails) {
         await strapi.plugins["email"].services.email.send({
-          to: email,
+          to: adminEmail,
           from: "admin@sagradacura.com",
           subject: "Nuevo pedido recibido :)",
           html: purchase,

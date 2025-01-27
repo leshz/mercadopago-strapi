@@ -25,7 +25,7 @@ declare const _default: {
         checkout: ({ strapi }: {
             strapi: import("@strapi/types/dist/core").Strapi;
         }) => {
-            checkout(ctx: any, next: any): Promise<any>;
+            checkout(ctx: any): Promise<any>;
         };
         notification: ({ strapi }: {
             strapi: import("@strapi/types/dist/core").Strapi;
@@ -101,11 +101,11 @@ declare const _default: {
             strapi: import("@strapi/types/dist/core").Strapi;
         }) => {
             createInitialOrder: ({ shipping, products, shopper, shipment, config, }: {
-                shipping: import("./types").Reqship;
-                shopper: import("./types").Reqbuyer;
+                shipping: import("./types").Reqfulfillment;
+                shopper: import("./types").resCustomer;
                 products: import("./types").buildedProduct[];
-                shipment: any;
-                config: import("./types").config;
+                shipment: import("./types").fulfillment;
+                config: import("./types").ConfigType;
             }) => Promise<{
                 id: import("@strapi/types/dist/data").ID;
             } & {
@@ -124,16 +124,16 @@ declare const _default: {
             strapi: import("@strapi/types/dist/core").Strapi;
         }) => {
             meliProduct: (product: any, config: any) => import("./types").buildedProduct[];
-            products: (items: import("./types").reqProduct[]) => Promise<any[]>;
-            buyer: (buyer: import("./types").buyer, ship: import("./types").shipping) => Promise<import("./types").buyerMeli>;
-            shipment: (shipping: import("./types").shipping, products: any) => Promise<any>;
+            products: (items: import("./types").reqProduct[]) => Promise<import("./types").buildedProduct[]>;
+            parserCustomer: (customer: import("./types").resCustomer, fulfillment: import("./types").fulfillment) => Promise<import("./types").meliCustomer>;
+            shipment: (shipping: import("./types").fulfillment) => Promise<import("./types").fulfillment>;
             createPreference: ({ products, payer, internalInvoiceId, shipment }: {
                 products: any;
                 payer: any;
                 internalInvoiceId: any;
                 shipment: any;
-            }, config: import("./types").config) => Promise<import("mercadopago/dist/clients/preference/commonTypes").PreferenceResponse>;
-            paymentHook: (payload: import("./types").PaymentPayload, config: import("./types").config) => Promise<void>;
+            }, config: import("./types").ConfigType) => Promise<import("mercadopago/dist/clients/preference/commonTypes").PreferenceResponse>;
+            paymentHook: (payload: import("./types").PaymentPayload, config: import("./types").ConfigType) => Promise<void>;
         };
     };
     contentTypes: {
@@ -186,6 +186,18 @@ declare const _default: {
                     shipping_status: {
                         type: string;
                         enum: string[];
+                    };
+                    fulfillment: {
+                        type: string;
+                        repeatable: boolean;
+                        component: string;
+                        required: boolean;
+                    };
+                    customer: {
+                        type: string;
+                        repeatable: boolean;
+                        component: string;
+                        required: boolean;
                     };
                 };
             };
@@ -358,7 +370,7 @@ declare const _default: {
         loadConfig: (options: any, { strapi }: {
             strapi: any;
         }) => (ctx: any, next: any) => Promise<any>;
-        verifySign: (option: any, { strapi }: {
+        verifySign: ({ strapi }: {
             strapi: import("@strapi/types/dist/core").Strapi;
         }) => (ctx: any, next: any) => Promise<any>;
         populating: () => (ctx: any, next: any) => Promise<any>;

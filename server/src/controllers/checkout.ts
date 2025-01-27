@@ -2,16 +2,14 @@
  *  controller
  */
 import type { Core } from '@strapi/strapi';
-import type { config, buyerMeli, request } from "../types";
+import type { ConfigType, CheckoutBody } from "../types";
 import { INVOICES_STATUS } from "../constants";
 
 
 export default ({ strapi }: { strapi: Core.Strapi }) => ({
-  async checkout(ctx, next) {
-    const { config }: { config: config } = ctx.state;
-
-    //TODO : Add validation
-    const { items = [], buyer, ship }: request = ctx.request.body || {};
+  async checkout(ctx) {
+    const { config }: { config: ConfigType } = ctx.state;
+    const { items = [], customer, fulfillment }: CheckoutBody = ctx.request.body || {};
     if (items.length === 0) return ctx.badRequest();
 
     try {
@@ -19,19 +17,19 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         .service("plugin::strapi-mercadopago.mercadopago")
         .products(items, config);
 
-      const buyerData: buyerMeli = await strapi
+      const buyerData = await strapi
         .service("plugin::strapi-mercadopago.mercadopago")
-        .buyer(buyer, ship);
+        .parserCustomer(customer, fulfillment);
 
       const shipment = await strapi
         .service("plugin::strapi-mercadopago.mercadopago")
-        .shipment(ship, products);
+        .shipment(fulfillment, products);
 
       const initInvoice = await strapi
         .service("plugin::strapi-mercadopago.order")
         .createInitialOrder({
-          shipping: ship,
-          shopper: buyer,
+          shipping: fulfillment,
+          shopper: customer,
           products,
           shipment,
           config,

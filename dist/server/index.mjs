@@ -44,8 +44,8 @@ const attributes$6 = {
     required: true
   }
 };
-const __filename__$1 = "customer.json";
-const __schema__$1 = {
+const __filename__$3 = "customer.json";
+const __schema__$3 = {
   collectionName: "components_mercadopago_customer",
   info: {
     displayName: "Customer",
@@ -76,27 +76,27 @@ const __schema__$1 = {
   },
   __filename__: "customer.json"
 };
-const uid$1 = "mercadopago.customer";
-const category$5 = "mercadopago";
-const modelType$1 = "component";
-const modelName$1 = "customer";
-const globalId$1 = "ComponentMercadopagoCustomer";
+const uid$3 = "mercadopago.customer";
+const category$7 = "mercadopago";
+const modelType$3 = "component";
+const modelName$3 = "customer";
+const globalId$3 = "ComponentMercadopagoCustomer";
 const customerSchema = {
   collectionName: collectionName$6,
   info: info$6,
   options: options$6,
   attributes: attributes$6,
-  __filename__: __filename__$1,
-  __schema__: __schema__$1,
-  uid: uid$1,
-  category: category$5,
-  modelType: modelType$1,
-  modelName: modelName$1,
-  globalId: globalId$1
+  __filename__: __filename__$3,
+  __schema__: __schema__$3,
+  uid: uid$3,
+  category: category$7,
+  modelType: modelType$3,
+  modelName: modelName$3,
+  globalId: globalId$3
 };
-const collectionName$5 = "components_mercadopago_fulfilment";
+const collectionName$5 = "components_mercadopago_fulfillment";
 const info$5 = {
-  displayName: "fulfilment",
+  displayName: "fulfillment",
   icon: "exit",
   description: ""
 };
@@ -122,11 +122,11 @@ const attributes$5 = {
     type: "text"
   }
 };
-const __filename__ = "fulfilment.json";
-const __schema__ = {
-  collectionName: "components_mercadopago_fulfilment",
+const __filename__$2 = "fulfillment.json";
+const __schema__$2 = {
+  collectionName: "components_mercadopago_fulfillment",
   info: {
-    displayName: "fulfilment",
+    displayName: "fulfillment",
     icon: "exit",
     description: ""
   },
@@ -152,25 +152,25 @@ const __schema__ = {
       type: "text"
     }
   },
-  __filename__: "fulfilment.json"
+  __filename__: "fulfillment.json"
 };
-const uid = "mercadopago.fulfilment";
-const category$4 = "mercadopago";
-const modelType = "component";
-const modelName = "fulfilment";
-const globalId = "ComponentMercadopagoFulfilment";
-const fulfilmentSchema = {
+const uid$2 = "mercadopago.fulfillment";
+const category$6 = "mercadopago";
+const modelType$2 = "component";
+const modelName$2 = "fulfillment";
+const globalId$2 = "ComponentMercadopagofulfillment";
+const fulfillmentSchema = {
   collectionName: collectionName$5,
   info: info$5,
   options: options$5,
   attributes: attributes$5,
-  __filename__,
-  __schema__,
-  uid,
-  category: category$4,
-  modelType,
-  modelName,
-  globalId
+  __filename__: __filename__$2,
+  __schema__: __schema__$2,
+  uid: uid$2,
+  category: category$6,
+  modelType: modelType$2,
+  modelName: modelName$2,
+  globalId: globalId$2
 };
 const collectionName$4 = "components_mercadopago_promotion";
 const info$4 = {
@@ -203,11 +203,57 @@ const attributes$4 = {
     type: "string"
   }
 };
+const __filename__$1 = "promotion.json";
+const __schema__$1 = {
+  collectionName: "components_mercadopago_promotion",
+  info: {
+    displayName: "Promotion",
+    icon: "walk",
+    description: ""
+  },
+  options: {},
+  attributes: {
+    with_discount: {
+      type: "boolean",
+      "default": false
+    },
+    price_with_discount: {
+      type: "integer"
+    },
+    recommended: {
+      type: "boolean",
+      "default": false
+    },
+    best_seller: {
+      type: "boolean",
+      "default": false
+    },
+    "new": {
+      type: "boolean",
+      "default": false
+    },
+    discount_tag: {
+      type: "string"
+    }
+  }
+};
+const uid$1 = "mercadopago.promotion";
+const category$5 = "mercadopago";
+const modelType$1 = "component";
+const modelName$1 = "promotion";
+const globalId$1 = "ComponentMercadopagoPromotion";
 const promotionSchema = {
   collectionName: collectionName$4,
   info: info$4,
   options: options$4,
-  attributes: attributes$4
+  attributes: attributes$4,
+  __filename__: __filename__$1,
+  __schema__: __schema__$1,
+  uid: uid$1,
+  category: category$5,
+  modelType: modelType$1,
+  modelName: modelName$1,
+  globalId: globalId$1
 };
 const collectionName$3 = "components_mercadopago_product_information";
 const info$3 = {
@@ -226,50 +272,55 @@ const attributes$3 = {
     required: true
   }
 };
+const __filename__ = "information.json";
+const __schema__ = {
+  collectionName: "components_mercadopago_product_information",
+  info: {
+    displayName: "information",
+    icon: "bell",
+    description: ""
+  },
+  options: {},
+  attributes: {
+    title: {
+      type: "string",
+      required: true
+    },
+    information: {
+      type: "blocks",
+      required: true
+    }
+  }
+};
+const uid = "mercadopago.information";
+const category$4 = "mercadopago";
+const modelType = "component";
+const modelName = "information";
+const globalId = "ComponentMercadopagoInformation";
 const informationSchema = {
   collectionName: collectionName$3,
   info: info$3,
   options: options$3,
-  attributes: attributes$3
+  attributes: attributes$3,
+  __filename__,
+  __schema__,
+  uid,
+  category: category$4,
+  modelType,
+  modelName,
+  globalId
 };
 const register = ({ strapi: strapi2 }) => {
-  const fulfilment = strapi2.components["mercadopago.fulfilment"];
+  const fulfillment = strapi2.components["mercadopago.fulfilment"];
   const customer = strapi2.components["mercadopago.customer"];
   const promotion = strapi2.components["mercadopago.promotion"];
   const information = strapi2.components["mercadopago.information"];
-  if (!(fulfilment && customer && promotion && information)) {
+  if (!(fulfillment && customer && promotion && information)) {
     strapi2.log.warn("Register new components");
-    strapi2.plugin("content-type-builder").services.components.createComponent({
-      component: {
-        category: "mercadopago",
-        displayName: fulfilmentSchema.info.displayName,
-        icon: fulfilmentSchema.info.icon,
-        attributes: fulfilmentSchema.attributes
-      },
-      components: [
-        {
-          tmpUID: "mercadopago.customer",
-          category: "mercadopago",
-          displayName: customerSchema.info.displayName,
-          icon: customerSchema.info.icon,
-          attributes: customerSchema.attributes
-        },
-        {
-          tmpUID: "mercadopago.promotion",
-          category: "mercadopago",
-          displayName: promotionSchema.info.displayName,
-          icon: promotionSchema.info.icon,
-          attributes: promotionSchema.attributes
-        },
-        {
-          tmpUID: "mercadopago.information",
-          category: "mercadopago",
-          displayName: informationSchema.info.displayName,
-          icon: informationSchema.info.icon,
-          attributes: informationSchema.attributes
-        }
-      ]
-    });
+    strapi2.components["mercadopago.fulfillment"] = fulfillmentSchema;
+    strapi2.components["mercadopago.customer"] = customerSchema;
+    strapi2.components["mercadopago.promotion"] = promotionSchema;
+    strapi2.components["mercadopago.information"] = informationSchema;
   }
 };
 const config = {
@@ -342,6 +393,18 @@ const attributes$2 = {
       "cancelled",
       "refunded"
     ]
+  },
+  fulfillment: {
+    type: "component",
+    repeatable: false,
+    component: "mercadopago.fulfillment",
+    required: true
+  },
+  customer: {
+    type: "component",
+    repeatable: false,
+    component: "mercadopago.customer",
+    required: true
   }
 };
 const schema$3 = {
@@ -25517,23 +25580,18 @@ const METHODS = {
 const NOTIFICATION_TYPES = {
   PAYMENT: "payment"
 };
-var TYPE_OF_PRODUCTS = /* @__PURE__ */ ((TYPE_OF_PRODUCTS2) => {
-  TYPE_OF_PRODUCTS2["PRODUCT"] = "producto";
-  TYPE_OF_PRODUCTS2["SERVICE"] = "servicio";
-  return TYPE_OF_PRODUCTS2;
-})(TYPE_OF_PRODUCTS || {});
 const checkout$1 = ({ strapi: strapi2 }) => ({
-  async checkout(ctx, next) {
+  async checkout(ctx) {
     const { config: config2 } = ctx.state;
-    const { items = [], buyer, ship } = ctx.request.body || {};
+    const { items = [], customer, fulfillment } = ctx.request.body || {};
     if (items.length === 0) return ctx.badRequest();
     try {
       const products = await strapi2.service("plugin::strapi-mercadopago.mercadopago").products(items, config2);
-      const buyerData = await strapi2.service("plugin::strapi-mercadopago.mercadopago").buyer(buyer, ship);
-      const shipment = await strapi2.service("plugin::strapi-mercadopago.mercadopago").shipment(ship, products);
+      const buyerData = await strapi2.service("plugin::strapi-mercadopago.mercadopago").parserCustomer(customer, fulfillment);
+      const shipment = await strapi2.service("plugin::strapi-mercadopago.mercadopago").shipment(fulfillment, products);
       const initInvoice = await strapi2.service("plugin::strapi-mercadopago.order").createInitialOrder({
-        shipping: ship,
-        shopper: buyer,
+        shipping: fulfillment,
+        shopper: customer,
         products,
         shipment,
         config: config2
@@ -25662,7 +25720,7 @@ const loadConfig = (options2, { strapi: strapi2 }) => {
     return ctx.serviceUnavailable("Service Unavailable");
   };
 };
-const verifySign = (option, { strapi: strapi2 }) => {
+const verifySign = ({ strapi: strapi2 }) => {
   return async (ctx, next) => {
     try {
       strapi2.log.info("VERIFY SIGN");
@@ -25676,7 +25734,7 @@ const verifySign = (option, { strapi: strapi2 }) => {
       const xRequestId = ctx.request.headers["x-request-id"] || "";
       const dataID = queryParams?.["data.id"] || "";
       const {
-        config: { webhook_pass }
+        config: { webhookPass }
       } = ctx.state;
       let ts = "";
       let hash = "";
@@ -25695,9 +25753,9 @@ const verifySign = (option, { strapi: strapi2 }) => {
           }
         });
       }
-      console.debug({ ts, hash, dataID, xRequestId, webhook_pass });
+      console.debug({ ts, hash, dataID, xRequestId, webhookPass });
       if (ts && hash && dataID && xRequestId) {
-        const secret = webhook_pass;
+        const secret = webhookPass;
         const manifest = `id:${dataID};request-id:${xRequestId};ts:${ts};`;
         const hmac = require$$1.createHmac("sha256", secret);
         hmac.update(manifest);
@@ -25769,10 +25827,6 @@ const productsPricesSummary = (products) => {
 const mergeShipmentAtProducts = (products, shipment) => {
   const addShipment = Object.keys(shipment).length > 0;
   return addShipment ? [...products, shipment] : products;
-};
-const calculateWithShipment = (total, shipment) => {
-  const addShipment = Object.keys(shipment).length > 0;
-  return addShipment ? total + shipment?.unit_price : total;
 };
 const fieldsImage = [
   "url",
@@ -25896,24 +25950,30 @@ const order = factories.createCoreService(
     }) {
       try {
         const formatedProducts = await strapi2.service("plugin::strapi-mercadopago.mercadopago").meliProduct(products, config2);
-        const productsWithShipment = mergeShipmentAtProducts(
-          formatedProducts,
-          shipment
-        );
-        const { total: subtotal, totalDiscounted } = productsPricesSummary(products);
-        const total = calculateWithShipment(subtotal, shipment);
+        const { total, totalDiscounted } = productsPricesSummary(products);
+        const data = {
+          payment_status: INVOICES_STATUS.INITIAL,
+          total,
+          total_discount: totalDiscounted,
+          products: formatedProducts,
+          payment_link: "",
+          shipping_status: SHIPPING_STATUS.INITIAL,
+          customer: { ...shopper, last_name: shopper.lastName },
+          fulfillment: { ...shipping, postal_code: shipping.postalCode || 0 }
+        };
+        console.log(data);
         const savedata = await strapi2?.entityService?.create(
-          "plugin::strapi-mercadopago.invoice",
+          "plugin::strapi-mercadopago.order",
           {
             data: {
               payment_status: INVOICES_STATUS.INITIAL,
               total,
               total_discount: totalDiscounted,
-              products: productsWithShipment,
+              products: formatedProducts,
               payment_link: "",
               shipping_status: SHIPPING_STATUS.INITIAL,
-              shopper: { ...shopper, last_name: shopper.lastName },
-              shipping: { ...shipping, postal_code: shipping.postalCode || 0 }
+              customer: { ...shopper, last_name: shopper.lastName },
+              fulfillment: { ...shipping, postal_code: shipping.postalCode || 0 }
             }
           }
         );
@@ -26035,7 +26095,7 @@ const purchase = `
 </html>
 `;
 const productFormatter = (products, config2) => {
-  const { default_currency } = config2;
+  const { defaultCurrency } = config2;
   return products.map((product2) => {
     const { pictures, promotion, categories, price } = product2;
     const categoryId = categories?.[0]?.id || 0;
@@ -26048,16 +26108,14 @@ const productFormatter = (products, config2) => {
       description: product2.short_description,
       picture_url: urlImage,
       quantity: product2.quantity,
-      currency_id: default_currency,
+      currency_id: defaultCurrency,
       unit_price: finalPriceProduct,
       category_id: categoryId
     };
   });
 };
 const mercadopago = ({ strapi: strapi2 }) => ({
-  meliProduct: (product2, config2) => {
-    return productFormatter(product2, config2);
-  },
+  meliProduct: (product2, config2) => productFormatter(product2, config2),
   products: async (items) => {
     const attibutes = [
       "id",
@@ -26066,7 +26124,6 @@ const mercadopago = ({ strapi: strapi2 }) => ({
       "short_description",
       "slug",
       "stock",
-      "type",
       "sku"
     ];
     if (!strapi2.db) throw new errors.ApplicationError("Service not Available");
@@ -26093,9 +26150,9 @@ const mercadopago = ({ strapi: strapi2 }) => ({
       };
     });
   },
-  buyer: async (buyer, ship) => {
-    const { dni, email, lastName, name, phone } = buyer;
-    const { postalCode = "", address, city, department } = ship;
+  parserCustomer: async (customer, fulfillment) => {
+    const { dni, email, lastName, name, phone } = customer;
+    const { postalCode = "", address, city, department } = fulfillment;
     const payer = {
       name,
       surname: lastName,
@@ -26116,36 +26173,18 @@ const mercadopago = ({ strapi: strapi2 }) => ({
     };
     return payer;
   },
-  shipment: async (shipping, products) => {
-    const { type: shippingType = "SW01" } = shipping;
-    const includeShipment = products.some(({ type: type2 }) => {
-      return type2 === TYPE_OF_PRODUCTS.PRODUCT;
-    });
-    if (includeShipment) {
-      const shipment = await strapi2.query("plugin::strapi-mercadopago.shipment").findOne({
-        select: ["*"],
-        where: { code: shippingType }
-      });
-      if (!shipment) {
-        return {};
-      }
-      return {
-        id: shipment.code,
-        title: "Cargo de envio",
-        description: "Cargo de envio",
-        quantity: 1,
-        unit_price: shipment.price,
-        currency_id: "COP"
-      };
-    }
-    return {};
-  },
+  shipment: async (shipping) => shipping,
   createPreference: async ({ products, payer, internalInvoiceId, shipment }, config2) => {
-    const { token, back_urls, bussiness_description, notification_url } = config2;
+    const {
+      mercadoPagoToken,
+      backUrls,
+      bussinessDescription,
+      notificationUrl
+    } = config2;
     const productsFormmated = productFormatter(products, config2);
     const items = mergeShipmentAtProducts(productsFormmated, shipment);
     const client = new MercadoPagoConfig({
-      accessToken: token,
+      accessToken: mercadoPagoToken,
       options: { timeout: 5e3, idempotencyKey: "abc" }
     });
     const preference = new Preference(client);
@@ -26153,18 +26192,18 @@ const mercadopago = ({ strapi: strapi2 }) => ({
     const metadata = {};
     const body = {
       back_urls: {
-        failure: back_urls,
-        pending: back_urls,
-        success: back_urls
+        failure: backUrls,
+        pending: backUrls,
+        success: backUrls
       },
       binary_mode: true,
       external_reference: internalInvoiceId,
       items,
       metadata,
-      notification_url,
+      notificationUrl,
       payer,
       payment_methods,
-      statement_descriptor: bussiness_description
+      statement_descriptor: bussinessDescription
     };
     try {
       const response = await preference.create({ body });
@@ -26176,7 +26215,7 @@ const mercadopago = ({ strapi: strapi2 }) => ({
     }
   },
   paymentHook: async (payload, config2) => {
-    const { token = "", send_emails, email } = config2;
+    const { mercadoPagoToken = "", canSendMails, adminEmail } = config2;
     const {
       data: { id = "" }
     } = payload;
@@ -26184,7 +26223,7 @@ const mercadopago = ({ strapi: strapi2 }) => ({
       return;
     }
     const client = new MercadoPagoConfig({
-      accessToken: token,
+      accessToken: mercadoPagoToken,
       options: { timeout: 5e3, idempotencyKey: "abc" }
     });
     if (id === "") {
@@ -26242,9 +26281,9 @@ const mercadopago = ({ strapi: strapi2 }) => ({
           strapi2.log.info(`Product without update: ${product2.id}`);
         }
       });
-      if (send_emails) {
+      if (canSendMails) {
         await strapi2.plugins["email"].services.email.send({
-          to: email,
+          to: adminEmail,
           from: "admin@sagradacura.com",
           subject: "Nuevo pedido recibido :)",
           html: purchase
