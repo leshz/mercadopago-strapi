@@ -8,7 +8,7 @@
     "description": ""
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {
     "i18n": {
@@ -71,7 +71,7 @@
       },
       "required": true,
       "unique": false,
-      "max": 100
+      "max": 1000
     },
     "sku": {
       "pluginOptions": {
@@ -79,7 +79,9 @@
           "localized": false
         }
       },
-      "type": "string"
+      "type": "string",
+      "unique": true,
+      "required": true
     },
     "promotion": {
       "displayName": "Promotion",

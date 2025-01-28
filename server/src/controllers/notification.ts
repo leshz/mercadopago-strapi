@@ -12,19 +12,23 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     const { config }: { config: ConfigType } = ctx.state;
     const { type = "", action = "" } = payload;
 
-    strapi.log.info("Notification activated!");
+    console.log(payload);
+
 
     switch (type) {
       case NOTIFICATION_TYPES.PAYMENT:
-        strapi.log.info("Payment Action");
-        await strapi
-          .service("plugin::strapi-mercadopago.mercadopago")
-          .paymentHook(payload, config);
-        return ctx.send();
+        try {
+          await strapi
+            .service("plugin::strapi-mercadopago.mercadopago")
+            .paymentAction(payload, config);
+          return ctx.send();
+        } catch (error) {
+          return ctx.internalServerError(error.message);
+        }
 
       default:
-        strapi.log.info(`Meli Webhook type: ${type}`);
-        strapi.log.info(`Meli Webhook action: ${action}`);
+        strapi.log.info(`Webhook type: ${type}`);
+        strapi.log.info(`Webhook action: ${action}`);
         return ctx.send();
     }
   },

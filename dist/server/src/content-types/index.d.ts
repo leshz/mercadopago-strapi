@@ -186,6 +186,8 @@ declare const _default: {
                         };
                     };
                     type: string;
+                    unique: boolean;
+                    required: boolean;
                 };
                 promotion: {
                     displayName: string;

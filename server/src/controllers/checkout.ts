@@ -13,26 +13,17 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     if (items.length === 0) return ctx.badRequest();
 
     try {
-      const products = await strapi
-        .service("plugin::strapi-mercadopago.mercadopago")
-        .products(items, config);
 
-      const buyerData = await strapi
-        .service("plugin::strapi-mercadopago.mercadopago")
-        .parserCustomer(customer, fulfillment);
-
-      const shipment = await strapi
-        .service("plugin::strapi-mercadopago.mercadopago")
-        .shipment(fulfillment, products);
+      const rawProducts = await strapi
+        .service("plugin::strapi-mercadopago.product")
+        .getProducts(items);
 
       const initInvoice = await strapi
         .service("plugin::strapi-mercadopago.order")
         .createInitialOrder({
-          shipping: fulfillment,
-          shopper: customer,
-          products,
-          shipment,
-          config,
+          fulfillment,
+          customer,
+          rawProducts,
         });
 
       if (!initInvoice) {
@@ -41,13 +32,21 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         });
       }
 
+      const customerParsed = await strapi
+        .service("plugin::strapi-mercadopago.mercadopago")
+        .parserCustomer(customer, fulfillment);
+
+      const fulfillmentParsed = await strapi
+        .service("plugin::strapi-mercadopago.mercadopago")
+        .parserFulfillment(fulfillment);
+
       const preference = await strapi
         .service("plugin::strapi-mercadopago.mercadopago")
         .createPreference(
           {
-            products,
-            payer: buyerData,
-            shipment,
+            rawProducts,
+            payer: customerParsed,
+            fulfillmentParsed,
             internalInvoiceId: initInvoice.id,
           },
           config
@@ -56,7 +55,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       const { id, init_point, collector_id } = preference;
       const updatedInvoice = await strapi
         .service("plugin::strapi-mercadopago.order")
-        .updateInvoice({
+        .updateOrder({
           id: initInvoice.id,
           data: {
             ...initInvoice,
@@ -74,8 +73,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         invoiceId: updatedInvoice.id,
       });
     } catch (error) {
-      strapi.log.error(error);
-      return ctx.internalServerError({ error });
+      return ctx.internalServerError(error.message, {});
     }
   },
 });

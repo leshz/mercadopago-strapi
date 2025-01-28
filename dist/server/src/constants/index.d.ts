@@ -10,7 +10,6 @@ export declare const SHIPPING_STATUS: {
     REFUNDED: string;
 };
 export declare const URLS: {
-    readonly CHECK: "/";
     readonly CHECKOUT: "/checkout";
     readonly WEBHOOK: "/notifications";
 };

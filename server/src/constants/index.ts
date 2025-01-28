@@ -21,7 +21,6 @@ export const SHIPPING_STATUS = {
 };
 
 export const URLS = {
-  CHECK: "/",
   CHECKOUT: "/checkout",
   WEBHOOK: "/notifications",
 } as const;

@@ -118,7 +118,7 @@ const attributes$5 = {
   department: {
     type: "string",
     required: true,
-    unique: true
+    unique: false
   },
   city: {
     type: "string",
@@ -481,7 +481,7 @@ const info = {
   description: ""
 };
 const options = {
-  draftAndPublish: true
+  draftAndPublish: false
 };
 const pluginOptions = {
   i18n: {
@@ -546,7 +546,7 @@ const attributes = {
     },
     required: true,
     unique: false,
-    max: 100
+    max: 1e3
   },
   sku: {
     pluginOptions: {
@@ -554,7 +554,9 @@ const attributes = {
         localized: false
       }
     },
-    type: "string"
+    type: "string",
+    unique: true,
+    required: true
   },
   promotion: {
     displayName: "Promotion",
@@ -25580,7 +25582,6 @@ const SHIPPING_STATUS = {
   REFUNDED: "refunded"
 };
 const URLS = {
-  CHECK: "/",
   CHECKOUT: "/checkout",
   WEBHOOK: "/notifications"
 };
@@ -25599,32 +25600,30 @@ const checkout$1 = ({ strapi: strapi2 }) => ({
     const { items = [], customer, fulfillment } = ctx.request.body || {};
     if (items.length === 0) return ctx.badRequest();
     try {
-      const products = await strapi2.service("plugin::strapi-mercadopago.mercadopago").products(items, config2);
-      const buyerData = await strapi2.service("plugin::strapi-mercadopago.mercadopago").parserCustomer(customer, fulfillment);
-      const shipment = await strapi2.service("plugin::strapi-mercadopago.mercadopago").shipment(fulfillment, products);
+      const rawProducts = await strapi2.service("plugin::strapi-mercadopago.product").getProducts(items);
       const initInvoice = await strapi2.service("plugin::strapi-mercadopago.order").createInitialOrder({
-        shipping: fulfillment,
-        shopper: customer,
-        products,
-        shipment,
-        config: config2
+        fulfillment,
+        customer,
+        rawProducts
       });
       if (!initInvoice) {
         ctx.internalServerError("Creating invoice Error", {
           controller: "createInvoice"
         });
       }
+      const customerParsed = await strapi2.service("plugin::strapi-mercadopago.mercadopago").parserCustomer(customer, fulfillment);
+      const fulfillmentParsed = await strapi2.service("plugin::strapi-mercadopago.mercadopago").parserFulfillment(fulfillment);
       const preference = await strapi2.service("plugin::strapi-mercadopago.mercadopago").createPreference(
         {
-          products,
-          payer: buyerData,
-          shipment,
+          rawProducts,
+          payer: customerParsed,
+          fulfillmentParsed,
           internalInvoiceId: initInvoice.id
         },
         config2
       );
       const { id, init_point, collector_id } = preference;
-      const updatedInvoice = await strapi2.service("plugin::strapi-mercadopago.order").updateInvoice({
+      const updatedInvoice = await strapi2.service("plugin::strapi-mercadopago.order").updateOrder({
         id: initInvoice.id,
         data: {
           ...initInvoice,
@@ -25641,8 +25640,7 @@ const checkout$1 = ({ strapi: strapi2 }) => ({
         invoiceId: updatedInvoice.id
       });
     } catch (error2) {
-      strapi2.log.error(error2);
-      return ctx.internalServerError({ error: error2 });
+      return ctx.internalServerError(error2.message, {});
     }
   }
 });
@@ -25651,15 +25649,18 @@ const notification$1 = ({ strapi: strapi2 }) => ({
     const payload = ctx?.request?.body || {};
     const { config: config2 } = ctx.state;
     const { type: type2 = "", action = "" } = payload;
-    strapi2.log.info("Notification activated!");
+    console.log(payload);
     switch (type2) {
       case NOTIFICATION_TYPES.PAYMENT:
-        strapi2.log.info("Payment Action");
-        await strapi2.service("plugin::strapi-mercadopago.mercadopago").paymentHook(payload, config2);
-        return ctx.send();
+        try {
+          await strapi2.service("plugin::strapi-mercadopago.mercadopago").paymentAction(payload, config2);
+          return ctx.send();
+        } catch (error2) {
+          return ctx.internalServerError(error2.message);
+        }
       default:
-        strapi2.log.info(`Meli Webhook type: ${type2}`);
-        strapi2.log.info(`Meli Webhook action: ${action}`);
+        strapi2.log.info(`Webhook type: ${type2}`);
+        strapi2.log.info(`Webhook action: ${action}`);
         return ctx.send();
     }
   }
@@ -25733,13 +25734,12 @@ const loadConfig = (options2, { strapi: strapi2 }) => {
     return ctx.serviceUnavailable("Service Unavailable");
   };
 };
-const verifySign = ({ strapi: strapi2 }) => {
+const verifySign = (config2, { strapi: strapi2 }) => {
   return async (ctx, next) => {
+    const { isActiveVerification = false } = ctx.state.config;
     try {
-      strapi2.log.info("VERIFY SIGN");
-      const FF = (process.env.FF_VERIFICATION_SIGN ?? "true") === "true";
-      if (!FF) {
-        strapi2.log.warn("⚠️ FF_VERIFICATION_SIGN: DEACTIVATED");
+      if (!isActiveVerification) {
+        strapi2.log.warn("VERIFICATION SIGN: DEACTIVATED");
         return next();
       }
       const queryParams = ctx.request.query || {};
@@ -25792,8 +25792,7 @@ const verifySign = ({ strapi: strapi2 }) => {
       }
     } catch (error2) {
       strapi2.log.error("Error Sign Auth Middleware");
-      strapi2.log.error(error2);
-      return ctx.serviceUnavailable("Service Unavailable");
+      return ctx.serviceUnavailable("Service Unavailable", { details: "Error Sign Auth" });
     }
   };
 };
@@ -25836,10 +25835,6 @@ const productsPricesSummary = (products) => {
     totalDiscounted,
     total
   };
-};
-const mergeShipmentAtProducts = (products, shipment) => {
-  const addShipment = Object.keys(shipment).length > 0;
-  return addShipment ? [...products, shipment] : products;
 };
 const fieldsImage = [
   "url",
@@ -25950,186 +25945,8 @@ const routes = {
   configuration
 };
 const category = strapi$1.factories.createCoreService("plugin::strapi-mercadopago.category");
-const product = strapi$1.factories.createCoreService("plugin::strapi-mercadopago.product");
-const order = strapi$1.factories.createCoreService(
-  "plugin::strapi-mercadopago.order",
-  ({ strapi: strapi2 }) => ({
-    async createInitialOrder({
-      shipping,
-      products,
-      shopper,
-      shipment,
-      config: config2
-    }) {
-      try {
-        const formatedProducts = await strapi2.service("plugin::strapi-mercadopago.mercadopago").meliProduct(products, config2);
-        const { total, totalDiscounted } = productsPricesSummary(products);
-        const data = {
-          payment_status: INVOICES_STATUS.INITIAL,
-          total,
-          total_discount: totalDiscounted,
-          products: formatedProducts,
-          payment_link: "",
-          shipping_status: SHIPPING_STATUS.INITIAL,
-          customer: { ...shopper, last_name: shopper.lastName },
-          fulfillment: { ...shipping, postal_code: shipping.postalCode || 0 }
-        };
-        console.log(data);
-        const savedata = await strapi2?.entityService?.create(
-          "plugin::strapi-mercadopago.order",
-          {
-            data: {
-              payment_status: INVOICES_STATUS.INITIAL,
-              total,
-              total_discount: totalDiscounted,
-              products: formatedProducts,
-              payment_link: "",
-              shipping_status: SHIPPING_STATUS.INITIAL,
-              customer: { ...shopper, last_name: shopper.lastName },
-              fulfillment: { ...shipping, postal_code: shipping.postalCode || 0 }
-            }
-          }
-        );
-        return savedata;
-      } catch (error2) {
-        console.log(JSON.stringify(error2, null, 2));
-        throw new errors.ApplicationError(error2.message, {
-          service: "createInitialOrder"
-        });
-      }
-    },
-    updateInvoice: async ({ id, data }) => {
-      try {
-        const savedata = await strapi2.entityService?.update(
-          "plugin::strapi-mercadopago.invoice",
-          id,
-          { data }
-        );
-        return savedata;
-      } catch (error2) {
-        throw new errors.ApplicationError(error2.message, {
-          service: "updateInvoice"
-        });
-      }
-    }
-  })
-);
-const purchase = `
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <style type="text/css">
-        body { margin: 0; padding: 0; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
-        table, td { border-collapse: collapse; }
-        img { border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; }
-        p { display: block; margin: 13px 0; }
-        @media only screen and (min-width: 480px) {
-            .mj-column-per-100 { width: 100% !important; max-width: 100%; }
-        }
-        @media only screen and (max-width: 479px) {
-            table.mj-full-width-mobile { width: 100% !important; }
-            td.mj-full-width-mobile { width: auto !important; }
-        }
-        p, h1, h2, h3 { margin: 0px; }
-        ul, li, ol { font-size: 11px; font-family: Ubuntu, Helvetica, Arial; }
-        a { text-decoration: none; color: inherit; }
-        @media only screen and (max-width: 480px) {
-            .mj-column-per-100 { width: 100% !important; max-width: 100% !important; }
-        }
-    </style>
-</head>
-<body style="word-spacing: normal; background-color: #ffffff">
-    <div style="background-color: #ffffff">
-        <div style="margin: 0px auto; max-width: 600px">
-            <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width: 100%">
-                <tbody>
-                    <tr>
-                        <td style="direction: ltr; font-size: 0px; padding: 10px 0px; text-align: center;">
-                            <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size: 0px; text-align: left; direction: ltr; display: inline-block; vertical-align: top; width: 100%;">
-                                <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align: top" width="100%">
-                                    <tbody>
-                                        <tr>
-                                            <td align="center" style="font-size: 0px; padding: 0px;">
-                                                <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse: collapse;">
-                                                    <tbody>
-                                                        <tr>
-                                                            <td style="width: 200px">
-                                                                <img src="https://strapi-aws-develop-bucket.s3.us-east-2.amazonaws.com/sagradacura_black_82be04c33f.svg" style="border: 0; display: block; outline: none; text-decoration: none; height: auto; width: 100%; font-size: 13px;" width="600" height="auto"/>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td align="left" style="font-size: 0px; padding: 15px;">
-                                                <div style="font-family: Ubuntu, Helvetica, Arial, sans-serif; font-size: 13px; line-height: 1.5; text-align: left; color: #000000;">
-                                                    <h1 style="font-family: Ubuntu, sans-serif; font-size: 22px; text-align: center;">! Tienes un nuevo pedido ! 🥳</h1>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td align="left" style="font-size: 0px; padding: 15px;">
-                                                <div style="font-family: Ubuntu, Helvetica, Arial, sans-serif; font-size: 13px; line-height: 1.5; text-align: left; color: #000000;">
-                                                    <p style="font-family: Ubuntu, sans-serif; font-size: 11px;">
-                                                        <span style="font-size: 17px">Revisa la pagina de administrador para ver la informacion de compra y la informacion del envio &#x1F601;</span>
-                                                    </p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td align="center" style="font-size: 0px; padding: 20px;">
-                                                <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse: separate; width: auto; line-height: 100%;">
-                                                    <tbody>
-                                                        <tr>
-                                                            <td align="center" bgcolor="#0092FF" role="presentation" style="border: none; border-radius: 5px; cursor: auto; font-style: normal; background: #0092ff;" valign="middle">
-                                                                <a href="https://sagradacura.shztech.dev/admin/content-manager/collection-types/plugin::strapi-ecommerce-mercadopago.invoice?page=1&pageSize=10&sort=id:DESC" style="display: inline-block; background: #0092ff; color: #ffffff; font-family: Ubuntu, Helvetica, Arial, sans-serif, Helvetica, Arial, sans-serif; font-size: 13px; font-style: normal; font-weight: normal; line-height: 100%; margin: 0; text-decoration: none; text-transform: none; padding: 15px 20px; border-radius: 5px;" target="_blank">
-                                                                    <span>Ver orden de compra</span>
-                                                                </a>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</body>
-</html>
-`;
-const productFormatter = (products, config2) => {
-  const { defaultCurrency } = config2;
-  return products.map((product2) => {
-    const { pictures, promotion, categories, price } = product2;
-    const categoryId = categories?.[0]?.id || 0;
-    const { with_discount = false, price_with_discount = 0 } = promotion || {};
-    const finalPriceProduct = with_discount ? price_with_discount : price;
-    const urlImage = pictures?.[0]?.url || "";
-    return {
-      id: product2.sku,
-      title: product2.name,
-      description: product2.short_description,
-      picture_url: urlImage,
-      quantity: product2.quantity,
-      currency_id: defaultCurrency,
-      unit_price: finalPriceProduct,
-      category_id: categoryId
-    };
-  });
-};
-const mercadopago = ({ strapi: strapi2 }) => ({
-  meliProduct: (product2, config2) => productFormatter(product2, config2),
-  products: async (items) => {
+const product = strapi$1.factories.createCoreService("plugin::strapi-mercadopago.product", ({ strapi: strapi2 }) => ({
+  getProducts: async (items) => {
     const attibutes = [
       "id",
       "name",
@@ -26147,7 +25964,7 @@ const mercadopago = ({ strapi: strapi2 }) => ({
       populate: ["pictures", "promotion", "categories"]
     });
     if (results.length === 0)
-      throw new errors.ApplicationError("products are not availables");
+      throw new errors.ApplicationError("products are not available");
     return results.map((product2) => {
       const productSelected = items.find(({ sku: sku2 }) => sku2 === product2.sku);
       if (productSelected?.quantity > product2.stock) {
@@ -26160,6 +25977,73 @@ const mercadopago = ({ strapi: strapi2 }) => ({
         ...product2,
         stock: null,
         quantity: productSelected?.quantity
+      };
+    });
+  }
+}));
+const order = strapi$1.factories.createCoreService(
+  "plugin::strapi-mercadopago.order",
+  ({ strapi: strapi2 }) => ({
+    async createInitialOrder({
+      fulfillment,
+      rawProducts,
+      customer
+    }) {
+      try {
+        const { total, totalDiscounted } = productsPricesSummary(rawProducts);
+        const savedata = await strapi2.entityService.create("plugin::strapi-mercadopago.order", {
+          data: {
+            payment_status: INVOICES_STATUS.INITIAL,
+            total,
+            total_discount: totalDiscounted,
+            products: rawProducts,
+            payment_link: "",
+            shipping_status: SHIPPING_STATUS.INITIAL,
+            customer: { ...customer, last_name: customer.lastName },
+            fulfillment: { ...fulfillment, postal_code: fulfillment.postalCode || "" }
+          }
+        });
+        return savedata;
+      } catch (error2) {
+        throw new errors.ApplicationError(error2.message, {
+          service: "createInitialOrder"
+        });
+      }
+    },
+    updateOrder: async ({ id, data }) => {
+      try {
+        const savedata = await strapi2.entityService.update(
+          "plugin::strapi-mercadopago.order",
+          id,
+          { data }
+        );
+        return savedata;
+      } catch (error2) {
+        throw new errors.ApplicationError(error2.message, {
+          service: "updateOrder"
+        });
+      }
+    }
+  })
+);
+const mercadopago = ({ strapi: strapi2 }) => ({
+  parserProducts: async (rawProducts, config2) => {
+    const { defaultCurrency } = config2;
+    return rawProducts.map((product2) => {
+      const { pictures, promotion, categories, price } = product2;
+      const categoryId = categories?.[0]?.id || 0;
+      const { with_discount = false, price_with_discount = 0 } = promotion || {};
+      const finalPriceProduct = with_discount ? price_with_discount : price;
+      const urlImage = pictures?.[0]?.url || "";
+      return {
+        id: product2.sku,
+        title: product2.name,
+        description: product2.short_description,
+        picture_url: urlImage,
+        quantity: product2.quantity,
+        currency_id: defaultCurrency,
+        unit_price: finalPriceProduct,
+        category_id: categoryId
       };
     });
   },
@@ -26186,22 +26070,21 @@ const mercadopago = ({ strapi: strapi2 }) => ({
     };
     return payer;
   },
-  shipment: async (shipping) => shipping,
-  createPreference: async ({ products, payer, internalInvoiceId, shipment }, config2) => {
+  parserFulfillment: async (shipping) => shipping,
+  createPreference: async ({ rawProducts, payer, internalInvoiceId }, config2) => {
     const {
       mercadoPagoToken,
       backUrls,
       bussinessDescription,
       notificationUrl
     } = config2;
-    const productsFormmated = productFormatter(products, config2);
-    const items = mergeShipmentAtProducts(productsFormmated, shipment);
+    const productsFormmated = await strapi2.service("plugin::strapi-mercadopago.mercadopago").parserProducts(rawProducts, config2);
     const client = new mercadopago$1.MercadoPagoConfig({
       accessToken: mercadoPagoToken,
       options: { timeout: 5e3, idempotencyKey: "abc" }
     });
     const preference = new mercadopago$1.Preference(client);
-    const payment_methods = { installments: 24, default_installments: 1 };
+    const payment_methods = { installments: 12, default_installments: 1 };
     const metadata = {};
     const body = {
       back_urls: {
@@ -26211,9 +26094,9 @@ const mercadopago = ({ strapi: strapi2 }) => ({
       },
       binary_mode: true,
       external_reference: internalInvoiceId,
-      items,
+      items: productsFormmated,
       metadata,
-      notificationUrl,
+      notification_url: notificationUrl,
       payer,
       payment_methods,
       statement_descriptor: bussinessDescription
@@ -26227,14 +26110,11 @@ const mercadopago = ({ strapi: strapi2 }) => ({
       });
     }
   },
-  paymentHook: async (payload, config2) => {
-    const { mercadoPagoToken = "", canSendMails, adminEmail } = config2;
+  paymentAction: async (payload, config2) => {
+    const { mercadoPagoToken = "" } = config2;
     const {
       data: { id = "" }
     } = payload;
-    if (Number(id) === 123456) {
-      return;
-    }
     const client = new mercadopago$1.MercadoPagoConfig({
       accessToken: mercadoPagoToken,
       options: { timeout: 5e3, idempotencyKey: "abc" }
@@ -26245,74 +26125,71 @@ const mercadopago = ({ strapi: strapi2 }) => ({
       });
     }
     const paymentService = new mercadopago$1.Payment(client);
-    const response = await paymentService.get({ id });
-    const {
-      status: status2,
-      additional_info,
-      external_reference: invoiceId,
-      payment_type_id = ""
-    } = response;
-    const { items = [], ip_address } = additional_info || {};
-    const invoice2 = await strapi2.query("plugin::strapi-mercadopago.invoice").findOne({
-      select: ["*"],
-      where: { id: invoiceId }
-    });
-    if (invoice2 === null) {
-      strapi2.log.info(`Invoice: not found`);
-      return;
-    }
-    if (invoice2.status === INVOICES_STATUS.APPROVED) {
-      strapi2.log.info(`Invoice: On retry but it has status approved`);
-      return;
-    }
-    if (status2 === INVOICES_STATUS.APPROVED) {
-      strapi2.log.info(`TO THE MOON 🚀`);
-      await strapi2.query("plugin::strapi-mercadopago.invoice").update({
-        where: { id: invoiceId },
-        data: {
-          payment_status: status2,
-          paid_with: payment_type_id
-        }
+    try {
+      const paymentData = await paymentService.get({ id });
+      const {
+        status: status2,
+        additional_info,
+        external_reference: invoiceId,
+        payment_type_id = ""
+      } = paymentData;
+      const { items = [], ip_address } = additional_info || {};
+      const invoice2 = await strapi2.query("plugin::strapi-mercadopago.order").findOne({
+        select: ["*"],
+        where: { id: invoiceId }
       });
-      strapi2.log.info(
-        `Invoice: ${invoiceId} has been updated with Status: ${status2}`
-      );
-      await items.forEach(async (product2) => {
-        const dbproduct = await strapi2.query("plugin::strapi-mercadopago.product").findOne({ where: { sku: product2.id } });
-        if (dbproduct) {
-          const newStock = Number(dbproduct.stock) - Number(product2.quantity);
-          await strapi2.query("plugin::strapi-mercadopago.product").update({
-            where: { sku: product2.id },
-            data: {
-              stock: newStock
-            }
-          });
-          strapi2.log.info(
-            `Product: ${dbproduct.sku} has been updated with Stock: ${newStock}`
-          );
-        } else {
-          strapi2.log.info(`Product without update: ${product2.id}`);
-        }
-      });
-      if (canSendMails) {
-        await strapi2.plugins["email"].services.email.send({
-          to: adminEmail,
-          from: "admin@sagradacura.com",
-          subject: "Nuevo pedido recibido :)",
-          html: purchase
+      if (invoice2 === null) {
+        strapi2.log.info(`Invoice: not found`);
+        throw new errors.ApplicationError("Invoice: not found", {
+          service: "paymentAction"
         });
       }
-    } else {
-      await strapi2.query("plugin::strapi-mercadopago.invoice").update({
-        where: { id: invoiceId },
-        data: {
-          status: status2,
-          paid_with: payment_type_id
-        }
-      });
-      strapi2.log.info(
-        `Invoice: ${invoiceId} has been updated with Status: ${status2}`
-      );
+      if (invoice2.status === INVOICES_STATUS.APPROVED) {
+        strapi2.log.warn(`Order: On retry but it has status approved`);
+        return;
+      }
+      if (status2 === INVOICES_STATUS.APPROVED) {
+        await strapi2.query("plugin::strapi-mercadopago.order").update({
+          where: { id: invoiceId },
+          data: {
+            payment_status: status2,
+            paid_with: payment_type_id
+          }
+        });
+        strapi2.log.info(
+          `Invoice: ${invoiceId} has been updated with Status: ${status2}`
+        );
+        await items.forEach(async (product2) => {
+          const dbproduct = await strapi2.query("plugin::strapi-mercadopago.product").findOne({ where: { sku: product2.id } });
+          if (dbproduct) {
+            const newStock = Number(dbproduct.stock) - Number(product2.quantity);
+            await strapi2.query("plugin::strapi-mercadopago.product").update({
+              where: { sku: product2.id },
+              data: {
+                stock: newStock
+              }
+            });
+            strapi2.log.info(
+              `Product: ${dbproduct.sku} has been updated with Stock: ${newStock}`
+            );
+          } else {
+            strapi2.log.info(`Product without update: ${product2.id}`);
+          }
+        });
+      } else {
+        await strapi2.query("plugin::strapi-mercadopago.order").update({
+          where: { id: invoiceId },
+          data: {
+            status: status2,
+            paid_with: payment_type_id
+          }
+        });
+        strapi2.log.info(
+          `Invoice: ${invoiceId} has been updated with Status: ${status2}`
+        );
+      }
+    } catch (error2) {
+      throw new errors.ApplicationError(error2.message);
     }
   }
 });

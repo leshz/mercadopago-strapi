@@ -96,22 +96,22 @@ declare const _default: {
         }) => Partial<import("@strapi/types/dist/core/core-api/service").Base> & import("@strapi/types/dist/core/core-api/service").Generic & import("@strapi/types/dist/core/core-api/service").Base;
         product: ({ strapi, }: {
             strapi: import("@strapi/types/dist/core").Strapi;
-        }) => Partial<import("@strapi/types/dist/core/core-api/service").Base> & import("@strapi/types/dist/core/core-api/service").Generic & import("@strapi/types/dist/core/core-api/service").Base;
+        }) => {
+            getProducts: (items: import("./types").reqProduct[]) => Promise<import("./types").buildedProduct[]>;
+        } & import("@strapi/types/dist/core/core-api/service").Base;
         order: ({ strapi, }: {
             strapi: import("@strapi/types/dist/core").Strapi;
         }) => {
-            createInitialOrder: ({ shipping, products, shopper, shipment, config, }: {
-                shipping: import("./types").Reqfulfillment;
-                shopper: import("./types").resCustomer;
-                products: import("./types").buildedProduct[];
-                shipment: import("./types").fulfillment;
-                config: import("./types").ConfigType;
+            createInitialOrder: ({ fulfillment, rawProducts, customer, }: {
+                fulfillment: import("./types").Reqfulfillment;
+                customer: import("./types").resCustomer;
+                rawProducts: import("./types").buildedProduct[];
             }) => Promise<{
                 id: import("@strapi/types/dist/data").ID;
             } & {
                 [key: string]: any;
             }>;
-            updateInvoice: ({ id, data }: {
+            updateOrder: ({ id, data }: {
                 id: any;
                 data: any;
             }) => Promise<{
@@ -123,17 +123,15 @@ declare const _default: {
         mercadopago: ({ strapi }: {
             strapi: import("@strapi/types/dist/core").Strapi;
         }) => {
-            meliProduct: (product: any, config: any) => import("./types").buildedProduct[];
-            products: (items: import("./types").reqProduct[]) => Promise<import("./types").buildedProduct[]>;
+            parserProducts: (rawProducts: any, config: import("./types").ConfigType) => Promise<any>;
             parserCustomer: (customer: import("./types").resCustomer, fulfillment: import("./types").fulfillment) => Promise<import("./types").meliCustomer>;
-            shipment: (shipping: import("./types").fulfillment) => Promise<import("./types").fulfillment>;
-            createPreference: ({ products, payer, internalInvoiceId, shipment }: {
-                products: any;
+            parserFulfillment: (shipping: import("./types").fulfillment) => Promise<import("./types").fulfillment>;
+            createPreference: ({ rawProducts, payer, internalInvoiceId }: {
+                rawProducts: any;
                 payer: any;
                 internalInvoiceId: any;
-                shipment: any;
             }, config: import("./types").ConfigType) => Promise<import("mercadopago/dist/clients/preference/commonTypes").PreferenceResponse>;
-            paymentHook: (payload: import("./types").PaymentPayload, config: import("./types").ConfigType) => Promise<void>;
+            paymentAction: (payload: import("./types").PaymentPayload, config: import("./types").ConfigType) => Promise<void>;
         };
     };
     contentTypes: {
@@ -324,6 +322,8 @@ declare const _default: {
                             };
                         };
                         type: string;
+                        unique: boolean;
+                        required: boolean;
                     };
                     promotion: {
                         displayName: string;
@@ -370,7 +370,7 @@ declare const _default: {
         loadConfig: (options: any, { strapi }: {
             strapi: any;
         }) => (ctx: any, next: any) => Promise<any>;
-        verifySign: ({ strapi }: {
+        verifySign: (config: any, { strapi }: {
             strapi: import("@strapi/types/dist/core").Strapi;
         }) => (ctx: any, next: any) => Promise<any>;
         populating: () => (ctx: any, next: any) => Promise<any>;

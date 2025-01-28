@@ -4,14 +4,12 @@ import crypto from "crypto";
 import { ConfigType } from "../types";
 
 
-const verifySign = ({ strapi }: { strapi: Core.Strapi }) => {
+const verifySign = (config, { strapi }: { strapi: Core.Strapi }) => {
   return async (ctx, next) => {
+    const { isActiveVerification = false } = ctx.state.config;
     try {
-      strapi.log.info("VERIFY SIGN");
-      const FF = (process.env.FF_VERIFICATION_SIGN ?? "true") === "true";
-
-      if (!FF) {
-        strapi.log.warn("⚠️ FF_VERIFICATION_SIGN: DEACTIVATED");
+      if (!isActiveVerification) {
+        strapi.log.warn("VERIFICATION SIGN: DEACTIVATED");
         return next();
       }
       const queryParams = ctx.request.query || {};
@@ -71,8 +69,7 @@ const verifySign = ({ strapi }: { strapi: Core.Strapi }) => {
       }
     } catch (error) {
       strapi.log.error("Error Sign Auth Middleware");
-      strapi.log.error(error);
-      return ctx.serviceUnavailable("Service Unavailable");
+      return ctx.serviceUnavailable("Service Unavailable", { details: "Error Sign Auth" });
     }
   };
 };
