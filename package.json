@@ -67,5 +67,8 @@
   "description": "mercadopago payments to use with strapi  5",
   "license": "MIT",
   "author": "Jeff Barragan <leshz@me.com>",
-  "main": "index.js"
+  "main": "index.js",
+  "engines": {
+    "node": ">=20.17.0"
+  }
 }
