@@ -7,4 +7,3 @@ const es = {
 export {
   es as default
 };
-//# sourceMappingURL=es-CHtAdAgu.mjs.map

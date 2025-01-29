@@ -7,4 +7,3 @@ const en = {
 export {
   en as default
 };
-//# sourceMappingURL=en-CVBUb9hD.mjs.map

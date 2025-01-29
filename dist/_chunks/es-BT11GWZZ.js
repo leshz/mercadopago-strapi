@@ -7,4 +7,3 @@ const es = {
   "mercadopago.setting.header.action": "Guardar"
 };
 exports.default = es;
-//# sourceMappingURL=es-BT11GWZZ.js.map

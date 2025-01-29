@@ -25672,8 +25672,7 @@ const configuration$1 = ({ strapi: strapi2 }) => ({
       webhookPass,
       notificationUrl,
       bussinessDescription,
-      canSendMails,
-      adminEmail
+      isActiveVerification
     } = data;
     const pluginStore = strapi2.store({
       environment: strapi2.config.environment,
@@ -25690,8 +25689,7 @@ const configuration$1 = ({ strapi: strapi2 }) => ({
         webhookPass,
         notificationUrl,
         bussinessDescription,
-        canSendMails,
-        adminEmail
+        isActiveVerification
       }
     });
     return ctx.send({ ok: true, response });
@@ -26201,4 +26199,3 @@ const index = {
 export {
   index as default
 };
-//# sourceMappingURL=index.mjs.map
