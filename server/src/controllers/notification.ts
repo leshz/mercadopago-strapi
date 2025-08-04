@@ -12,8 +12,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     const { config }: { config: ConfigType } = ctx.state;
     const { type = "", action = "" } = payload;
 
-    console.log(payload);
-
+    strapi.log.info(`Webhook type: ${type}`);
+    strapi.log.info(`Webhook action: ${action}`);
 
     switch (type) {
       case NOTIFICATION_TYPES.PAYMENT:
@@ -21,7 +21,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           await strapi
             .service("plugin::strapi-mercadopago.mercadopago")
             .paymentAction(payload, config);
-          return ctx.send();
+          return ctx.send({
+            message: "Webhook received",
+          }, 200);
         } catch (error) {
           return ctx.internalServerError(error.message);
         }
@@ -29,7 +31,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       default:
         strapi.log.info(`Webhook type: ${type}`);
         strapi.log.info(`Webhook action: ${action}`);
-        return ctx.send();
+        return ctx.send({
+          message: "Webhook received",
+        }, 200);
     }
   },
 });

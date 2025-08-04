@@ -152,7 +152,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         });
       }
 
-      if (invoice.status === INVOICES_STATUS.APPROVED) {
+      if (invoice.payment_status === INVOICES_STATUS.APPROVED) {
         strapi.log.warn(`Order: On retry but it has status approved`);
         return
       }
