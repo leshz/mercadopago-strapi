@@ -38,6 +38,10 @@
       "type": "string",
       "required": false
     },
+    "payment_id": {
+      "type": "string",
+      "required": false
+    },
     "payment_status": {
       "type": "enumeration",
       "required": true,

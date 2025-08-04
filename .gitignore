@@ -32,7 +32,8 @@ $RECYCLE.BIN/
 *.msi
 *.msm
 *.msp
-
+dist/
+build/
 
 ############################
 # Packages
