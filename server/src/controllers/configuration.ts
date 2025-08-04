@@ -24,8 +24,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       webhookPass,
       notificationUrl,
       bussinessDescription,
-      canSendMails,
-      adminEmail,
+      isActiveVerification
     } = data;
 
     const pluginStore = strapi.store({
@@ -45,8 +44,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         webhookPass,
         notificationUrl,
         bussinessDescription,
-        canSendMails,
-        adminEmail,
+        isActiveVerification
       },
     });
 

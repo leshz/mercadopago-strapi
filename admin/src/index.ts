@@ -6,19 +6,19 @@ import { SettingsPage } from "./pages/Settings";
 
 export default {
   register(app: any) {
-    app.addMenuLink({
-      to: `plugins/${PLUGIN_ID}`,
-      icon: PluginIcon,
-      intlLabel: {
-        id: `${PLUGIN_ID}.plugin.name`,
-        defaultMessage: "Mercadopago",
-      },
-      Component: async () => {
-        const { App } = await import('./pages/App');
-
-        return App;
-      },
-    });
+    // TODO: next release create a dashboard
+    // app.addMenuLink({
+    //   to: `plugins/${PLUGIN_ID}`,
+    //   icon: PluginIcon,
+    //   intlLabel: {
+    //     id: `${PLUGIN_ID}.plugin.name`,
+    //     defaultMessage: "Mercadopago",
+    //   },
+    //   Component: async () => {
+    //     const { App } = await import('./pages/App');
+    //     return App;
+    //   },
+    // });
 
     const settingsBaseName = `${PLUGIN_ID}-configuracion`;
 
@@ -52,8 +52,6 @@ export default {
   },
 
   boostrap(app: any) {
-    app.getPlugin('content-manager').injectComponent('editView', 'right-links', { name: 'prueba', Component: () => SettingsPage })
-
   },
   async registerTrads({ locales }: { locales: string[] }) {
     return Promise.all(
