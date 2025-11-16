@@ -24,58 +24,81 @@ A powerful plugin for integrating **MercadoPago** integration with **Strapi** CM
 
 ## 🏗️ Architecture & Improvements
 
-> **⭐ NEW:** Comprehensive architecture analysis and improvement proposals available!
+> **⚠️ IMPORTANT:** This plugin has critical security issues that must be addressed before production use.
 
-We've conducted an in-depth review of the plugin architecture and identified opportunities for improvement based on **Clean Code principles** and **Strapi v5 best practices**.
+We've conducted a comprehensive review and created an actionable improvement plan based on **Service Layer Pattern** and **Strapi v5 best practices**.
 
-### 📚 Documentation Available
+### 📚 Documentation
 
-- **[GUIA_MEJORAS.md](./GUIA_MEJORAS.md)** - START HERE
-  - Master guide with navigation and quick decision flowchart
-  - Reading time: 10-25 minutes depending on your needs
+#### 🔴 [FIXES_CRITICOS_SEGURIDAD.md](./FIXES_CRITICOS_SEGURIDAD.md) - **START HERE**
+**Critical security fixes that MUST be implemented before production.**
 
-- **[COMPARACION_ARQUITECTURAS.md](./COMPARACION_ARQUITECTURAS.md)** - RECOMMENDED
-  - Detailed comparison: Clean Architecture vs Service Layer Pattern
-  - Includes scoring matrix (8.5/10 vs 6.5/10)
-  - Reading time: 15 minutes
+- ⚠️ 8 critical security vulnerabilities identified
+- 🔧 Step-by-step fixes with code examples
+- ⏱️ Implementation time: 1-2 weeks
+- 🎯 Priority: **URGENT**
 
-- **[ARQUITECTURAS_PRAGMATICAS.md](./ARQUITECTURAS_PRAGMATICAS.md)** ⭐
-  - Service Layer Pattern proposal (RECOMMENDED for this plugin)
-  - Implementation time: 6 weeks
-  - Reading time: 20 minutes
+**Issues covered:**
+1. Unprotected configuration endpoints (anyone can read your MercadoPago token!)
+2. Secrets stored in plaintext in database
+3. Missing input validation (injection vulnerabilities)
+4. Race conditions in stock management
+5. Static idempotency key (breaks payment protection)
+6. forEach with async (operations not completed)
+7. Sensitive data in logs
+8. console.log instead of structured logging
 
-- **[MEJORAS_ARQUITECTURA_LIMPIA.md](./MEJORAS_ARQUITECTURA_LIMPIA.md)**
-  - Complete Clean Architecture proposal
-  - 45+ improvements identified
-  - Implementation time: 12 weeks
-  - Reading time: 30 minutes
+#### 📘 [PLAN_MIGRACION_SERVICE_LAYER.md](./PLAN_MIGRACION_SERVICE_LAYER.md)
+**Complete migration plan to Service Layer Pattern architecture.**
 
-### 🚨 Critical Issues Identified
+- 🏗️ Service Layer Pattern (recommended architecture)
+- 📅 Week-by-week implementation plan (4 weeks)
+- 💻 Complete code examples for all services
+- ✅ Testing strategy and checklist
+- 📊 Before/after architecture comparison
 
-Before using this plugin in production, please review:
+**Refactoring includes:**
+- Separating `sdk.ts` (218 lines) into focused services
+- Creating gateway abstraction for MercadoPago API
+- Implementing single-responsibility services
+- Adding comprehensive tests (>80% coverage)
 
-1. **Security vulnerabilities** (8 critical issues)
-   - Unprotected configuration endpoints
-   - Secrets stored in plaintext
-   - Missing input validation
-   - Race conditions in stock management
+### ⚠️ Critical Issues Summary
 
-2. **Architecture improvements** (30+ suggestions)
-   - Service layer separation
-   - Transaction handling
-   - Idempotency implementation
-   - Testing strategy
+**Before production deployment, you MUST fix:**
 
-**👉 [Read the full analysis](./GUIA_MEJORAS.md)**
+| Issue | Risk | Location |
+|-------|------|----------|
+| Unprotected config endpoints | 🔴 Critical | `routes/configuration.ts` |
+| Plaintext secrets in DB | 🔴 Critical | `middlewares/configuration.ts` |
+| No input validation | 🔴 Critical | `controllers/checkout.ts` |
+| Race condition in stock | 🔴 Critical | `services/sdk.ts:177` |
+| Static idempotency key | 🔴 Critical | `services/sdk.ts:79` |
 
-### ⭐ Recommended Path
+### 🚀 Recommended Implementation Path
 
+```bash
+# Step 1: Security Fixes (URGENT - 1-2 weeks)
+📖 Read FIXES_CRITICOS_SEGURIDAD.md
+✅ Implement all 8 critical fixes
+🧪 Test security improvements
+
+# Step 2: Architecture Refactoring (4 weeks)
+📖 Read PLAN_MIGRACION_SERVICE_LAYER.md
+✅ Week 1: Create gateway and helpers
+✅ Week 2: Refactor checkout services
+✅ Week 3: Refactor payment services
+✅ Week 4: Testing and documentation
 ```
-1. Read GUIA_MEJORAS.md (10 min)
-2. Review critical security issues
-3. Decide on architecture: Service Layer Pattern (recommended)
-4. Start with Phase 1: Security fixes (2 weeks)
-```
+
+### 💡 Why Service Layer Pattern?
+
+- ✅ Works **with** Strapi (uses factories and Entity Service)
+- ✅ Minimal friction (no complex abstractions)
+- ✅ Fast implementation (4 weeks vs 12 weeks for Clean Architecture)
+- ✅ Easy to understand and maintain
+- ✅ Testable without complex mocking
+- ✅ Each service <60 lines (vs 218 lines monolith)
 
 ---
 
