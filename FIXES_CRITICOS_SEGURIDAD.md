@@ -79,19 +79,22 @@ curl -H "Authorization: Bearer ADMIN_TOKEN" \
 ---
 
 ## 2. Mover Secretos a Variables de Entorno
+## 2. Cifrar Secretos en Plugin Store
 
 ### ❌ Problema Actual
 
-**Ubicación:** `server/src/middlewares/configuration.ts`
+**Ubicación:** `server/src/controllers/configuration.ts`
 
 ```typescript
-// Los tokens se guardan en la base de datos sin cifrado
-const config = await strapi
-  .store({ type: "plugin", name: "strapi-mercadopago" })
-  .get({ key: "configuration" });
-
-// config.mercadoPagoToken está en texto plano en DB
-// config.webhookPass está en texto plano en DB
+// Los tokens se guardan en plugin store sin cifrado
+const response = await pluginStore.set({
+  key: 'mercadopagoSetting',
+  value: {
+    mercadoPagoToken,  // ⚠️ Texto plano en DB
+    webhookPass,       // ⚠️ Texto plano en DB
+    // ... otros campos
+  },
+});
 ```
 
 **Riesgo:**
@@ -99,67 +102,216 @@ const config = await strapi
 - Accesibles si hay SQL injection
 - Visibles en logs de DB
 
-### ✅ Solución
+**Contexto importante:**
+- El token se configura desde el **Admin Panel de Strapi** (interfaz UI)
+- Los usuarios ingresan el token en un formulario (ver `admin/src/pages/Settings.tsx:128`)
+- **NO puede ir a variables de entorno** porque usuarios no técnicos no tienen acceso
+- Plugin Store es la forma correcta según Strapi para configuraciones de plugins
 
-**Paso 1:** Crear archivo de configuración
+###✅ Solución
+
+**Opción 1: Cifrar con Crypto de Node.js (Recomendado para Producción)**
+
+**Paso 1:** Crear utilidad de cifrado
 
 ```typescript
-// config/plugins.ts
-export default ({ env }) => ({
-  'strapi-mercadopago': {
-    enabled: true,
-    config: {
-      // Secretos desde variables de entorno
-      mercadoPagoToken: env('MERCADOPAGO_ACCESS_TOKEN'),
-      webhookPass: env('MERCADOPAGO_WEBHOOK_SECRET'),
+// server/src/utils/encryption.ts
+import crypto from 'crypto';
 
-      // Configuración no sensible puede venir de DB o env
-      defaultCurrency: env('MERCADOPAGO_CURRENCY', 'COP'),
-      backUrls: env('MERCADOPAGO_BACK_URL'),
-      notificationUrl: env('MERCADOPAGO_NOTIFICATION_URL'),
-      isActiveVerification: env.bool('MERCADOPAGO_VERIFY_WEBHOOKS', true),
+const ALGORITHM = 'aes-256-gcm';
+const IV_LENGTH = 16;
+const TAG_LENGTH = 16;
+const SALT_LENGTH = 64;
+const TAG_POSITION = SALT_LENGTH + IV_LENGTH;
+const ENCRYPTED_POSITION = TAG_POSITION + TAG_LENGTH;
+
+/**
+ * Obtiene la clave de cifrado desde la configuración de Strapi
+ */
+function getEncryptionKey(strapi): Buffer {
+  // Usar la misma clave que Strapi usa para API tokens
+  const key = strapi.config.get('admin.apiToken.secrets.encryptionKey');
+
+  if (!key) {
+    throw new Error(
+      'Encryption key not configured. Add ENCRYPTION_KEY to .env'
+    );
+  }
+
+  return crypto.scryptSync(key, 'salt', 32);
+}
+
+/**
+ * Cifra un valor sensible
+ */
+export function encrypt(text: string, strapi): string {
+  if (!text) return text;
+
+  const key = getEncryptionKey(strapi);
+  const iv = crypto.randomBytes(IV_LENGTH);
+  const salt = crypto.randomBytes(SALT_LENGTH);
+
+  const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
+
+  const encrypted = Buffer.concat([
+    cipher.update(String(text), 'utf8'),
+    cipher.final(),
+  ]);
+
+  const tag = cipher.getAuthTag();
+
+  return Buffer.concat([salt, iv, tag, encrypted]).toString('hex');
+}
+
+/**
+ * Descifra un valor sensible
+ */
+export function decrypt(encryptedText: string, strapi): string {
+  if (!encryptedText) return encryptedText;
+
+  try {
+    const key = getEncryptionKey(strapi);
+    const stringValue = Buffer.from(String(encryptedText), 'hex');
+
+    const salt = stringValue.subarray(0, SALT_LENGTH);
+    const iv = stringValue.subarray(SALT_LENGTH, TAG_POSITION);
+    const tag = stringValue.subarray(TAG_POSITION, ENCRYPTED_POSITION);
+    const encrypted = stringValue.subarray(ENCRYPTED_POSITION);
+
+    const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
+    decipher.setAuthTag(tag);
+
+    return decipher.update(encrypted) + decipher.final('utf8');
+  } catch (error) {
+    // Si falla el descifrado, puede ser texto plano (migración)
+    strapi.log.warn('Failed to decrypt value, returning as-is');
+    return encryptedText;
+  }
+}
+```
+
+**Paso 2:** Configurar encryption key
+
+```typescript
+// config/admin.ts (o admin.js)
+export default ({ env }) => ({
+  // ... otras configuraciones
+  apiToken: {
+    salt: env('API_TOKEN_SALT'),
+    secrets: {
+      // ✅ Esta clave se usa para cifrar tokens Y secretos del plugin
+      encryptionKey: env('ENCRYPTION_KEY'),
     },
   },
 });
 ```
 
-**Paso 2:** Agregar a .env
+**Paso 3:** Agregar a .env
 
 ```bash
 # .env
-MERCADOPAGO_ACCESS_TOKEN=APP_USR-xxxxxxxxxx
-MERCADOPAGO_WEBHOOK_SECRET=your-webhook-secret
-MERCADOPAGO_CURRENCY=COP
-MERCADOPAGO_BACK_URL=https://yoursite.com/payment-result
-MERCADOPAGO_NOTIFICATION_URL=https://yoursite.com/strapi-mercadopago/notifications
-MERCADOPAGO_VERIFY_WEBHOOKS=true
+# Generar con: node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+ENCRYPTION_KEY=tu-clave-aleatoria-de-32-bytes-en-base64
+
+# También necesitas
+API_TOKEN_SALT=tu-salt-aleatorio
 ```
 
-**Paso 3:** Actualizar middleware de configuración
+**Paso 4:** Actualizar controller para cifrar al guardar
+
+```typescript
+// server/src/controllers/configuration.ts
+import { encrypt, decrypt } from '../utils/encryption';
+
+export default ({ strapi }) => ({
+  async get(ctx) {
+    const pluginStore = strapi.store({
+      environment: strapi.config.environment,
+      type: 'plugin',
+      name: 'strapi-mercadopago',
+    });
+
+    const config = await pluginStore.get({ key: 'mercadopagoSetting' });
+
+    if (!config) {
+      return ctx.send({ ok: true, data: null });
+    }
+
+    // ✅ Descifrar antes de enviar al admin
+    const decryptedConfig = {
+      ...config,
+      mercadoPagoToken: decrypt(config.mercadoPagoToken, strapi),
+      webhookPass: decrypt(config.webhookPass, strapi),
+    };
+
+    return ctx.send({ ok: true, data: decryptedConfig });
+  },
+
+  async update(ctx) {
+    const { data } = ctx.request.body;
+    const {
+      isActive,
+      mercadoPagoToken,
+      defaultCurrency,
+      backUrls,
+      webhookPass,
+      notificationUrl,
+      bussinessDescription,
+      isActiveVerification,
+    } = data;
+
+    const pluginStore = strapi.store({
+      environment: strapi.config.environment,
+      type: 'plugin',
+      name: 'strapi-mercadopago',
+    });
+
+    // ✅ Cifrar antes de guardar
+    const response = await pluginStore.set({
+      key: 'mercadopagoSetting',
+      value: {
+        isActive,
+        mercadoPagoToken: encrypt(mercadoPagoToken, strapi),
+        defaultCurrency,
+        backUrls,
+        webhookPass: encrypt(webhookPass, strapi),
+        notificationUrl,
+        bussinessDescription,
+        isActiveVerification,
+      },
+    });
+
+    return ctx.send({ ok: true, response });
+  },
+});
+```
+
+**Paso 5:** Actualizar middleware para descifrar al leer
 
 ```typescript
 // server/src/middlewares/configuration.ts
+import { decrypt } from '../utils/encryption';
+
 export const loadConfig = (config, { strapi }) => {
   return async (ctx, next) => {
-    // Obtener config desde plugin config (viene de env)
-    const pluginConfig = strapi.config.get('plugin.strapi-mercadopago');
+    const pluginStore = strapi.store({
+      environment: strapi.config.environment,
+      type: 'plugin',
+      name: 'strapi-mercadopago',
+    });
 
-    if (!pluginConfig?.mercadoPagoToken) {
+    const storedConfig = await pluginStore.get({ key: 'mercadopagoSetting' });
+
+    if (!storedConfig?.mercadoPagoToken) {
       strapi.log.error('MercadoPago token not configured');
       return ctx.serviceUnavailable('Payment service not configured');
     }
 
-    // Mezclar con configuración de DB (solo campos no sensibles)
-    const dbConfig = await strapi
-      .store({ type: 'plugin', name: 'strapi-mercadopago' })
-      .get({ key: 'configuration' });
-
+    // ✅ Descifrar secretos al cargar
     ctx.state.config = {
-      ...pluginConfig,
-      // DB solo para config no sensible
-      bussinessDescription: dbConfig?.bussinessDescription || 'My Store',
-      canSendMails: dbConfig?.canSendMails || false,
-      adminEmail: dbConfig?.adminEmail || '',
+      ...storedConfig,
+      mercadoPagoToken: decrypt(storedConfig.mercadoPagoToken, strapi),
+      webhookPass: decrypt(storedConfig.webhookPass, strapi),
     };
 
     await next();
@@ -167,28 +319,40 @@ export const loadConfig = (config, { strapi }) => {
 };
 ```
 
-**Paso 4:** Agregar .env al .gitignore
+---
 
-```bash
-# .gitignore
-.env
-.env.*
-!.env.example
-```
+**Opción 2: Protección sin Cifrado (Más Simple, Solo para Desarrollo/Staging)**
 
-**Paso 5:** Crear .env.example
+Si decides no implementar cifrado por ahora, asegúrate de tener estas protecciones:
 
-```bash
-# .env.example
-# MercadoPago Configuration
-MERCADOPAGO_ACCESS_TOKEN=your-access-token-here
-MERCADOPAGO_WEBHOOK_SECRET=your-webhook-secret-here
-MERCADOPAGO_CURRENCY=COP
-MERCADOPAGO_BACK_URL=https://yoursite.com/payment-result
-MERCADOPAGO_NOTIFICATION_URL=https://yoursite.com/api/strapi-mercadopago/notifications
-MERCADOPAGO_VERIFY_WEBHOOKS=true
-```
+1. ✅ **Endpoint protegido con `auth: true`** (ya implementado en Fix #1)
+2. ✅ **HTTPS obligatorio en producción** (datos cifrados en tránsito)
+3. ✅ **Backups de DB cifrados** (a nivel de infraestructura)
+4. ✅ **Acceso a DB restringido** (solo personal autorizado)
+5. ✅ **Logs sanitizados** (no exponer tokens - ver Fix #7)
+6. ✅ **Auditoría de accesos** (logs de quién accede a configuración)
 
+**Nota:** Esta opción es común en muchos plugins de Strapi, confiando en:
+- Sistema RBAC de Strapi (solo admins)
+- HTTPS/TLS para protección en tránsito
+- Seguridad a nivel de infraestructura
+
+---
+
+**Recomendación Final:**
+
+| Entorno | Opción Recomendada | Razón |
+|---------|-------------------|-------|
+| **Producción** | Opción 1 (Cifrado) | Máxima seguridad, tokens cifrados en DB |
+| **Staging** | Opción 1 o 2 | Depende de datos reales vs. datos de prueba |
+| **Desarrollo** | Opción 2 (Sin cifrado) | Más simple, tokens de sandbox |
+
+**Migración gradual:**
+1. Implementar Fix #1 (auth) primero
+2. Usar Opción 2 temporalmente
+3. Implementar Opción 1 antes de producción
+
+---
 ---
 
 ## 3. Validación de Entrada con Yup
@@ -913,10 +1077,12 @@ strapi.log.warn('warning');
 
 ### Semana 1
 - [ ] 1. Cambiar `auth: false` a `auth: true` en rutas de configuración
-- [ ] 2. Crear `config/plugins.ts` con env vars
-- [ ] 2. Mover secretos a `.env`
-- [ ] 2. Actualizar middleware `loadConfig`
-- [ ] 2. Crear `.env.example`
+- [ ] 2. OPCIONAL: Implementar cifrado de secretos
+  - [ ] 2a. Crear `utils/encryption.ts` (funciones encrypt/decrypt)
+  - [ ] 2b. Configurar `ENCRYPTION_KEY` en `config/admin.ts` y `.env`
+  - [ ] 2c. Actualizar controller para cifrar/descifrar
+  - [ ] 2d. Actualizar middleware para descifrar
+  - [ ] **Alternativa:** Usar protección básica (auth + HTTPS) sin cifrado
 - [ ] 3. Instalar Yup
 - [ ] 3. Crear schemas de validación
 - [ ] 3. Crear middleware de validación
@@ -938,6 +1104,7 @@ strapi.log.warn('warning');
 - [ ] Probar checkout con datos inválidos (debe retornar 400)
 - [ ] Probar webhook duplicado (debe ser idempotente)
 - [ ] Verificar que logs no exponen secretos
+- [ ] Si implementaste cifrado: verificar que tokens están cifrados en DB
 
 ---
 
