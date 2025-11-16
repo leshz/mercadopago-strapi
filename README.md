@@ -10,14 +10,72 @@ A powerful plugin for integrating **MercadoPago** integration with **Strapi** CM
 
 ## 📖 Table of Contents
 
-1. [Features](#-features)  
-2. [Requirements](#-requirements)  
-3. [Installation](#-installation)  
-4. [Configuration](#-configuration)  
-5. [Usage](#-usage)  
-6. [API Endpoints](#-api-endpoints)  
-7. [Contributing](#-contributing)  
-8. [License](#-license)
+1. [Architecture & Improvements](#-architecture--improvements) ⭐ NEW
+2. [Features](#-features)
+3. [Requirements](#-requirements)
+4. [Installation](#-installation)
+5. [Configuration](#-configuration)
+6. [Usage](#-usage)
+7. [API Endpoints](#-api-endpoints)
+8. [Contributing](#-contributing)
+9. [License](#-license)
+
+---
+
+## 🏗️ Architecture & Improvements
+
+> **⭐ NEW:** Comprehensive architecture analysis and improvement proposals available!
+
+We've conducted an in-depth review of the plugin architecture and identified opportunities for improvement based on **Clean Code principles** and **Strapi v5 best practices**.
+
+### 📚 Documentation Available
+
+- **[GUIA_MEJORAS.md](./GUIA_MEJORAS.md)** - START HERE
+  - Master guide with navigation and quick decision flowchart
+  - Reading time: 10-25 minutes depending on your needs
+
+- **[COMPARACION_ARQUITECTURAS.md](./COMPARACION_ARQUITECTURAS.md)** - RECOMMENDED
+  - Detailed comparison: Clean Architecture vs Service Layer Pattern
+  - Includes scoring matrix (8.5/10 vs 6.5/10)
+  - Reading time: 15 minutes
+
+- **[ARQUITECTURAS_PRAGMATICAS.md](./ARQUITECTURAS_PRAGMATICAS.md)** ⭐
+  - Service Layer Pattern proposal (RECOMMENDED for this plugin)
+  - Implementation time: 6 weeks
+  - Reading time: 20 minutes
+
+- **[MEJORAS_ARQUITECTURA_LIMPIA.md](./MEJORAS_ARQUITECTURA_LIMPIA.md)**
+  - Complete Clean Architecture proposal
+  - 45+ improvements identified
+  - Implementation time: 12 weeks
+  - Reading time: 30 minutes
+
+### 🚨 Critical Issues Identified
+
+Before using this plugin in production, please review:
+
+1. **Security vulnerabilities** (8 critical issues)
+   - Unprotected configuration endpoints
+   - Secrets stored in plaintext
+   - Missing input validation
+   - Race conditions in stock management
+
+2. **Architecture improvements** (30+ suggestions)
+   - Service layer separation
+   - Transaction handling
+   - Idempotency implementation
+   - Testing strategy
+
+**👉 [Read the full analysis](./GUIA_MEJORAS.md)**
+
+### ⭐ Recommended Path
+
+```
+1. Read GUIA_MEJORAS.md (10 min)
+2. Review critical security issues
+3. Decide on architecture: Service Layer Pattern (recommended)
+4. Start with Phase 1: Security fixes (2 weeks)
+```
 
 ---
 
