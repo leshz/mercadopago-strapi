@@ -34,32 +34,9 @@
 
 ### ✅ Solución
 
-**Paso 1:** Crear policy de administrador
+Como este endpoint es parte del **Admin Panel de Strapi**, ya está protegido por el sistema RBAC nativo de Strapi. Solo necesitamos habilitar la autenticación.
 
-```typescript
-// server/src/policies/isAdmin.ts
-export default (policyContext, config, { strapi }) => {
-  const user = policyContext.state.user;
-
-  if (!user) {
-    return false;
-  }
-
-  // Verificar que el usuario tiene rol de administrador
-  const isAdmin = user.roles?.some(role =>
-    role.type === 'admin' || role.type === 'super-admin'
-  );
-
-  if (!isAdmin) {
-    strapi.log.warn(`Unauthorized access attempt to admin endpoint by user ${user.id}`);
-    return false;
-  }
-
-  return true;
-};
-```
-
-**Paso 2:** Actualizar rutas
+**Actualizar rutas:**
 
 ```typescript
 // server/src/routes/configuration.ts
@@ -69,8 +46,7 @@ export default [
     path: "/configuration",
     handler: "configuration.get",
     config: {
-      auth: true, // ✅ Requiere autenticación
-      policies: ['plugin::strapi-mercadopago.isAdmin'], // ✅ Solo admins
+      auth: true, // ✅ Requiere autenticación de admin
     },
   },
   {
@@ -78,38 +54,24 @@ export default [
     path: "/configuration",
     handler: "configuration.update",
     config: {
-      auth: true,
-      policies: ['plugin::strapi-mercadopago.isAdmin'],
+      auth: true, // ✅ Requiere autenticación de admin
     },
   },
 ];
 ```
 
-**Paso 3:** Registrar policy
-
-```typescript
-// server/src/index.ts
-import isAdmin from './policies/isAdmin';
-
-export default {
-  // ...
-  policies: {
-    isAdmin,
-  },
-  // ...
-};
-```
+**Nota importante:**
+- Con `auth: true`, Strapi automáticamente verifica que el usuario esté autenticado
+- El Admin Panel de Strapi ya tiene su propio sistema de permisos
+- Solo usuarios con acceso al admin pueden ver/modificar configuraciones de plugins
+- No necesitas crear policies adicionales
 
 **Verificación:**
 ```bash
-# Sin token - debe retornar 401
+# Sin autenticación - debe retornar 401 Unauthorized
 curl http://localhost:1337/strapi-mercadopago/configuration
 
-# Con token de usuario normal - debe retornar 403
-curl -H "Authorization: Bearer USER_TOKEN" \
-  http://localhost:1337/strapi-mercadopago/configuration
-
-# Con token de admin - debe retornar 200
+# Con token de admin - debe retornar 200 OK
 curl -H "Authorization: Bearer ADMIN_TOKEN" \
   http://localhost:1337/strapi-mercadopago/configuration
 ```
@@ -950,8 +912,7 @@ strapi.log.warn('warning');
 ## 📋 Checklist de Implementación
 
 ### Semana 1
-- [ ] 1. Crear policy `isAdmin`
-- [ ] 1. Proteger rutas de configuración
+- [ ] 1. Cambiar `auth: false` a `auth: true` en rutas de configuración
 - [ ] 2. Crear `config/plugins.ts` con env vars
 - [ ] 2. Mover secretos a `.env`
 - [ ] 2. Actualizar middleware `loadConfig`
@@ -972,8 +933,7 @@ strapi.log.warn('warning');
 - [ ] 8. Reemplazar console.log
 
 ### Testing Final
-- [ ] Probar endpoints sin auth (deben fallar)
-- [ ] Probar endpoints con auth de user normal (deben fallar)
+- [ ] Probar endpoints sin auth (deben fallar con 401)
 - [ ] Probar endpoints con auth de admin (deben funcionar)
 - [ ] Probar checkout con datos inválidos (debe retornar 400)
 - [ ] Probar webhook duplicado (debe ser idempotente)
