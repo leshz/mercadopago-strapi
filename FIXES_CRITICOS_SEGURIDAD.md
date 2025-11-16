@@ -78,7 +78,6 @@ curl -H "Authorization: Bearer ADMIN_TOKEN" \
 
 ---
 
-## 2. Mover Secretos a Variables de Entorno
 ## 2. Cifrar Secretos en Plugin Store
 
 ### ❌ Problema Actual
@@ -108,7 +107,7 @@ const response = await pluginStore.set({
 - **NO puede ir a variables de entorno** porque usuarios no técnicos no tienen acceso
 - Plugin Store es la forma correcta según Strapi para configuraciones de plugins
 
-###✅ Solución
+### ✅ Solución
 
 **Opción 1: Cifrar con Crypto de Node.js (Recomendado para Producción)**
 
@@ -117,80 +116,219 @@ const response = await pluginStore.set({
 ```typescript
 // server/src/utils/encryption.ts
 import crypto from 'crypto';
+import type { Core } from '@strapi/strapi';
 
 const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 16;
-const TAG_LENGTH = 16;
-const SALT_LENGTH = 64;
-const TAG_POSITION = SALT_LENGTH + IV_LENGTH;
-const ENCRYPTED_POSITION = TAG_POSITION + TAG_LENGTH;
+const AUTH_TAG_LENGTH = 16;
 
 /**
  * Obtiene la clave de cifrado desde la configuración de Strapi
  */
-function getEncryptionKey(strapi): Buffer {
-  // Usar la misma clave que Strapi usa para API tokens
-  const key = strapi.config.get('admin.apiToken.secrets.encryptionKey');
+function getEncryptionKey(strapi: Core.Strapi): Buffer {
+  const encryptionKey = strapi.config.get('admin.apiToken.secrets.encryptionKey');
 
-  if (!key) {
+  if (!encryptionKey || typeof encryptionKey !== 'string') {
     throw new Error(
-      'Encryption key not configured. Add ENCRYPTION_KEY to .env'
+      'ENCRYPTION_KEY not configured. Add it to .env and config/admin.ts'
     );
   }
 
-  return crypto.scryptSync(key, 'salt', 32);
+  // Validar longitud mínima
+  if (encryptionKey.length < 32) {
+    throw new Error(
+      'ENCRYPTION_KEY must be at least 32 characters. Generate with: node -e "console.log(require(\'crypto\').randomBytes(32).toString(\'base64\'))"'
+    );
+  }
+
+  // Derivar clave de 32 bytes usando hash SHA-256
+  // Usamos hash en vez de scrypt porque no necesitamos salt aquí
+  // (la clave ya es única por instalación)
+  return crypto.createHash('sha256').update(encryptionKey).digest();
 }
 
 /**
- * Cifra un valor sensible
+ * Cifra un valor sensible usando AES-256-GCM
+ * @param text - Texto plano a cifrar
+ * @param strapi - Instancia de Strapi
+ * @returns Texto cifrado en formato: iv + authTag + encrypted (todo en hex)
  */
-export function encrypt(text: string, strapi): string {
-  if (!text) return text;
-
-  const key = getEncryptionKey(strapi);
-  const iv = crypto.randomBytes(IV_LENGTH);
-  const salt = crypto.randomBytes(SALT_LENGTH);
-
-  const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
-
-  const encrypted = Buffer.concat([
-    cipher.update(String(text), 'utf8'),
-    cipher.final(),
-  ]);
-
-  const tag = cipher.getAuthTag();
-
-  return Buffer.concat([salt, iv, tag, encrypted]).toString('hex');
-}
-
-/**
- * Descifra un valor sensible
- */
-export function decrypt(encryptedText: string, strapi): string {
-  if (!encryptedText) return encryptedText;
+export function encrypt(text: string, strapi: Core.Strapi): string {
+  if (!text || text.trim() === '') {
+    return text;
+  }
 
   try {
     const key = getEncryptionKey(strapi);
-    const stringValue = Buffer.from(String(encryptedText), 'hex');
+    const iv = crypto.randomBytes(IV_LENGTH);
 
-    const salt = stringValue.subarray(0, SALT_LENGTH);
-    const iv = stringValue.subarray(SALT_LENGTH, TAG_POSITION);
-    const tag = stringValue.subarray(TAG_POSITION, ENCRYPTED_POSITION);
-    const encrypted = stringValue.subarray(ENCRYPTED_POSITION);
+    const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
+
+    let encrypted = cipher.update(text, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+
+    const authTag = cipher.getAuthTag();
+
+    // Formato: iv (32 chars hex) + authTag (32 chars hex) + encrypted
+    return iv.toString('hex') + authTag.toString('hex') + encrypted;
+  } catch (error) {
+    strapi.log.error('Encryption failed', {
+      error: error.message,
+      // NO loguear el texto plano
+    });
+    throw new Error('Failed to encrypt sensitive data');
+  }
+}
+
+/**
+ * Descifra un valor previamente cifrado
+ * @param encryptedText - Texto cifrado (formato: iv + authTag + encrypted)
+ * @param strapi - Instancia de Strapi
+ * @returns Texto plano descifrado
+ */
+export function decrypt(encryptedText: string, strapi: Core.Strapi): string {
+  if (!encryptedText || encryptedText.trim() === '') {
+    return encryptedText;
+  }
+
+  try {
+    const key = getEncryptionKey(strapi);
+
+    // Parsear el formato: iv (32 chars) + authTag (32 chars) + encrypted
+    const ivHex = encryptedText.slice(0, IV_LENGTH * 2);
+    const authTagHex = encryptedText.slice(IV_LENGTH * 2, (IV_LENGTH + AUTH_TAG_LENGTH) * 2);
+    const encryptedHex = encryptedText.slice((IV_LENGTH + AUTH_TAG_LENGTH) * 2);
+
+    if (!ivHex || !authTagHex || !encryptedHex) {
+      throw new Error('Invalid encrypted data format');
+    }
+
+    const iv = Buffer.from(ivHex, 'hex');
+    const authTag = Buffer.from(authTagHex, 'hex');
 
     const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
-    decipher.setAuthTag(tag);
+    decipher.setAuthTag(authTag);
 
-    return decipher.update(encrypted) + decipher.final('utf8');
+    let decrypted = decipher.update(encryptedHex, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+
+    return decrypted;
   } catch (error) {
-    // Si falla el descifrado, puede ser texto plano (migración)
-    strapi.log.warn('Failed to decrypt value, returning as-is');
+    // Si falla el descifrado, puede ser porque:
+    // 1. Dato en texto plano (migración desde versión anterior)
+    // 2. Clave de cifrado cambió
+    // 3. Dato corrupto
+
+    strapi.log.warn('Decryption failed - data may be in plain text', {
+      error: error.message,
+      encryptedTextLength: encryptedText?.length,
+    });
+
+    // Retornar tal cual para backward compatibility
+    // IMPORTANTE: Esto permite migración gradual, pero implica que
+    // datos en texto plano aún pueden ser leídos
     return encryptedText;
+  }
+}
+
+/**
+ * Verifica si un valor está cifrado
+ * @param value - Valor a verificar
+ * @returns true si parece estar cifrado, false si es texto plano
+ */
+export function isEncrypted(value: string): boolean {
+  if (!value || typeof value !== 'string') {
+    return false;
+  }
+
+  // Verificar longitud mínima (iv + authTag = 64 chars hex)
+  if (value.length < (IV_LENGTH + AUTH_TAG_LENGTH) * 2) {
+    return false;
+  }
+
+  // Verificar que sea hexadecimal válido
+  return /^[0-9a-f]+$/i.test(value);
+}
+```
+
+**🔑 Puntos Clave de la Mejora**
+
+1. **Formato Simplificado**
+   ```
+   ❌ ANTES: salt + iv + authTag + encrypted
+   ✅ AHORA: iv + authTag + encrypted
+   ```
+   - Eliminamos salt innecesario (no se usaba correctamente)
+   - Formato más simple y compacto
+   - Más fácil de parsear
+
+2. **Derivación de Clave Mejorada**
+   ```typescript
+   // ✅ SHA-256 hash (determinístico y seguro)
+   return crypto.createHash('sha256').update(encryptionKey).digest();
+   ```
+   - Más simple que scrypt con salt estático
+   - Determinístico (misma key → mismo resultado)
+   - Seguro para este caso de uso
+
+3. **Función Helper `isEncrypted()`**
+   ```typescript
+   // Útil para detectar si un valor ya está cifrado
+   if (!isEncrypted(config.mercadoPagoToken)) {
+     // Migrar: cifrar valores en texto plano
+   }
+   ```
+
+**Paso 2:** Script de migración para datos existentes
+
+```typescript
+// server/src/scripts/migrate-encryption.ts
+import type { Core } from '@strapi/strapi';
+import { encrypt, isEncrypted } from '../utils/encryption';
+
+export async function migrateConfigEncryption(strapi: Core.Strapi) {
+  const pluginStore = strapi.store({
+    environment: strapi.config.environment,
+    type: 'plugin',
+    name: 'strapi-mercadopago',
+  });
+
+  const config = await pluginStore.get({ key: 'mercadopagoSetting' });
+
+  if (!config) {
+    strapi.log.info('No configuration to migrate');
+    return;
+  }
+
+  let updated = false;
+
+  // Migrar mercadoPagoToken si no está cifrado
+  if (config.mercadoPagoToken && !isEncrypted(config.mercadoPagoToken)) {
+    strapi.log.info('Migrating mercadoPagoToken to encrypted format');
+    config.mercadoPagoToken = encrypt(config.mercadoPagoToken, strapi);
+    updated = true;
+  }
+
+  // Migrar webhookPass si no está cifrado
+  if (config.webhookPass && !isEncrypted(config.webhookPass)) {
+    strapi.log.info('Migrating webhookPass to encrypted format');
+    config.webhookPass = encrypt(config.webhookPass, strapi);
+    updated = true;
+  }
+
+  if (updated) {
+    await pluginStore.set({
+      key: 'mercadopagoSetting',
+      value: config,
+    });
+    strapi.log.info('Configuration migration completed successfully');
+  } else {
+    strapi.log.info('Configuration already encrypted, no migration needed');
   }
 }
 ```
 
-**Paso 2:** Configurar encryption key
+**Paso 3:** Configurar encryption key
 
 ```typescript
 // config/admin.ts (o admin.js)
@@ -206,7 +344,7 @@ export default ({ env }) => ({
 });
 ```
 
-**Paso 3:** Agregar a .env
+**Paso 4:** Agregar a .env
 
 ```bash
 # .env
@@ -217,13 +355,14 @@ ENCRYPTION_KEY=tu-clave-aleatoria-de-32-bytes-en-base64
 API_TOKEN_SALT=tu-salt-aleatorio
 ```
 
-**Paso 4:** Actualizar controller para cifrar al guardar
+**Paso 5:** Actualizar controller para cifrar al guardar
 
 ```typescript
 // server/src/controllers/configuration.ts
+import type { Core } from '@strapi/strapi';
 import { encrypt, decrypt } from '../utils/encryption';
 
-export default ({ strapi }) => ({
+export default ({ strapi }: { strapi: Core.Strapi }) => ({
   async get(ctx) {
     const pluginStore = strapi.store({
       environment: strapi.config.environment,
@@ -286,7 +425,7 @@ export default ({ strapi }) => ({
 });
 ```
 
-**Paso 5:** Actualizar middleware para descifrar al leer
+**Paso 6:** Actualizar middleware para descifrar al leer
 
 ```typescript
 // server/src/middlewares/configuration.ts
@@ -316,6 +455,24 @@ export const loadConfig = (config, { strapi }) => {
 
     await next();
   };
+};
+```
+
+**Paso 7:** Ejecutar migración en bootstrap
+
+```typescript
+// server/src/bootstrap.ts
+import { migrateConfigEncryption } from './scripts/migrate-encryption';
+
+export default async ({ strapi }) => {
+  // Migrar configuración existente a formato cifrado
+  try {
+    await migrateConfigEncryption(strapi);
+  } catch (error) {
+    strapi.log.error('Failed to migrate encryption', error);
+  }
+
+  strapi.log.info('MercadoPago plugin initialized');
 };
 ```
 
@@ -352,7 +509,23 @@ Si decides no implementar cifrado por ahora, asegúrate de tener estas proteccio
 2. Usar Opción 2 temporalmente
 3. Implementar Opción 1 antes de producción
 
----
+**Notas de Implementación:**
+
+1. **ENCRYPTION_KEY debe ser >= 32 caracteres**
+2. **No cambiar ENCRYPTION_KEY una vez en producción** (perderías acceso a datos cifrados)
+3. **Hacer backup antes de migrar** datos existentes
+4. **La función `decrypt()` es tolerante** a texto plano (para migración)
+5. **Después de migración**, considera eliminar tolerancia a texto plano
+
+**Ventajas de esta implementación:**
+- ✅ Seguridad: AES-256-GCM (autenticación + cifrado)
+- ✅ Simplicidad: Formato más simple sin salt innecesario
+- ✅ Validaciones: Verifica ENCRYPTION_KEY antes de usar
+- ✅ Migración: Backward compatible con texto plano
+- ✅ Helper: `isEncrypted()` para detección automática
+- ✅ Logging: No expone datos sensibles en logs
+- ✅ Tipos: Full TypeScript con tipos de Strapi
+
 ---
 
 ## 3. Validación de Entrada con Yup
