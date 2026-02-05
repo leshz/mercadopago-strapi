@@ -54,7 +54,6 @@ export function encrypt(text: string, strapi: Core.Strapi): string {
     // Formato: iv (32 chars hex) + authTag (32 chars hex) + encrypted
     return iv.toString('hex') + authTag.toString('hex') + encrypted;
   } catch (error) {
-    console.error(error);
     strapi.log.error('Encryption failed', {
       error: error.message,
     });
