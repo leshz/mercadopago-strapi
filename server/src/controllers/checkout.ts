@@ -1,79 +1,34 @@
 /**
- *  controller
+ * Checkout Controller
+ * Responsabilidad: Recibir datos validados y delegar a services
  */
 import type { Core } from '@strapi/strapi';
-import type { ConfigType, CheckoutBody } from "../types";
-import { INVOICES_STATUS } from "../constants";
-
+import type { ConfigType } from '../types';
 
 export default ({ strapi }: { strapi: Core.Strapi }) => ({
   async checkout(ctx) {
     const { config }: { config: ConfigType } = ctx.state;
-    const { items = [], customer, fulfillment }: CheckoutBody = ctx.request.body || {};
-    if (items.length === 0) return ctx.badRequest();
+    // Datos ya validados y sanitizados por el middleware validateCheckout
+    const { items, customer, fulfillment } = ctx.state.validated;
 
     try {
-
-      const rawProducts = await strapi
-        .service("plugin::strapi-mercadopago.product")
-        .getProducts(items);
-
-      const initInvoice = await strapi
-        .service("plugin::strapi-mercadopago.order")
-        .createInitialOrder({
-          fulfillment,
-          customer,
-          rawProducts,
-        });
-
-      if (!initInvoice) {
-        ctx.internalServerError("Creating invoice Error", {
-          controller: "createInvoice",
-        });
-      }
-
-      const customerParsed = await strapi
-        .service("plugin::strapi-mercadopago.mercadopago")
-        .parserCustomer(customer, fulfillment);
-
-      const fulfillmentParsed = await strapi
-        .service("plugin::strapi-mercadopago.mercadopago")
-        .parserFulfillment(fulfillment);
-
-      const preference = await strapi
-        .service("plugin::strapi-mercadopago.mercadopago")
-        .createPreference(
-          {
-            rawProducts,
-            payer: customerParsed,
-            fulfillmentParsed,
-            internalInvoiceId: initInvoice.id,
-          },
-          config
-        );
-
-      const { id, init_point, collector_id } = preference;
-      const updatedInvoice = await strapi
-        .service("plugin::strapi-mercadopago.order")
-        .updateOrder({
-          id: initInvoice.id,
-          data: {
-            ...initInvoice,
-            payment_status: INVOICES_STATUS.IN_PROCESS,
-            collector_id: `${collector_id}`,
-            preference_id: id,
-            payment_link: init_point,
-          },
-        });
+      const result = await strapi
+        .service('plugin::strapi-mercadopago.checkout')
+        .processCheckout({ items, customer, fulfillment }, config);
 
       return ctx.send({
-        init_point,
-        preferenceId: id,
-        collector_id,
-        invoiceId: updatedInvoice.id,
+        init_point: result.paymentUrl,
+        preferenceId: result.preferenceId,
+        collector_id: result.collectorId,
+        invoiceId: result.orderId,
       });
     } catch (error) {
-      return ctx.internalServerError(error.message, {});
+      strapi.log.error('Checkout failed', {
+        error: error.message,
+        customerEmail: customer?.email,
+      });
+
+      return ctx.badRequest(error.message);
     }
   },
 });

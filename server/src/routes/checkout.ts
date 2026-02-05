@@ -1,14 +1,17 @@
-import { METHODS, URLS } from "../constants";
+import { METHODS, URLS } from '../constants';
 
 export default {
-  type: "content-api",
+  type: 'content-api',
   routes: [
     {
       method: METHODS.POST,
       path: URLS.CHECKOUT,
-      handler: "checkout.checkout",
+      handler: 'checkout.checkout',
       config: {
-        middlewares: ["plugin::strapi-mercadopago.loadConfig"],
+        middlewares: [
+          'plugin::strapi-mercadopago.loadConfig',
+          'plugin::strapi-mercadopago.validateCheckout',
+        ],
       },
     },
   ],
