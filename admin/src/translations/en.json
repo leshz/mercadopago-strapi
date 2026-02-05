@@ -1,6 +1,45 @@
 {
   "mercadopago.plugin.name": "Mercado Pago",
   "mercadopago.setting.header.title": "Mercado Pago",
-  "mercadopago.setting.header.subtitle": "Mercado Pago's settings",
-  "mercadopago.setting.header.action": "Save"
+  "mercadopago.setting.header.subtitle": "Configure Mercado Pago settings",
+  "mercadopago.setting.header.action": "Save",
+  "mercadopago.setting.nav.label": "Configuration",
+
+  "mercadopago.setting.toggle.on": "Enabled",
+  "mercadopago.setting.toggle.off": "Disabled",
+
+  "mercadopago.setting.section.general": "General",
+  "mercadopago.setting.section.credentials": "Credentials",
+  "mercadopago.setting.section.urls": "URLs",
+  "mercadopago.setting.section.webhook": "Webhook Security",
+
+  "mercadopago.setting.field.isActive.label": "Enable Mercado Pago",
+  "mercadopago.setting.field.isActive.hint": "Enable or disable the Mercado Pago integration",
+
+  "mercadopago.setting.field.currency.label": "Currency",
+
+  "mercadopago.setting.field.description.label": "Business description",
+  "mercadopago.setting.field.description.hint": "Description displayed on the payment preference",
+
+  "mercadopago.setting.field.token.label": "Access Token",
+  "mercadopago.setting.field.token.hint": "Access token from your Mercado Pago application",
+
+  "mercadopago.setting.field.backUrls.label": "Return URL",
+  "mercadopago.setting.field.backUrls.hint": "URL to redirect the user to after payment",
+
+  "mercadopago.setting.field.notificationUrl.label": "Notification URL",
+  "mercadopago.setting.field.notificationUrl.hint": "URL where Mercado Pago sends webhook notifications (IPN)",
+
+  "mercadopago.setting.field.webhookPass.label": "Webhook signature",
+  "mercadopago.setting.field.webhookPass.hint": "Secret key to verify the authenticity of notifications",
+
+  "mercadopago.setting.field.isActiveVerification.label": "Verify signature",
+  "mercadopago.setting.field.isActiveVerification.hint": "Validate that notifications come from Mercado Pago",
+
+  "mercadopago.dashboard.subtitle": "Sales and payments overview",
+  "mercadopago.dashboard.stat.totalSales": "Total sales",
+  "mercadopago.dashboard.stat.revenue": "Revenue",
+  "mercadopago.dashboard.stat.approved": "Approved",
+  "mercadopago.dashboard.stat.rejected": "Rejected",
+  "mercadopago.dashboard.recentPayments": "Recent payments"
 }

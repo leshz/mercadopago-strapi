@@ -13,7 +13,7 @@ const AUTH_TAG_LENGTH = 16;
  * Obtiene la clave de cifrado desde la configuración de Strapi
  */
 function getEncryptionKey(strapi: Core.Strapi): Buffer {
-  const encryptionKey = strapi.config.get('admin.apiToken.secrets.encryptionKey') as string | undefined;
+  const encryptionKey = strapi.config.get('admin.secrets.encryptionKey') as string | undefined;
 
   if (!encryptionKey || typeof encryptionKey !== 'string') {
     throw new Error(

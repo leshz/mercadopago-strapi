@@ -1,6 +1,45 @@
 {
-    "mercadopago.plugin.name": "Mercado Pago",
-    "mercadopago.setting.header.title": "Mercado Pago",
-    "mercadopago.setting.header.subtitle": "Configura los ajustes para Mercado Pago",
-    "mercadopago.setting.header.action": "Guardar"
+  "mercadopago.plugin.name": "Mercado Pago",
+  "mercadopago.setting.header.title": "Mercado Pago",
+  "mercadopago.setting.header.subtitle": "Configura los ajustes para Mercado Pago",
+  "mercadopago.setting.header.action": "Guardar",
+  "mercadopago.setting.nav.label": "Configuración",
+
+  "mercadopago.setting.toggle.on": "Activado",
+  "mercadopago.setting.toggle.off": "Desactivado",
+
+  "mercadopago.setting.section.general": "General",
+  "mercadopago.setting.section.credentials": "Credenciales",
+  "mercadopago.setting.section.urls": "URLs",
+  "mercadopago.setting.section.webhook": "Seguridad del Webhook",
+
+  "mercadopago.setting.field.isActive.label": "Activar Mercado Pago",
+  "mercadopago.setting.field.isActive.hint": "Habilita o deshabilita la integración con Mercado Pago",
+
+  "mercadopago.setting.field.currency.label": "Divisa",
+
+  "mercadopago.setting.field.description.label": "Descripción del negocio",
+  "mercadopago.setting.field.description.hint": "Descripción que aparecerá en la preferencia de pago",
+
+  "mercadopago.setting.field.token.label": "Access Token",
+  "mercadopago.setting.field.token.hint": "Token de acceso de tu aplicación de Mercado Pago",
+
+  "mercadopago.setting.field.backUrls.label": "URL de retorno",
+  "mercadopago.setting.field.backUrls.hint": "URL a la que se redirige al usuario luego del pago",
+
+  "mercadopago.setting.field.notificationUrl.label": "URL de notificación",
+  "mercadopago.setting.field.notificationUrl.hint": "URL donde Mercado Pago envía las notificaciones webhook (IPN)",
+
+  "mercadopago.setting.field.webhookPass.label": "Firma del Webhook",
+  "mercadopago.setting.field.webhookPass.hint": "Clave secreta para verificar la autenticidad de las notificaciones",
+
+  "mercadopago.setting.field.isActiveVerification.label": "Verificar firma",
+  "mercadopago.setting.field.isActiveVerification.hint": "Valida que las notificaciones provengan de Mercado Pago",
+
+  "mercadopago.dashboard.subtitle": "Resumen de ventas y pagos",
+  "mercadopago.dashboard.stat.totalSales": "Ventas totales",
+  "mercadopago.dashboard.stat.revenue": "Ingresos",
+  "mercadopago.dashboard.stat.approved": "Aprobados",
+  "mercadopago.dashboard.stat.rejected": "Rechazados",
+  "mercadopago.dashboard.recentPayments": "Pagos recientes"
 }

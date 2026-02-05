@@ -6,7 +6,6 @@ const getConfig = async () => {
 }
 
 const setConfig = async (data: any) => {
-  console.log(data)
   const response = await axios('/strapi-mercadopago/configuration', {
     method: 'POST',
     data: { data }
