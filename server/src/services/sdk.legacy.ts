@@ -7,6 +7,7 @@ import type {
   PaymentPayload,
 } from "../types";
 
+import { randomUUID } from "crypto";
 import { MercadoPagoConfig, Preference, Payment } from "mercadopago";
 import { errors } from "@strapi/utils";
 import { INVOICES_STATUS } from "../constants";
@@ -76,7 +77,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
     const client = new MercadoPagoConfig({
       accessToken: mercadoPagoToken,
-      options: { timeout: 5000, idempotencyKey: "abc" },
+      options: { timeout: 10000, idempotencyKey: randomUUID() },
     });
 
     const preference = new Preference(client);
@@ -115,7 +116,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
     const client = new MercadoPagoConfig({
       accessToken: mercadoPagoToken,
-      options: { timeout: 5000, idempotencyKey: "abc" },
+      options: { timeout: 10000, idempotencyKey: randomUUID() },
     });
 
     if (id === "") {
@@ -157,58 +158,53 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         return
       }
 
-      // PAYMENT SUCCESSFULL
+      // Actualizar orden con status del pago
+      await strapi
+        .query("plugin::strapi-mercadopago.order")
+        .update({
+          where: { id: invoiceId },
+          data: {
+            payment_status: status,
+            paid_with: payment_type_id,
+          },
+        });
+
+      strapi.log.info(
+        `Invoice: ${invoiceId} has been updated with Status: ${status}`
+      );
+
+      // Si pago aprobado, reducir stock secuencialmente
       if (status === INVOICES_STATUS.APPROVED) {
-        // UPDATE STATUS FROM PAYMENT SERVICE
-        await strapi
-          .query("plugin::strapi-mercadopago.order")
-          .update({
-            where: { id: invoiceId },
-            data: {
-              payment_status: status,
-              paid_with: payment_type_id,
-            },
-          });
-
-        strapi.log.info(
-          `Invoice: ${invoiceId} has been updated with Status: ${status}`
-        );
-
-        await items.forEach(async (product) => {
+        for (const product of items) {
           const dbproduct = await strapi
             .query("plugin::strapi-mercadopago.product")
             .findOne({ where: { sku: product.id } });
 
           if (dbproduct) {
             const newStock = Number(dbproduct.stock) - Number(product.quantity);
+
+            if (newStock < 0) {
+              strapi.log.error(`Insufficient stock for product ${product.id}`, {
+                currentStock: dbproduct.stock,
+                requested: product.quantity,
+              });
+              continue;
+            }
+
             await strapi
               .query("plugin::strapi-mercadopago.product")
               .update({
                 where: { sku: product.id },
-                data: {
-                  stock: newStock,
-                },
+                data: { stock: newStock },
               });
+
             strapi.log.info(
-              `Product: ${dbproduct.sku} has been updated with Stock: ${newStock}`
+              `Product: ${dbproduct.sku} stock updated to ${newStock}`
             );
           } else {
-            strapi.log.info(`Product without update: ${product.id}`);
+            strapi.log.warn(`Product not found for stock update: ${product.id}`);
           }
-        });
-      } else {
-        await strapi
-          .query("plugin::strapi-mercadopago.order")
-          .update({
-            where: { id: invoiceId },
-            data: {
-              status,
-              paid_with: payment_type_id,
-            },
-          });
-        strapi.log.info(
-          `Invoice: ${invoiceId} has been updated with Status: ${status}`
-        );
+        }
       }
 
     } catch (error) {

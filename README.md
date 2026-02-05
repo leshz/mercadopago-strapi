@@ -10,14 +10,95 @@ A powerful plugin for integrating **MercadoPago** integration with **Strapi** CM
 
 ## 📖 Table of Contents
 
-1. [Features](#-features)  
-2. [Requirements](#-requirements)  
-3. [Installation](#-installation)  
-4. [Configuration](#-configuration)  
-5. [Usage](#-usage)  
-6. [API Endpoints](#-api-endpoints)  
-7. [Contributing](#-contributing)  
-8. [License](#-license)
+1. [Architecture & Improvements](#-architecture--improvements) ⭐ NEW
+2. [Features](#-features)
+3. [Requirements](#-requirements)
+4. [Installation](#-installation)
+5. [Configuration](#-configuration)
+6. [Usage](#-usage)
+7. [API Endpoints](#-api-endpoints)
+8. [Contributing](#-contributing)
+9. [License](#-license)
+
+---
+
+## 🏗️ Architecture & Improvements
+
+> **⚠️ IMPORTANT:** This plugin has critical security issues that must be addressed before production use.
+
+We've conducted a comprehensive review and created an actionable improvement plan based on **Service Layer Pattern** and **Strapi v5 best practices**.
+
+### 📚 Documentation
+
+#### 🔴 [FIXES_CRITICOS_SEGURIDAD.md](./FIXES_CRITICOS_SEGURIDAD.md) - **START HERE**
+**Critical security fixes that MUST be implemented before production.**
+
+- ⚠️ 8 critical security vulnerabilities identified
+- 🔧 Step-by-step fixes with code examples
+- ⏱️ Implementation time: 1-2 weeks
+- 🎯 Priority: **URGENT**
+
+**Issues covered:**
+1. Unprotected configuration endpoints (anyone can read your MercadoPago token!)
+2. Secrets stored in plaintext in database
+3. Missing input validation (injection vulnerabilities)
+4. Race conditions in stock management
+5. Static idempotency key (breaks payment protection)
+6. forEach with async (operations not completed)
+7. Sensitive data in logs
+8. console.log instead of structured logging
+
+#### 📘 [PLAN_MIGRACION_SERVICE_LAYER.md](./PLAN_MIGRACION_SERVICE_LAYER.md)
+**Complete migration plan to Service Layer Pattern architecture.**
+
+- 🏗️ Service Layer Pattern (recommended architecture)
+- 📅 Week-by-week implementation plan (4 weeks)
+- 💻 Complete code examples for all services
+- ✅ Testing strategy and checklist
+- 📊 Before/after architecture comparison
+
+**Refactoring includes:**
+- Separating `sdk.ts` (218 lines) into focused services
+- Creating gateway abstraction for MercadoPago API
+- Implementing single-responsibility services
+- Adding comprehensive tests (>80% coverage)
+
+### ⚠️ Critical Issues Summary
+
+**Before production deployment, you MUST fix:**
+
+| Issue | Risk | Location |
+|-------|------|----------|
+| Unprotected config endpoints | 🔴 Critical | `routes/configuration.ts` |
+| Plaintext secrets in DB | 🔴 Critical | `middlewares/configuration.ts` |
+| No input validation | 🔴 Critical | `controllers/checkout.ts` |
+| Race condition in stock | 🔴 Critical | `services/sdk.ts:177` |
+| Static idempotency key | 🔴 Critical | `services/sdk.ts:79` |
+
+### 🚀 Recommended Implementation Path
+
+```bash
+# Step 1: Security Fixes (URGENT - 1-2 weeks)
+📖 Read FIXES_CRITICOS_SEGURIDAD.md
+✅ Implement all 8 critical fixes
+🧪 Test security improvements
+
+# Step 2: Architecture Refactoring (4 weeks)
+📖 Read PLAN_MIGRACION_SERVICE_LAYER.md
+✅ Week 1: Create gateway and helpers
+✅ Week 2: Refactor checkout services
+✅ Week 3: Refactor payment services
+✅ Week 4: Testing and documentation
+```
+
+### 💡 Why Service Layer Pattern?
+
+- ✅ Works **with** Strapi (uses factories and Entity Service)
+- ✅ Minimal friction (no complex abstractions)
+- ✅ Fast implementation (4 weeks vs 12 weeks for Clean Architecture)
+- ✅ Easy to understand and maintain
+- ✅ Testable without complex mocking
+- ✅ Each service <60 lines (vs 218 lines monolith)
 
 ---
 

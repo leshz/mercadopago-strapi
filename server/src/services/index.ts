@@ -1,11 +1,29 @@
-import category from "./category";
-import product from "./product";
-import order from "./order";
-import mercadopago from "./sdk";
+// Legacy services (mantener temporalmente para compatibilidad)
+import category from './category.service';
+import order from './order.service';
+import mercadopago from './sdk.legacy';
+
+// New Service Layer Architecture
+import checkoutServices from './checkout';
+import paymentServices from './payment';
+import productServices from './product';
+import externalServices from './external';
 
 export default {
+  // Legacy services
   category,
-  product,
   order,
   mercadopago,
+
+  // Checkout services
+  ...checkoutServices,
+
+  // Payment services
+  ...paymentServices,
+
+  // Product services (reemplaza el antiguo product.ts)
+  ...productServices,
+
+  // External services (gateways)
+  ...externalServices,
 };

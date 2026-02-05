@@ -1,8 +1,9 @@
 /**
- *  controller
+ * Configuration Controller
+ * Responsabilidad: CRUD de configuración del plugin con cifrado de secretos
  */
-
 import type { Core } from '@strapi/strapi';
+import { encrypt, decrypt } from '../utils/encryption';
 
 export default ({ strapi }: { strapi: Core.Strapi }) => ({
   async get(ctx) {
@@ -11,9 +12,27 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       type: 'plugin',
       name: 'strapi-mercadopago',
     });
-    const response = await pluginStore.get({ key: 'mercadopagoSetting', });
-    return ctx.send({ ok: true, data: response });
+
+    const config = await pluginStore.get({ key: 'mercadopagoSetting' }) as any;
+
+    if (!config) {
+      return ctx.send({ ok: true, data: null });
+    }
+
+    // Descifrar secretos antes de enviar al admin
+    const decryptedConfig = {
+      ...config,
+      mercadoPagoToken: config.mercadoPagoToken
+        ? decrypt(config.mercadoPagoToken, strapi)
+        : '',
+      webhookPass: config.webhookPass
+        ? decrypt(config.webhookPass, strapi)
+        : '',
+    };
+
+    return ctx.send({ ok: true, data: decryptedConfig });
   },
+
   async update(ctx) {
     const { data } = ctx.request.body;
     const {
@@ -24,7 +43,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       webhookPass,
       notificationUrl,
       bussinessDescription,
-      isActiveVerification
+      isActiveVerification,
     } = data;
 
     const pluginStore = strapi.store({
@@ -33,18 +52,22 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       name: 'strapi-mercadopago',
     });
 
-
+    // Cifrar secretos antes de guardar
     const response = await pluginStore.set({
       key: 'mercadopagoSetting',
       value: {
         isActive,
-        mercadoPagoToken,
+        mercadoPagoToken: mercadoPagoToken
+          ? encrypt(mercadoPagoToken, strapi)
+          : '',
         defaultCurrency,
         backUrls,
-        webhookPass,
+        webhookPass: webhookPass
+          ? encrypt(webhookPass, strapi)
+          : '',
         notificationUrl,
         bussinessDescription,
-        isActiveVerification
+        isActiveVerification,
       },
     });
 
