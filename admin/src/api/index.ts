@@ -13,4 +13,9 @@ const setConfig = async (data: any) => {
   return response;
 }
 
-export { getConfig, setConfig };
+const getDashboardStats = async (fetchClient: { get: (url: string) => Promise<{ data: any }> }, days: number = 30) => {
+  const { data } = await fetchClient.get(`/strapi-mercadopago/dashboard/stats?days=${days}`);
+  return data;
+};
+
+export { getConfig, setConfig, getDashboardStats };

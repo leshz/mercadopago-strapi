@@ -57,7 +57,7 @@ const index = {
         defaultMessage: "Mercado Pago"
       },
       Component: async () => {
-        const { App } = await Promise.resolve().then(() => require("./App-CqfEm_yF.js"));
+        const { App } = await Promise.resolve().then(() => require("./App-CdtK0YRI.js"));
         return App;
       }
     });
@@ -78,7 +78,7 @@ const index = {
             defaultMessage: "Configuration"
           },
           Component: async () => {
-            const { SettingsPage } = await Promise.resolve().then(() => require("./Settings-CFBr8hvY.js"));
+            const { SettingsPage } = await Promise.resolve().then(() => require("./Settings-8KMMtjuX.js"));
             return SettingsPage;
           }
         }
@@ -97,7 +97,7 @@ const index = {
     return Promise.all(
       locales.map(async (locale) => {
         try {
-          const { default: data } = await __variableDynamicImportRuntimeHelper(/* @__PURE__ */ Object.assign({ "./translations/en.json": () => Promise.resolve().then(() => require("./en-CHrc7k-N.js")), "./translations/es.json": () => Promise.resolve().then(() => require("./es-FXzN3va_.js")) }), `./translations/${locale}.json`, 3);
+          const { default: data } = await __variableDynamicImportRuntimeHelper(/* @__PURE__ */ Object.assign({ "./translations/en.json": () => Promise.resolve().then(() => require("./en-B3XI74hF.js")), "./translations/es.json": () => Promise.resolve().then(() => require("./es-RjHiIJ5v.js")) }), `./translations/${locale}.json`, 3);
           return { data, locale };
         } catch {
           return { data: {}, locale };

@@ -56,7 +56,7 @@ const index = {
         defaultMessage: "Mercado Pago"
       },
       Component: async () => {
-        const { App } = await import("./App-C0FIObgm.mjs");
+        const { App } = await import("./App-BB_oaorN.mjs");
         return App;
       }
     });
@@ -77,7 +77,7 @@ const index = {
             defaultMessage: "Configuration"
           },
           Component: async () => {
-            const { SettingsPage } = await import("./Settings-Bv3nv3pW.mjs");
+            const { SettingsPage } = await import("./Settings-DZa6QAA2.mjs");
             return SettingsPage;
           }
         }
@@ -96,7 +96,7 @@ const index = {
     return Promise.all(
       locales.map(async (locale) => {
         try {
-          const { default: data } = await __variableDynamicImportRuntimeHelper(/* @__PURE__ */ Object.assign({ "./translations/en.json": () => import("./en-CkU8BquV.mjs"), "./translations/es.json": () => import("./es-CiH3CMaY.mjs") }), `./translations/${locale}.json`, 3);
+          const { default: data } = await __variableDynamicImportRuntimeHelper(/* @__PURE__ */ Object.assign({ "./translations/en.json": () => import("./en-DZWrkCgw.mjs"), "./translations/es.json": () => import("./es-CY68NHfw.mjs") }), `./translations/${locale}.json`, 3);
           return { data, locale };
         } catch {
           return { data: {}, locale };

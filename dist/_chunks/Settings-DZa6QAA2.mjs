@@ -4,22 +4,11 @@ import { useIntl } from "react-intl";
 import { Main, Button, Box, Typography, Divider, Grid, Field, Toggle, SingleSelect, SingleSelectOption } from "@strapi/design-system";
 import "react-dom/client";
 import { Check, Eye, EyeStriked } from "@strapi/icons";
-import { a as axios, L as Layouts } from "./rulesEngine-B89gjlkb.mjs";
+import { b as getConfig, L as Layouts, s as setConfig } from "./index-BUsSJb2Z.mjs";
 import "react-router-dom";
 import "@strapi/icons/symbols";
 import "yup";
-import { g as getTranslation } from "./index-DgagI5oC.mjs";
-const getConfig = async () => {
-  const { data } = await axios.get("/strapi-mercadopago/configuration");
-  return data;
-};
-const setConfig = async (data) => {
-  const response = await axios("/strapi-mercadopago/configuration", {
-    method: "POST",
-    data: { data }
-  });
-  return response;
-};
+import { g as getTranslation } from "./index-Cf3Cj2pv.mjs";
 const SettingsPage = () => {
   const { formatMessage } = useIntl();
   const [isLoading, setIsLoading] = useState(true);

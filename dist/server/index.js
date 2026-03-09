@@ -515,6 +515,9 @@ const attributes$2 = {
     type: "string",
     required: false
   },
+  status_detail: {
+    type: "string"
+  },
   payment_status: {
     type: "enumeration",
     required: true,
@@ -25592,13 +25595,25 @@ const configuration$1 = ({ strapi: strapi2 }) => ({
     return ctx.send({ ok: true, response });
   }
 });
+const VALID_DAYS = [30, 60, 90];
+const dashboard$2 = ({ strapi: strapi2 }) => ({
+  async stats(ctx) {
+    const days = Number(ctx.query.days) || 30;
+    if (!VALID_DAYS.includes(days)) {
+      return ctx.badRequest("Invalid period. Use 30, 60, or 90.");
+    }
+    const stats = await strapi2.service("plugin::strapi-mercadopago.dashboard").getStats(days);
+    ctx.body = stats;
+  }
+});
 const controllers = {
   category: category$2,
   product: product$1,
   order: order$1,
   checkout: checkout$1,
   notification: notification$1,
-  configuration: configuration$1
+  configuration: configuration$1,
+  dashboard: dashboard$2
 };
 const loadConfig = (options2, { strapi: strapi2 }) => {
   return async (ctx, next) => {
@@ -25864,11 +25879,11 @@ const notification = {
       path: URLS.WEBHOOK,
       handler: "notification.notification",
       config: {
+        auth: false,
         middlewares: [
           "plugin::strapi-mercadopago.loadConfig",
           "plugin::strapi-mercadopago.verifySign"
-        ],
-        auth: false
+        ]
       }
     }
   ]
@@ -25894,13 +25909,27 @@ const configuration = {
     }
   ]
 };
+const dashboard$1 = {
+  type: "admin",
+  routes: [
+    {
+      method: "GET",
+      path: "/dashboard/stats",
+      handler: "dashboard.stats",
+      config: {
+        auth: {}
+      }
+    }
+  ]
+};
 const routes = {
   category: category$1,
   product,
   invoice,
   checkout,
   notification,
-  configuration
+  configuration,
+  dashboard: dashboard$1
 };
 const category = strapi$1.factories.createCoreService("plugin::strapi-mercadopago.category");
 const order = strapi$1.factories.createCoreService(
@@ -26269,7 +26298,7 @@ const paymentNotificationService = ({ strapi: strapi2 }) => ({
     }
     strapi2.log.info("Processing payment notification", { paymentId });
     const paymentInfo = await strapi2.service("plugin::strapi-mercadopago.payment-verification").getAndVerifyPayment(paymentId, config2);
-    const { status: status2, orderId, paymentTypeId, items } = paymentInfo;
+    const { status: status2, statusDetail, orderId, paymentTypeId, items } = paymentInfo;
     const order2 = await strapi2.db.query("plugin::strapi-mercadopago.order").findOne({
       where: { id: orderId }
     });
@@ -26291,6 +26320,7 @@ const paymentNotificationService = ({ strapi: strapi2 }) => ({
       where: { id: orderId },
       data: {
         payment_status: status2,
+        status_detail: statusDetail,
         paid_with: paymentTypeId
       }
     });
@@ -26322,6 +26352,7 @@ const paymentVerificationService = ({ strapi: strapi2 }) => ({
     );
     const {
       status: status2,
+      status_detail,
       additional_info,
       external_reference: orderId,
       payment_type_id
@@ -26330,6 +26361,7 @@ const paymentVerificationService = ({ strapi: strapi2 }) => ({
     return {
       paymentId,
       status: status2,
+      statusDetail: status_detail || "",
       orderId,
       paymentTypeId: payment_type_id || "",
       items,
@@ -26555,6 +26587,112 @@ const mercadopagoGateway = ({ strapi: strapi2 }) => ({
 const externalServices = {
   "mercadopago-gateway": mercadopagoGateway
 };
+const OPEN_STATUSES = ["initial", "in_process", "pending", "in_mediation", "authorized"];
+const dashboard = ({ strapi: strapi2 }) => ({
+  async getStats(days) {
+    const since = /* @__PURE__ */ new Date();
+    since.setDate(since.getDate() - days);
+    const orders = await strapi2.db.query("plugin::strapi-mercadopago.order").findMany({
+      where: {
+        createdAt: { $gte: since.toISOString() }
+      }
+    });
+    const timelineMap = /* @__PURE__ */ new Map();
+    for (let i = 0; i < days; i++) {
+      const d = /* @__PURE__ */ new Date();
+      d.setDate(d.getDate() - (days - 1 - i));
+      const key = d.toISOString().slice(0, 10);
+      timelineMap.set(key, { count: 0, revenue: 0 });
+    }
+    for (const order2 of orders) {
+      const dateKey = new Date(order2.createdAt).toISOString().slice(0, 10);
+      const entry = timelineMap.get(dateKey);
+      if (entry) {
+        entry.count += 1;
+        entry.revenue += order2.total || 0;
+      }
+    }
+    const salesTimeline = [];
+    for (const [date2, val] of timelineMap) {
+      salesTimeline.push({ date: date2, ...val });
+    }
+    let open = 0;
+    let closed = 0;
+    for (const order2 of orders) {
+      if (OPEN_STATUSES.includes(order2.payment_status)) {
+        open++;
+      } else {
+        closed++;
+      }
+    }
+    const orderRatio = { open, closed };
+    const rejectionMap = /* @__PURE__ */ new Map();
+    for (const order2 of orders) {
+      if (order2.payment_status === "rejected" && order2.status_detail) {
+        rejectionMap.set(
+          order2.status_detail,
+          (rejectionMap.get(order2.status_detail) || 0) + 1
+        );
+      }
+    }
+    const rejectionReasons = [...rejectionMap.entries()].map(([reason, count]) => ({ reason, count })).sort((a, b) => b.count - a.count).slice(0, 10);
+    const methodMap = /* @__PURE__ */ new Map();
+    for (const order2 of orders) {
+      if (order2.paid_with) {
+        methodMap.set(order2.paid_with, (methodMap.get(order2.paid_with) || 0) + 1);
+      }
+    }
+    const paymentMethods = [...methodMap.entries()].map(([method, count]) => ({ method, count })).sort((a, b) => b.count - a.count);
+    const productMap = /* @__PURE__ */ new Map();
+    for (const order2 of orders) {
+      let products = [];
+      try {
+        products = typeof order2.products === "string" ? JSON.parse(order2.products) : order2.products || [];
+      } catch {
+        continue;
+      }
+      for (const product2 of products) {
+        const name = product2.name || product2.title || "Unknown";
+        const qty = Number(product2.quantity) || 1;
+        const price = Number(product2.unit_price || product2.price) || 0;
+        const existing = productMap.get(name) || { name, count: 0, revenue: 0 };
+        existing.count += qty;
+        existing.revenue += price * qty;
+        productMap.set(name, existing);
+      }
+    }
+    const topProducts = [...productMap.values()].sort((a, b) => b.count - a.count).slice(0, 10);
+    const totalSales = orders.length;
+    const approvedOrders = orders.filter((o) => o.payment_status === "approved");
+    const approvedCount = approvedOrders.length;
+    const rejectedCount = orders.filter((o) => o.payment_status === "rejected").length;
+    const pendingCount = orders.filter(
+      (o) => OPEN_STATUSES.includes(o.payment_status)
+    ).length;
+    const revenue = approvedOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+    const avgTicket = approvedCount > 0 ? Math.round(revenue / approvedCount) : 0;
+    const conversionRate = totalSales > 0 ? Math.round(approvedCount / totalSales * 1e4) / 100 : 0;
+    return {
+      salesTimeline,
+      orderRatio,
+      rejectionReasons,
+      paymentMethods,
+      topProducts,
+      summary: {
+        totalSales,
+        revenue,
+        approvedCount,
+        rejectedCount,
+        pendingCount,
+        avgTicket,
+        conversionRate
+      }
+    };
+  }
+});
+const dashboardServices = {
+  dashboard
+};
 const services = {
   // Legacy services
   category,
@@ -26567,7 +26705,9 @@ const services = {
   // Product services (reemplaza el antiguo product.ts)
   ...productServices,
   // External services (gateways)
-  ...externalServices
+  ...externalServices,
+  // Dashboard services
+  ...dashboardServices
 };
 const index = {
   register,

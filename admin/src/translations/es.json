@@ -41,5 +41,20 @@
   "mercadopago.dashboard.stat.revenue": "Ingresos",
   "mercadopago.dashboard.stat.approved": "Aprobados",
   "mercadopago.dashboard.stat.rejected": "Rechazados",
-  "mercadopago.dashboard.recentPayments": "Pagos recientes"
+  "mercadopago.dashboard.stat.avgTicket": "Ticket promedio",
+  "mercadopago.dashboard.stat.conversionRate": "Tasa de conversión",
+  "mercadopago.dashboard.recentPayments": "Pagos recientes",
+  "mercadopago.dashboard.period.label": "Período",
+  "mercadopago.dashboard.period.30": "Últimos 30 días",
+  "mercadopago.dashboard.period.60": "Últimos 60 días",
+  "mercadopago.dashboard.period.90": "Últimos 90 días",
+  "mercadopago.dashboard.chart.salesTimeline": "Línea de tiempo de ventas",
+  "mercadopago.dashboard.chart.orderRatio": "Ratio de estado de órdenes",
+  "mercadopago.dashboard.chart.orderRatio.open": "Abiertas",
+  "mercadopago.dashboard.chart.orderRatio.closed": "Cerradas",
+  "mercadopago.dashboard.chart.rejectionReasons": "Motivos de rechazo",
+  "mercadopago.dashboard.chart.paymentMethods": "Métodos de pago",
+  "mercadopago.dashboard.chart.topProducts": "Productos más vendidos",
+  "mercadopago.dashboard.noData": "Sin datos disponibles",
+  "mercadopago.dashboard.error": "Error al cargar el dashboard"
 }

@@ -21,6 +21,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
     const {
       status,
+      status_detail,
       additional_info,
       external_reference: orderId,
       payment_type_id,
@@ -31,6 +32,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     return {
       paymentId,
       status,
+      statusDetail: status_detail || '',
       orderId,
       paymentTypeId: payment_type_id || '',
       items,

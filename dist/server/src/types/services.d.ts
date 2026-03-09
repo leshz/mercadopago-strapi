@@ -67,6 +67,7 @@ export interface PreferenceData {
 export interface PaymentInfo {
     paymentId: string;
     status: string;
+    statusDetail: string;
     orderId: string;
     paymentTypeId: string;
     items: StockItem[];
@@ -86,4 +87,14 @@ export interface WebhookPayload {
 export interface ProductItem {
     sku: string;
     quantity: number;
+}
+export interface TimelineEntry {
+    date: string;
+    count: number;
+    revenue: number;
+}
+export interface ProductAccum {
+    name: string;
+    count: number;
+    revenue: number;
 }

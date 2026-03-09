@@ -42,6 +42,9 @@
       "type": "string",
       "required": false
     },
+    "status_detail": {
+      "type": "string"
+    },
     "payment_status": {
       "type": "enumeration",
       "required": true,

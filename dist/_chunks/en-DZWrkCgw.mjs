@@ -1,5 +1,3 @@
-"use strict";
-Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 const en = {
   "mercadopago.plugin.name": "Mercado Pago",
   "mercadopago.setting.header.title": "Mercado Pago",
@@ -32,6 +30,23 @@ const en = {
   "mercadopago.dashboard.stat.revenue": "Revenue",
   "mercadopago.dashboard.stat.approved": "Approved",
   "mercadopago.dashboard.stat.rejected": "Rejected",
-  "mercadopago.dashboard.recentPayments": "Recent payments"
+  "mercadopago.dashboard.stat.avgTicket": "Avg. ticket",
+  "mercadopago.dashboard.stat.conversionRate": "Conversion rate",
+  "mercadopago.dashboard.recentPayments": "Recent payments",
+  "mercadopago.dashboard.period.label": "Period",
+  "mercadopago.dashboard.period.30": "Last 30 days",
+  "mercadopago.dashboard.period.60": "Last 60 days",
+  "mercadopago.dashboard.period.90": "Last 90 days",
+  "mercadopago.dashboard.chart.salesTimeline": "Sales timeline",
+  "mercadopago.dashboard.chart.orderRatio": "Order status ratio",
+  "mercadopago.dashboard.chart.orderRatio.open": "Open",
+  "mercadopago.dashboard.chart.orderRatio.closed": "Closed",
+  "mercadopago.dashboard.chart.rejectionReasons": "Rejection reasons",
+  "mercadopago.dashboard.chart.paymentMethods": "Payment methods",
+  "mercadopago.dashboard.chart.topProducts": "Top products",
+  "mercadopago.dashboard.noData": "No data available",
+  "mercadopago.dashboard.error": "Error loading dashboard"
 };
-exports.default = en;
+export {
+  en as default
+};

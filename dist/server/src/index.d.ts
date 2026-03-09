@@ -38,6 +38,11 @@ declare const _default: {
             get(ctx: any): Promise<any>;
             update(ctx: any): Promise<any>;
         };
+        dashboard: ({ strapi }: {
+            strapi: import("@strapi/types/dist/core").Strapi;
+        }) => {
+            stats(ctx: any): Promise<any>;
+        };
     };
     routes: {
         category: import("@strapi/types/dist/core/core-api/router").Router;
@@ -71,8 +76,8 @@ declare const _default: {
                 path: "/notifications";
                 handler: string;
                 config: {
-                    middlewares: string[];
                     auth: boolean;
+                    middlewares: string[];
                 };
             }[];
         };
@@ -89,8 +94,50 @@ declare const _default: {
                 };
             }[];
         };
+        dashboard: {
+            type: string;
+            routes: {
+                method: string;
+                path: string;
+                handler: string; /**
+                 * Plugin server methods
+                 */
+                config: {
+                    auth: {};
+                };
+            }[];
+        };
     };
     services: {
+        dashboard: ({ strapi }: {
+            strapi: import("@strapi/types/dist/core").Strapi;
+        }) => {
+            getStats(days: number): Promise<{
+                salesTimeline: import("./types").TimelineEntry[];
+                orderRatio: {
+                    open: number;
+                    closed: number;
+                };
+                rejectionReasons: {
+                    reason: string;
+                    count: number;
+                }[];
+                paymentMethods: {
+                    method: string;
+                    count: number;
+                }[];
+                topProducts: import("./types").ProductAccum[];
+                summary: {
+                    totalSales: number;
+                    revenue: any;
+                    approvedCount: number;
+                    rejectedCount: number;
+                    pendingCount: number;
+                    avgTicket: number;
+                    conversionRate: number;
+                };
+            }>;
+        };
         'mercadopago-gateway': ({ strapi }: {
             strapi: import("@strapi/types/dist/core").Strapi;
         }) => {
@@ -253,6 +300,9 @@ declare const _default: {
                     payment_id: {
                         type: string;
                         required: boolean;
+                    };
+                    status_detail: {
+                        type: string;
                     };
                     payment_status: {
                         type: string;

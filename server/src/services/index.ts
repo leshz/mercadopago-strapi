@@ -8,6 +8,7 @@ import checkoutServices from './checkout';
 import paymentServices from './payment';
 import productServices from './product';
 import externalServices from './external';
+import dashboardServices from './dashboard';
 
 export default {
   // Legacy services
@@ -26,4 +27,7 @@ export default {
 
   // External services (gateways)
   ...externalServices,
+
+  // Dashboard services
+  ...dashboardServices,
 };

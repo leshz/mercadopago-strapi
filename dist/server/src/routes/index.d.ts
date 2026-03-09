@@ -30,8 +30,8 @@ declare const _default: {
             path: "/notifications";
             handler: string;
             config: {
-                middlewares: string[];
                 auth: boolean;
+                middlewares: string[];
             };
         }[];
     };
@@ -43,6 +43,17 @@ declare const _default: {
             handler: string;
             config: {
                 auth: boolean;
+            };
+        }[];
+    };
+    dashboard: {
+        type: string;
+        routes: {
+            method: string;
+            path: string;
+            handler: string;
+            config: {
+                auth: {};
             };
         }[];
     };

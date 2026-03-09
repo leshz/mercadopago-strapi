@@ -4,6 +4,7 @@ import invoice from "./order";
 import checkout from "./checkout";
 import notification from "./notification";
 import configuration from "./configuration";
+import dashboard from "./dashboard";
 
 export default {
   category,
@@ -11,5 +12,6 @@ export default {
   invoice,
   checkout,
   notification,
-  configuration
+  configuration,
+  dashboard,
 };

@@ -24,7 +24,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       .service('plugin::strapi-mercadopago.payment-verification')
       .getAndVerifyPayment(paymentId, config);
 
-    const { status, orderId, paymentTypeId, items } = paymentInfo;
+    const { status, statusDetail, orderId, paymentTypeId, items } = paymentInfo;
 
     // 2. Buscar orden
     const order = await strapi.db
@@ -57,6 +57,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         where: { id: orderId },
         data: {
           payment_status: status,
+          status_detail: statusDetail,
           paid_with: paymentTypeId,
         },
       });

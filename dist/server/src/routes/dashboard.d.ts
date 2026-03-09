@@ -1,12 +1,11 @@
 declare const _default: {
     type: string;
     routes: {
-        method: "POST";
-        path: "/notifications";
+        method: string;
+        path: string;
         handler: string;
         config: {
-            auth: boolean;
-            middlewares: string[];
+            auth: {};
         };
     }[];
 };

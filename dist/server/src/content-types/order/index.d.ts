@@ -43,6 +43,9 @@ declare const _default: {
                 type: string;
                 required: boolean;
             };
+            status_detail: {
+                type: string;
+            };
             payment_status: {
                 type: string;
                 required: boolean;

@@ -24,5 +24,10 @@ declare const _default: {
         get(ctx: any): Promise<any>;
         update(ctx: any): Promise<any>;
     };
+    dashboard: ({ strapi }: {
+        strapi: import("@strapi/types/dist/core").Strapi;
+    }) => {
+        stats(ctx: any): Promise<any>;
+    };
 };
 export default _default;
