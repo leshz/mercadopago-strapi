@@ -6,7 +6,7 @@ export default {
       path: '/configuration',
       handler: 'configuration.get',
       config: {
-        auth: false
+        auth: true
       },
     },
     {
@@ -14,7 +14,7 @@ export default {
       path: '/configuration',
       handler: 'configuration.update',
       config: {
-        auth: false
+        auth: true
       },
     }
   ]

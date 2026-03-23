@@ -93,14 +93,10 @@ export function decrypt(encryptedText: string, strapi: Core.Strapi): string {
 
     return decrypted;
   } catch (error) {
-    // Si falla, puede ser texto plano (migración) o clave cambiada
-    strapi.log.warn('Decryption failed - data may be in plain text', {
+    strapi.log.error('Decryption failed - secret may need to be reconfigured', {
       error: error.message,
-      dataLength: encryptedText?.length,
     });
-
-    // Retornar tal cual para backward compatibility
-    return encryptedText;
+    throw new Error('Failed to decrypt sensitive data. Please reconfigure the plugin credentials.');
   }
 }
 

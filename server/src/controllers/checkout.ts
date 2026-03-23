@@ -25,10 +25,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     } catch (error) {
       strapi.log.error('Checkout failed', {
         error: error.message,
-        customerEmail: customer?.email,
       });
 
-      return ctx.badRequest(error.message);
+      return ctx.badRequest('Checkout processing failed. Please try again.');
     }
   },
 });

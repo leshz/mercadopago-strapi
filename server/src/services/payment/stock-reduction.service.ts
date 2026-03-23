@@ -7,51 +7,52 @@ import type { StockItem } from '../../types';
 
 export default ({ strapi }: { strapi: Core.Strapi }) => ({
   /**
-   * Reduce el stock de múltiples productos
-   * Usa las operaciones de Strapi directamente
+   * Reduce el stock de múltiples productos de forma atómica
+   * Usa transacción para evitar race conditions
    */
   async reduceStock(items: StockItem[]) {
-    for (const item of items) {
-      const quantity = Number(item.quantity);
+    await strapi.db.transaction(async ({ trx }) => {
+      for (const item of items) {
+        const quantity = Number(item.quantity);
 
-      // Buscar producto por SKU
-      const product = await strapi.db
-        .query('plugin::strapi-mercadopago.product')
-        .findOne({
-          where: { sku: item.id },
-        });
+        const product = await strapi.db
+          .query('plugin::strapi-mercadopago.product')
+          .findOne({
+            where: { sku: item.id },
+          }, trx);
 
-      if (!product) {
-        strapi.log.warn('Product not found for stock reduction', {
+        if (!product) {
+          strapi.log.warn('Product not found for stock reduction', {
+            sku: item.id,
+          });
+          continue;
+        }
+
+        const newStock = Number(product.stock) - quantity;
+
+        if (newStock < 0) {
+          strapi.log.error('Insufficient stock for reduction', {
+            sku: item.id,
+            currentStock: product.stock,
+            requested: quantity,
+          });
+          throw new Error(`Insufficient stock for ${item.id}`);
+        }
+
+        await strapi.db
+          .query('plugin::strapi-mercadopago.product')
+          .update({
+            where: { sku: item.id },
+            data: { stock: newStock },
+          }, trx);
+
+        strapi.log.info('Stock reduced successfully', {
           sku: item.id,
+          previousStock: product.stock,
+          newStock,
+          quantityReduced: quantity,
         });
-        continue;
       }
-
-      const newStock = Number(product.stock) - quantity;
-
-      if (newStock < 0) {
-        strapi.log.error('Insufficient stock for reduction', {
-          sku: item.id,
-          currentStock: product.stock,
-          requested: quantity,
-        });
-        throw new Error(`Insufficient stock for ${item.id}`);
-      }
-
-      await strapi.db
-        .query('plugin::strapi-mercadopago.product')
-        .update({
-          where: { sku: item.id },
-          data: { stock: newStock },
-        });
-
-      strapi.log.info('Stock reduced successfully', {
-        sku: item.id,
-        previousStock: product.stock,
-        newStock,
-        quantityReduced: quantity,
-      });
-    }
+    });
   },
 });

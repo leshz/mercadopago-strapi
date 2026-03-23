@@ -4,11 +4,11 @@ import crypto from 'crypto';
 
 const verifySign = (config, { strapi }: { strapi: Core.Strapi }) => {
   return async (ctx, next) => {
-    const { isActiveVerification = false } = ctx.state.config;
+    const { isActiveVerification = true } = ctx.state.config;
 
     try {
       if (!isActiveVerification) {
-        strapi.log.warn('Webhook signature verification is DISABLED');
+        strapi.log.warn('Webhook signature verification is DISABLED - this is a security risk');
         return next();
       }
 
@@ -58,7 +58,12 @@ const verifySign = (config, { strapi }: { strapi: Core.Strapi }) => {
 
         const sha = hmac.digest('hex');
 
-        if (sha === hash) {
+        const shaBuffer = Buffer.from(sha, 'utf8');
+        const hashBuffer = Buffer.from(hash, 'utf8');
+        const isValid = shaBuffer.length === hashBuffer.length &&
+          crypto.timingSafeEqual(shaBuffer, hashBuffer);
+
+        if (isValid) {
           strapi.log.info('Webhook signature verified successfully');
           return next();
         } else {

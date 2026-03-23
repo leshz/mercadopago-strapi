@@ -4,6 +4,7 @@
  */
 import type { Core } from '@strapi/strapi';
 import { encrypt, decrypt } from '../utils/encryption';
+import { configurationSchema } from '../validators/configuration.validator';
 
 export default ({ strapi }: { strapi: Core.Strapi }) => ({
   async get(ctx) {
@@ -35,6 +36,19 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
   async update(ctx) {
     const { data } = ctx.request.body;
+
+    let validated;
+    try {
+      validated = await configurationSchema.validate(data, {
+        abortEarly: false,
+        stripUnknown: true,
+      });
+    } catch (error) {
+      return ctx.badRequest('Invalid configuration data', {
+        errors: error.errors,
+      });
+    }
+
     const {
       isActive,
       mercadoPagoToken,
@@ -44,7 +58,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       notificationUrl,
       bussinessDescription,
       isActiveVerification,
-    } = data;
+    } = validated;
 
     const pluginStore = strapi.store({
       environment: strapi.config.environment,

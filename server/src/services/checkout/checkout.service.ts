@@ -14,7 +14,6 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
     strapi.log.info('Processing checkout', {
       itemsCount: items.length,
-      customerEmail: customer.email,
     });
 
     // 1. Obtener y validar productos
