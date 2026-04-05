@@ -50,3 +50,4 @@ const es = {
   "mercadopago.dashboard.error": "Error al cargar el dashboard"
 };
 exports.default = es;
+//# sourceMappingURL=es-RjHiIJ5v.js.map

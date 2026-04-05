@@ -25879,11 +25879,11 @@ const notification = {
       path: URLS.WEBHOOK,
       handler: "notification.notification",
       config: {
-        auth: false,
         middlewares: [
           "plugin::strapi-mercadopago.loadConfig",
           "plugin::strapi-mercadopago.verifySign"
-        ]
+        ],
+        auth: false
       }
     }
   ]
@@ -26722,3 +26722,4 @@ const index = {
   middlewares
 };
 module.exports = index;
+//# sourceMappingURL=index.js.map
