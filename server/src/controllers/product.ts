@@ -5,7 +5,6 @@
 import type { Core } from '@strapi/strapi';
 
 import { factories } from "@strapi/strapi";
-import { errors } from "@strapi/utils";
 
 export default factories.createCoreController(
   "plugin::strapi-mercadopago.product",
@@ -14,17 +13,17 @@ export default factories.createCoreController(
       await this.validateQuery(ctx);
 
       const { slug } = ctx.params;
-      if (!strapi.db)
-        throw new errors.ApplicationError("Service not Available");
+      const locale = (ctx.query.locale as string) ?? 'all';
 
-      const entity = await strapi.db
-        .query("plugin::strapi-mercadopago.product")
-        .findOne({
-          where: { slug },
-          populate: true,
-        });
+      const sanitizedQuery = await this.sanitizeQuery(ctx);
 
-      if (entity === null) return ctx.notFound();
+      const entity = await strapi.documents("plugin::strapi-mercadopago.product").findFirst({
+        filters: { slug } as any,
+        populate: (sanitizedQuery.populate as any) ?? ['pictures', 'categories', 'promotion', 'information'],
+        ...(locale !== 'all' && { locale }),
+      });
+
+      if (!entity) return ctx.notFound();
       const sanitizedEntity = await this.sanitizeOutput(entity, ctx);
       return ctx.send(this.transformResponse(sanitizedEntity));
     },
