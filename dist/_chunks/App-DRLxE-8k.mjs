@@ -7,10 +7,11 @@ import { useIntl } from "react-intl";
 import { Box, Typography, Divider, Flex, Main, SingleSelect, SingleSelectOption, Loader, Grid, Badge } from "@strapi/design-system";
 import "react-dom/client";
 import "@strapi/icons";
-import { g as getFetchClient, a as getDashboardStats, L as Layouts } from "./index-BUsSJb2Z.mjs";
+import { g as getFetchClient, a as getDashboardStats, L as Layouts } from "./index-BSjFQn-a.mjs";
 import "@strapi/icons/symbols";
 import "yup";
-import { g as getTranslation } from "./index-Cf3Cj2pv.mjs";
+import "styled-components";
+import { g as getTranslation } from "./index-C5657In2.mjs";
 import { ResponsiveContainer, ComposedChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Area, Line, PieChart, Pie, Cell, BarChart, Bar } from "recharts";
 const useFetchClient = () => {
   const controller = React.useRef(null);

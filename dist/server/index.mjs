@@ -1240,7 +1240,7 @@ lodash.exports;
 (function(module, exports) {
   (function() {
     var undefined$1;
-    var VERSION = "4.17.21";
+    var VERSION = "4.17.23";
     var LARGE_ARRAY_SIZE = 200;
     var CORE_ERROR_TEXT = "Unsupported core-js use. Try https://npms.io/search?q=ponyfill.", FUNC_ERROR_TEXT = "Expected a function", INVALID_TEMPL_VAR_ERROR_TEXT = "Invalid `variable` option passed into `_.template`";
     var HASH_UNDEFINED = "__lodash_hash_undefined__";
@@ -3168,8 +3168,28 @@ lodash.exports;
       }
       function baseUnset(object2, path2) {
         path2 = castPath(path2, object2);
-        object2 = parent(object2, path2);
-        return object2 == null || delete object2[toKey(last(path2))];
+        var index2 = -1, length = path2.length;
+        if (!length) {
+          return true;
+        }
+        var isRootPrimitive = object2 == null || typeof object2 !== "object" && typeof object2 !== "function";
+        while (++index2 < length) {
+          var key = path2[index2];
+          if (typeof key !== "string") {
+            continue;
+          }
+          if (key === "__proto__" && !hasOwnProperty.call(object2, "__proto__")) {
+            return false;
+          }
+          if (key === "constructor" && index2 + 1 < length && typeof path2[index2 + 1] === "string" && path2[index2 + 1] === "prototype") {
+            if (isRootPrimitive && index2 === 0) {
+              continue;
+            }
+            return false;
+          }
+        }
+        var obj = parent(object2, path2);
+        return obj == null || delete obj[toKey(last(path2))];
       }
       function baseUpdate(object2, path2, updater, customizer) {
         return baseSet(object2, path2, updater(baseGet(object2, path2)), customizer);
@@ -6716,73 +6736,76 @@ function envFn(key, defaultValue) {
 function getKey(key) {
   return process.env[key] ?? "";
 }
-const utils$9 = {
-  int(key, defaultValue) {
-    if (!___default.has(process.env, key)) {
-      return defaultValue;
-    }
-    return parseInt(getKey(key), 10);
-  },
-  float(key, defaultValue) {
-    if (!___default.has(process.env, key)) {
-      return defaultValue;
-    }
-    return parseFloat(getKey(key));
-  },
-  bool(key, defaultValue) {
-    if (!___default.has(process.env, key)) {
-      return defaultValue;
-    }
-    return getKey(key) === "true";
-  },
-  json(key, defaultValue) {
-    if (!___default.has(process.env, key)) {
-      return defaultValue;
-    }
-    try {
-      return JSON.parse(getKey(key));
-    } catch (error2) {
-      if (error2 instanceof Error) {
-        throw new Error(`Invalid json environment variable ${key}: ${error2.message}`);
-      }
-      throw error2;
-    }
-  },
-  array(key, defaultValue) {
-    if (!___default.has(process.env, key)) {
-      return defaultValue;
-    }
-    let value = getKey(key);
-    if (value.startsWith("[") && value.endsWith("]")) {
-      value = value.substring(1, value.length - 1);
-    }
-    return value.split(",").map((v) => {
-      return ___default.trim(___default.trim(v, " "), '"');
-    });
-  },
-  date(key, defaultValue) {
-    if (!___default.has(process.env, key)) {
-      return defaultValue;
-    }
-    return new Date(getKey(key));
-  },
-  /**
-  * Gets a value from env that matches oneOf provided values
-  * @param {string} key
-  * @param {string[]} expectedValues
-  * @param {string|undefined} defaultValue
-  * @returns {string|undefined}
-  */
-  oneOf(key, expectedValues, defaultValue) {
-    if (!expectedValues) {
-      throw new Error(`env.oneOf requires expectedValues`);
-    }
-    if (defaultValue && !expectedValues.includes(defaultValue)) {
-      throw new Error(`env.oneOf requires defaultValue to be included in expectedValues`);
-    }
-    const rawValue = env(key, defaultValue);
-    return expectedValues.includes(rawValue) ? rawValue : defaultValue;
+function int$2(key, defaultValue) {
+  if (!___default.has(process.env, key)) {
+    return defaultValue;
   }
+  return parseInt(getKey(key), 10);
+}
+function float$1(key, defaultValue) {
+  if (!___default.has(process.env, key)) {
+    return defaultValue;
+  }
+  return parseFloat(getKey(key));
+}
+function bool$1(key, defaultValue) {
+  if (!___default.has(process.env, key)) {
+    return defaultValue;
+  }
+  return getKey(key) === "true";
+}
+function json$1(key, defaultValue) {
+  if (!___default.has(process.env, key)) {
+    return defaultValue;
+  }
+  try {
+    return JSON.parse(getKey(key));
+  } catch (error2) {
+    if (error2 instanceof Error) {
+      throw new Error(`Invalid json environment variable ${key}: ${error2.message}`);
+    }
+    throw error2;
+  }
+}
+function array$1(key, defaultValue) {
+  if (!___default.has(process.env, key)) {
+    return defaultValue;
+  }
+  let value = getKey(key);
+  if (value.startsWith("[") && value.endsWith("]")) {
+    value = value.substring(1, value.length - 1);
+  }
+  return value.split(",").map((v) => {
+    return ___default.trim(___default.trim(v, " "), '"');
+  });
+}
+function date$2(key, defaultValue) {
+  if (!___default.has(process.env, key)) {
+    return defaultValue;
+  }
+  return new Date(getKey(key));
+}
+function oneOf(key, expectedValues, defaultValue) {
+  if (!expectedValues) {
+    throw new Error(`env.oneOf requires expectedValues`);
+  }
+  if (defaultValue && !expectedValues.includes(defaultValue)) {
+    throw new Error(`env.oneOf requires defaultValue to be included in expectedValues`);
+  }
+  const rawValue = env(key, defaultValue);
+  if (rawValue !== void 0 && expectedValues.includes(rawValue)) {
+    return rawValue;
+  }
+  return defaultValue;
+}
+const utils$9 = {
+  int: int$2,
+  float: float$1,
+  bool: bool$1,
+  json: json$1,
+  array: array$1,
+  date: date$2,
+  oneOf
 };
 const env = Object.assign(envFn, utils$9);
 var lodash_min = { exports: {} };
@@ -7033,7 +7056,7 @@ lodash_min.exports;
     function Q(n2) {
       return n2.match(Fr) || [];
     }
-    var X, nn = "4.17.21", tn = 200, rn = "Unsupported core-js use. Try https://npms.io/search?q=ponyfill.", en = "Expected a function", un = "Invalid `variable` option passed into `_.template`", on = "__lodash_hash_undefined__", fn = 500, cn = "__lodash_placeholder__", an = 1, ln = 2, sn = 4, hn = 1, pn = 2, _n = 1, vn = 2, gn = 4, yn = 8, dn = 16, bn = 32, wn = 64, mn = 128, xn = 256, jn = 512, An = 30, kn = "...", On = 800, In = 16, Rn = 1, zn = 2, En = 3, Sn = 1 / 0, Wn = 9007199254740991, Ln = 17976931348623157e292, Cn = NaN, Un = 4294967295, Bn = Un - 1, Tn = Un >>> 1, $n = [["ary", mn], ["bind", _n], ["bindKey", vn], ["curry", yn], ["curryRight", dn], ["flip", jn], ["partial", bn], ["partialRight", wn], ["rearg", xn]], Dn = "[object Arguments]", Mn = "[object Array]", Fn = "[object AsyncFunction]", Nn = "[object Boolean]", Pn = "[object Date]", qn = "[object DOMException]", Zn = "[object Error]", Kn = "[object Function]", Vn = "[object GeneratorFunction]", Gn = "[object Map]", Hn = "[object Number]", Jn = "[object Null]", Yn = "[object Object]", Qn = "[object Promise]", Xn = "[object Proxy]", nt = "[object RegExp]", tt = "[object Set]", rt = "[object String]", et = "[object Symbol]", ut = "[object Undefined]", it = "[object WeakMap]", ot = "[object WeakSet]", ft = "[object ArrayBuffer]", ct = "[object DataView]", at = "[object Float32Array]", lt = "[object Float64Array]", st = "[object Int8Array]", ht = "[object Int16Array]", pt = "[object Int32Array]", _t = "[object Uint8Array]", vt = "[object Uint8ClampedArray]", gt = "[object Uint16Array]", yt = "[object Uint32Array]", dt = /\b__p \+= '';/g, bt = /\b(__p \+=) '' \+/g, wt = /(__e\(.*?\)|\b__t\)) \+\n'';/g, mt = /&(?:amp|lt|gt|quot|#39);/g, xt = /[&<>"']/g, jt = RegExp(mt.source), At = RegExp(xt.source), kt = /<%-([\s\S]+?)%>/g, Ot = /<%([\s\S]+?)%>/g, It = /<%=([\s\S]+?)%>/g, Rt = /\.|\[(?:[^[\]]*|(["'])(?:(?!\1)[^\\]|\\.)*?\1)\]/, zt = /^\w*$/, Et = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))/g, St = /[\\^$.*+?()[\]{}|]/g, Wt = RegExp(St.source), Lt = /^\s+/, Ct = /\s/, Ut = /\{(?:\n\/\* \[wrapped with .+\] \*\/)?\n?/, Bt = /\{\n\/\* \[wrapped with (.+)\] \*/, Tt = /,? & /, $t = /[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g, Dt = /[()=,{}\[\]\/\s]/, Mt = /\\(\\)?/g, Ft = /\$\{([^\\}]*(?:\\.[^\\}]*)*)\}/g, Nt = /\w*$/, Pt = /^[-+]0x[0-9a-f]+$/i, qt = /^0b[01]+$/i, Zt = /^\[object .+?Constructor\]$/, Kt = /^0o[0-7]+$/i, Vt = /^(?:0|[1-9]\d*)$/, Gt = /[\xc0-\xd6\xd8-\xf6\xf8-\xff\u0100-\u017f]/g, Ht = /($^)/, Jt = /['\n\r\u2028\u2029\\]/g, Yt = "\\ud800-\\udfff", Qt = "\\u0300-\\u036f", Xt = "\\ufe20-\\ufe2f", nr = "\\u20d0-\\u20ff", tr = Qt + Xt + nr, rr = "\\u2700-\\u27bf", er = "a-z\\xdf-\\xf6\\xf8-\\xff", ur = "\\xac\\xb1\\xd7\\xf7", ir = "\\x00-\\x2f\\x3a-\\x40\\x5b-\\x60\\x7b-\\xbf", or = "\\u2000-\\u206f", fr = " \\t\\x0b\\f\\xa0\\ufeff\\n\\r\\u2028\\u2029\\u1680\\u180e\\u2000\\u2001\\u2002\\u2003\\u2004\\u2005\\u2006\\u2007\\u2008\\u2009\\u200a\\u202f\\u205f\\u3000", cr = "A-Z\\xc0-\\xd6\\xd8-\\xde", ar = "\\ufe0e\\ufe0f", lr = ur + ir + or + fr, sr = "['’]", hr = "[" + Yt + "]", pr = "[" + lr + "]", _r = "[" + tr + "]", vr = "\\d+", gr = "[" + rr + "]", yr = "[" + er + "]", dr = "[^" + Yt + lr + vr + rr + er + cr + "]", br = "\\ud83c[\\udffb-\\udfff]", wr = "(?:" + _r + "|" + br + ")", mr = "[^" + Yt + "]", xr = "(?:\\ud83c[\\udde6-\\uddff]){2}", jr = "[\\ud800-\\udbff][\\udc00-\\udfff]", Ar = "[" + cr + "]", kr = "\\u200d", Or = "(?:" + yr + "|" + dr + ")", Ir = "(?:" + Ar + "|" + dr + ")", Rr = "(?:" + sr + "(?:d|ll|m|re|s|t|ve))?", zr = "(?:" + sr + "(?:D|LL|M|RE|S|T|VE))?", Er = wr + "?", Sr = "[" + ar + "]?", Wr = "(?:" + kr + "(?:" + [mr, xr, jr].join("|") + ")" + Sr + Er + ")*", Lr = "\\d*(?:1st|2nd|3rd|(?![123])\\dth)(?=\\b|[A-Z_])", Cr = "\\d*(?:1ST|2ND|3RD|(?![123])\\dTH)(?=\\b|[a-z_])", Ur = Sr + Er + Wr, Br = "(?:" + [gr, xr, jr].join("|") + ")" + Ur, Tr = "(?:" + [mr + _r + "?", _r, xr, jr, hr].join("|") + ")", $r = RegExp(sr, "g"), Dr = RegExp(_r, "g"), Mr = RegExp(br + "(?=" + br + ")|" + Tr + Ur, "g"), Fr = RegExp([Ar + "?" + yr + "+" + Rr + "(?=" + [pr, Ar, "$"].join("|") + ")", Ir + "+" + zr + "(?=" + [pr, Ar + Or, "$"].join("|") + ")", Ar + "?" + Or + "+" + Rr, Ar + "+" + zr, Cr, Lr, vr, Br].join("|"), "g"), Nr = RegExp("[" + kr + Yt + tr + ar + "]"), Pr = /[a-z][A-Z]|[A-Z]{2}[a-z]|[0-9][a-zA-Z]|[a-zA-Z][0-9]|[^a-zA-Z0-9 ]/, qr = ["Array", "Buffer", "DataView", "Date", "Error", "Float32Array", "Float64Array", "Function", "Int8Array", "Int16Array", "Int32Array", "Map", "Math", "Object", "Promise", "RegExp", "Set", "String", "Symbol", "TypeError", "Uint8Array", "Uint8ClampedArray", "Uint16Array", "Uint32Array", "WeakMap", "_", "clearTimeout", "isFinite", "parseInt", "setTimeout"], Zr = -1, Kr = {};
+    var X, nn = "4.17.23", tn = 200, rn = "Unsupported core-js use. Try https://npms.io/search?q=ponyfill.", en = "Expected a function", un = "Invalid `variable` option passed into `_.template`", on = "__lodash_hash_undefined__", fn = 500, cn = "__lodash_placeholder__", an = 1, ln = 2, sn = 4, hn = 1, pn = 2, _n = 1, vn = 2, gn = 4, yn = 8, dn = 16, bn = 32, wn = 64, mn = 128, xn = 256, jn = 512, An = 30, kn = "...", On = 800, In = 16, Rn = 1, zn = 2, En = 3, Sn = 1 / 0, Wn = 9007199254740991, Ln = 17976931348623157e292, Cn = NaN, Un = 4294967295, Bn = Un - 1, Tn = Un >>> 1, $n = [["ary", mn], ["bind", _n], ["bindKey", vn], ["curry", yn], ["curryRight", dn], ["flip", jn], ["partial", bn], ["partialRight", wn], ["rearg", xn]], Dn = "[object Arguments]", Mn = "[object Array]", Fn = "[object AsyncFunction]", Nn = "[object Boolean]", Pn = "[object Date]", qn = "[object DOMException]", Zn = "[object Error]", Kn = "[object Function]", Vn = "[object GeneratorFunction]", Gn = "[object Map]", Hn = "[object Number]", Jn = "[object Null]", Yn = "[object Object]", Qn = "[object Promise]", Xn = "[object Proxy]", nt = "[object RegExp]", tt = "[object Set]", rt = "[object String]", et = "[object Symbol]", ut = "[object Undefined]", it = "[object WeakMap]", ot = "[object WeakSet]", ft = "[object ArrayBuffer]", ct = "[object DataView]", at = "[object Float32Array]", lt = "[object Float64Array]", st = "[object Int8Array]", ht = "[object Int16Array]", pt = "[object Int32Array]", _t = "[object Uint8Array]", vt = "[object Uint8ClampedArray]", gt = "[object Uint16Array]", yt = "[object Uint32Array]", dt = /\b__p \+= '';/g, bt = /\b(__p \+=) '' \+/g, wt = /(__e\(.*?\)|\b__t\)) \+\n'';/g, mt = /&(?:amp|lt|gt|quot|#39);/g, xt = /[&<>"']/g, jt = RegExp(mt.source), At = RegExp(xt.source), kt = /<%-([\s\S]+?)%>/g, Ot = /<%([\s\S]+?)%>/g, It = /<%=([\s\S]+?)%>/g, Rt = /\.|\[(?:[^[\]]*|(["'])(?:(?!\1)[^\\]|\\.)*?\1)\]/, zt = /^\w*$/, Et = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))/g, St = /[\\^$.*+?()[\]{}|]/g, Wt = RegExp(St.source), Lt = /^\s+/, Ct = /\s/, Ut = /\{(?:\n\/\* \[wrapped with .+\] \*\/)?\n?/, Bt = /\{\n\/\* \[wrapped with (.+)\] \*/, Tt = /,? & /, $t = /[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g, Dt = /[()=,{}\[\]\/\s]/, Mt = /\\(\\)?/g, Ft = /\$\{([^\\}]*(?:\\.[^\\}]*)*)\}/g, Nt = /\w*$/, Pt = /^[-+]0x[0-9a-f]+$/i, qt = /^0b[01]+$/i, Zt = /^\[object .+?Constructor\]$/, Kt = /^0o[0-7]+$/i, Vt = /^(?:0|[1-9]\d*)$/, Gt = /[\xc0-\xd6\xd8-\xf6\xf8-\xff\u0100-\u017f]/g, Ht = /($^)/, Jt = /['\n\r\u2028\u2029\\]/g, Yt = "\\ud800-\\udfff", Qt = "\\u0300-\\u036f", Xt = "\\ufe20-\\ufe2f", nr = "\\u20d0-\\u20ff", tr = Qt + Xt + nr, rr = "\\u2700-\\u27bf", er = "a-z\\xdf-\\xf6\\xf8-\\xff", ur = "\\xac\\xb1\\xd7\\xf7", ir = "\\x00-\\x2f\\x3a-\\x40\\x5b-\\x60\\x7b-\\xbf", or = "\\u2000-\\u206f", fr = " \\t\\x0b\\f\\xa0\\ufeff\\n\\r\\u2028\\u2029\\u1680\\u180e\\u2000\\u2001\\u2002\\u2003\\u2004\\u2005\\u2006\\u2007\\u2008\\u2009\\u200a\\u202f\\u205f\\u3000", cr = "A-Z\\xc0-\\xd6\\xd8-\\xde", ar = "\\ufe0e\\ufe0f", lr = ur + ir + or + fr, sr = "['’]", hr = "[" + Yt + "]", pr = "[" + lr + "]", _r = "[" + tr + "]", vr = "\\d+", gr = "[" + rr + "]", yr = "[" + er + "]", dr = "[^" + Yt + lr + vr + rr + er + cr + "]", br = "\\ud83c[\\udffb-\\udfff]", wr = "(?:" + _r + "|" + br + ")", mr = "[^" + Yt + "]", xr = "(?:\\ud83c[\\udde6-\\uddff]){2}", jr = "[\\ud800-\\udbff][\\udc00-\\udfff]", Ar = "[" + cr + "]", kr = "\\u200d", Or = "(?:" + yr + "|" + dr + ")", Ir = "(?:" + Ar + "|" + dr + ")", Rr = "(?:" + sr + "(?:d|ll|m|re|s|t|ve))?", zr = "(?:" + sr + "(?:D|LL|M|RE|S|T|VE))?", Er = wr + "?", Sr = "[" + ar + "]?", Wr = "(?:" + kr + "(?:" + [mr, xr, jr].join("|") + ")" + Sr + Er + ")*", Lr = "\\d*(?:1st|2nd|3rd|(?![123])\\dth)(?=\\b|[A-Z_])", Cr = "\\d*(?:1ST|2ND|3RD|(?![123])\\dTH)(?=\\b|[a-z_])", Ur = Sr + Er + Wr, Br = "(?:" + [gr, xr, jr].join("|") + ")" + Ur, Tr = "(?:" + [mr + _r + "?", _r, xr, jr, hr].join("|") + ")", $r = RegExp(sr, "g"), Dr = RegExp(_r, "g"), Mr = RegExp(br + "(?=" + br + ")|" + Tr + Ur, "g"), Fr = RegExp([Ar + "?" + yr + "+" + Rr + "(?=" + [pr, Ar, "$"].join("|") + ")", Ir + "+" + zr + "(?=" + [pr, Ar + Or, "$"].join("|") + ")", Ar + "?" + Or + "+" + Rr, Ar + "+" + zr, Cr, Lr, vr, Br].join("|"), "g"), Nr = RegExp("[" + kr + Yt + tr + ar + "]"), Pr = /[a-z][A-Z]|[A-Z]{2}[a-z]|[0-9][a-zA-Z]|[a-zA-Z][0-9]|[^a-zA-Z0-9 ]/, qr = ["Array", "Buffer", "DataView", "Date", "Error", "Float32Array", "Float64Array", "Function", "Int8Array", "Int16Array", "Int32Array", "Map", "Math", "Object", "Promise", "RegExp", "Set", "String", "Symbol", "TypeError", "Uint8Array", "Uint8ClampedArray", "Uint16Array", "Uint32Array", "WeakMap", "_", "clearTimeout", "isFinite", "parseInt", "setTimeout"], Zr = -1, Kr = {};
     Kr[at] = Kr[lt] = Kr[st] = Kr[ht] = Kr[pt] = Kr[_t] = Kr[vt] = Kr[gt] = Kr[yt] = true, Kr[Dn] = Kr[Mn] = Kr[ft] = Kr[Nn] = Kr[ct] = Kr[Pn] = Kr[Zn] = Kr[Kn] = Kr[Gn] = Kr[Hn] = Kr[Yn] = Kr[nt] = Kr[tt] = Kr[rt] = Kr[it] = false;
     var Vr = {};
     Vr[Dn] = Vr[Mn] = Vr[ft] = Vr[ct] = Vr[Nn] = Vr[Pn] = Vr[at] = Vr[lt] = Vr[st] = Vr[ht] = Vr[pt] = Vr[Gn] = Vr[Hn] = Vr[Yn] = Vr[nt] = Vr[tt] = Vr[rt] = Vr[et] = Vr[_t] = Vr[vt] = Vr[gt] = Vr[yt] = true, Vr[Zn] = Vr[Kn] = Vr[it] = false;
@@ -7886,7 +7909,21 @@ lodash_min.exports;
         return a2;
       }
       function yu(n2, t2) {
-        return t2 = ku(t2, n2), n2 = Gi(n2, t2), null == n2 || delete n2[no(jo(t2))];
+        t2 = ku(t2, n2);
+        var r2 = -1, e2 = t2.length;
+        if (!e2) return true;
+        for (var u2 = null == n2 || "object" != typeof n2 && "function" != typeof n2; ++r2 < e2; ) {
+          var i2 = t2[r2];
+          if ("string" == typeof i2) {
+            if ("__proto__" === i2 && !bl.call(n2, "__proto__")) return false;
+            if ("constructor" === i2 && r2 + 1 < e2 && "string" == typeof t2[r2 + 1] && "prototype" === t2[r2 + 1]) {
+              if (u2 && 0 === r2) continue;
+              return false;
+            }
+          }
+        }
+        var o2 = Gi(n2, t2);
+        return null == o2 || delete o2[no(jo(t2))];
       }
       function du(n2, t2, r2, e2) {
         return fu(n2, t2, r2(_e2(n2, t2)), e2);
@@ -10752,11 +10789,22 @@ const isDynamicZoneAttribute = (attribute) => !!attribute && attribute.type === 
 const isMorphToRelationalAttribute = (attribute) => {
   return !!attribute && isRelationalAttribute(attribute) && attribute.relation?.startsWith?.("morphTo");
 };
-const traverseEntity = async (visitor2, options2, entity) => {
+const parallelWithOrderedErrors = async (promises) => {
+  const results = await Promise.allSettled(promises);
+  for (let i = 0; i < results.length; i += 1) {
+    const result = results[i];
+    if (result.status === "rejected") {
+      throw result.reason;
+    }
+  }
+  return results.map((r) => r.value);
+};
+const traverseEntity$1 = async (visitor2, options2, entity) => {
   const { path: path2 = {
     raw: null,
-    attribute: null
-  }, schema: schema2, getModel } = options2;
+    attribute: null,
+    rawWithIndices: null
+  }, schema: schema2, getModel, allowedExtraRootKeys } = options2;
   let parent = options2.parent;
   const traverseMorphRelationTarget = async (visitor3, path3, entry) => {
     const targetSchema = getModel(entry.__type);
@@ -10764,18 +10812,20 @@ const traverseEntity = async (visitor2, options2, entity) => {
       schema: targetSchema,
       path: path3,
       getModel,
-      parent
+      parent,
+      allowedExtraRootKeys
     };
-    return traverseEntity(visitor3, traverseOptions, entry);
+    return traverseEntity$1(visitor3, traverseOptions, entry);
   };
   const traverseRelationTarget = (schema3) => async (visitor3, path3, entry) => {
     const traverseOptions = {
       schema: schema3,
       path: path3,
       getModel,
-      parent
+      parent,
+      allowedExtraRootKeys
     };
-    return traverseEntity(visitor3, traverseOptions, entry);
+    return traverseEntity$1(visitor3, traverseOptions, entry);
   };
   const traverseMediaTarget = async (visitor3, path3, entry) => {
     const targetSchemaUID = "plugin::upload.file";
@@ -10784,18 +10834,20 @@ const traverseEntity = async (visitor2, options2, entity) => {
       schema: targetSchema,
       path: path3,
       getModel,
-      parent
+      parent,
+      allowedExtraRootKeys
     };
-    return traverseEntity(visitor3, traverseOptions, entry);
+    return traverseEntity$1(visitor3, traverseOptions, entry);
   };
   const traverseComponent = async (visitor3, path3, schema3, entry) => {
     const traverseOptions = {
       schema: schema3,
       path: path3,
       getModel,
-      parent
+      parent,
+      allowedExtraRootKeys
     };
-    return traverseEntity(visitor3, traverseOptions, entry);
+    return traverseEntity$1(visitor3, traverseOptions, entry);
   };
   const visitDynamicZoneEntry = async (visitor3, path3, entry) => {
     const targetSchema = getModel(entry.__component);
@@ -10803,9 +10855,10 @@ const traverseEntity = async (visitor2, options2, entity) => {
       schema: targetSchema,
       path: path3,
       getModel,
-      parent
+      parent,
+      allowedExtraRootKeys
     };
-    return traverseEntity(visitor3, traverseOptions, entry);
+    return traverseEntity$1(visitor3, traverseOptions, entry);
   };
   if (!fp.isObject(entity) || fp.isNil(schema2)) {
     return entity;
@@ -10822,6 +10875,7 @@ const traverseEntity = async (visitor2, options2, entity) => {
       ...path2
     };
     newPath.raw = fp.isNil(path2.raw) ? key : `${path2.raw}.${key}`;
+    newPath.rawWithIndices = fp.isNil(path2.rawWithIndices) ? key : `${path2.rawWithIndices}.${key}`;
     if (!fp.isNil(attribute)) {
       newPath.attribute = fp.isNil(path2.attribute) ? key : `${path2.attribute}.${key}`;
     }
@@ -10833,64 +10887,91 @@ const traverseEntity = async (visitor2, options2, entity) => {
       attribute,
       path: newPath,
       getModel,
-      parent
+      parent,
+      allowedExtraRootKeys
     };
     await visitor2(visitorOptions, visitorUtils);
     const value = copy[key];
     if (fp.isNil(value) || fp.isNil(attribute)) {
       continue;
     }
-    parent = {
-      schema: schema2,
-      key,
-      attribute,
-      path: newPath
-    };
     if (isRelationalAttribute(attribute)) {
+      parent = {
+        schema: schema2,
+        key,
+        attribute,
+        path: newPath
+      };
       const isMorphRelation = attribute.relation.toLowerCase().startsWith("morph");
       const method = isMorphRelation ? traverseMorphRelationTarget : traverseRelationTarget(getModel(attribute.target));
       if (fp.isArray(value)) {
-        const res = new Array(value.length);
-        for (let i2 = 0; i2 < value.length; i2 += 1) {
-          res[i2] = await method(visitor2, newPath, value[i2]);
-        }
-        copy[key] = res;
+        copy[key] = await parallelWithOrderedErrors(value.map((item, i2) => {
+          const arrayPath = {
+            ...newPath,
+            rawWithIndices: fp.isNil(newPath.rawWithIndices) ? `${i2}` : `${newPath.rawWithIndices}.${i2}`
+          };
+          return method(visitor2, arrayPath, item);
+        }));
       } else {
         copy[key] = await method(visitor2, newPath, value);
       }
       continue;
     }
     if (isMediaAttribute(attribute)) {
+      parent = {
+        schema: schema2,
+        key,
+        attribute,
+        path: newPath
+      };
       if (fp.isArray(value)) {
-        const res = new Array(value.length);
-        for (let i2 = 0; i2 < value.length; i2 += 1) {
-          res[i2] = await traverseMediaTarget(visitor2, newPath, value[i2]);
-        }
-        copy[key] = res;
+        copy[key] = await parallelWithOrderedErrors(value.map((item, i2) => {
+          const arrayPath = {
+            ...newPath,
+            rawWithIndices: fp.isNil(newPath.rawWithIndices) ? `${i2}` : `${newPath.rawWithIndices}.${i2}`
+          };
+          return traverseMediaTarget(visitor2, arrayPath, item);
+        }));
       } else {
         copy[key] = await traverseMediaTarget(visitor2, newPath, value);
       }
       continue;
     }
     if (attribute.type === "component") {
+      parent = {
+        schema: schema2,
+        key,
+        attribute,
+        path: newPath
+      };
       const targetSchema = getModel(attribute.component);
       if (fp.isArray(value)) {
-        const res = new Array(value.length);
-        for (let i2 = 0; i2 < value.length; i2 += 1) {
-          res[i2] = await traverseComponent(visitor2, newPath, targetSchema, value[i2]);
-        }
-        copy[key] = res;
+        copy[key] = await parallelWithOrderedErrors(value.map((item, i2) => {
+          const arrayPath = {
+            ...newPath,
+            rawWithIndices: fp.isNil(newPath.rawWithIndices) ? `${i2}` : `${newPath.rawWithIndices}.${i2}`
+          };
+          return traverseComponent(visitor2, arrayPath, targetSchema, item);
+        }));
       } else {
         copy[key] = await traverseComponent(visitor2, newPath, targetSchema, value);
       }
       continue;
     }
     if (attribute.type === "dynamiczone" && fp.isArray(value)) {
-      const res = new Array(value.length);
-      for (let i2 = 0; i2 < value.length; i2 += 1) {
-        res[i2] = await visitDynamicZoneEntry(visitor2, newPath, value[i2]);
-      }
-      copy[key] = res;
+      parent = {
+        schema: schema2,
+        key,
+        attribute,
+        path: newPath
+      };
+      copy[key] = await parallelWithOrderedErrors(value.map((item, i2) => {
+        const arrayPath = {
+          ...newPath,
+          rawWithIndices: fp.isNil(newPath.rawWithIndices) ? `${i2}` : `${newPath.rawWithIndices}.${i2}`
+        };
+        return visitDynamicZoneEntry(visitor2, arrayPath, item);
+      }));
       continue;
     }
   }
@@ -10904,7 +10985,7 @@ const createVisitorUtils = ({ data }) => ({
     data[key] = value;
   }
 });
-fp.curry(traverseEntity);
+fp.curry(traverseEntity$1);
 var dist = { exports: {} };
 (function(module, exports) {
   !function(t, n) {
@@ -12012,7 +12093,7 @@ function toIdentifier(str2) {
   }
 })(httpErrors);
 class ApplicationError extends Error {
-  constructor(message = "An application error occured", details = {}) {
+  constructor(message = "An application error occurred", details = {}) {
     super();
     this.name = "ApplicationError";
     this.message = message;
@@ -12768,12 +12849,12 @@ const populate = traverseFactory().intercept(isPopulateString, async (visitor2, 
   get(key, data) {
     return data[key];
   }
-})).ignore(({ key, attribute }) => {
+})).ignore(({ key, attribute, parent }) => {
   return [
     "sort",
     "filters",
     "fields"
-  ].includes(key) && !attribute;
+  ].includes(key) && (!attribute || !!parent?.attribute);
 }).on(
   // Handle recursion on populate."populate"
   isKeyword("populate"),
@@ -19880,6 +19961,18 @@ function charFromCodepoint(c) {
     (c - 65536 & 1023) + 56320
   );
 }
+function setProperty(object2, key, value) {
+  if (key === "__proto__") {
+    Object.defineProperty(object2, key, {
+      configurable: true,
+      enumerable: true,
+      writable: true,
+      value
+    });
+  } else {
+    object2[key] = value;
+  }
+}
 var simpleEscapeCheck = new Array(256);
 var simpleEscapeMap = new Array(256);
 for (var i = 0; i < 256; i++) {
@@ -19986,7 +20079,7 @@ function mergeMappings(state, destination, source, overridableKeys) {
   for (index2 = 0, quantity = sourceKeys.length; index2 < quantity; index2 += 1) {
     key = sourceKeys[index2];
     if (!_hasOwnProperty$1.call(destination, key)) {
-      destination[key] = source[key];
+      setProperty(destination, key, source[key]);
       overridableKeys[key] = true;
     }
   }
@@ -20025,7 +20118,7 @@ function storeMappingPair(state, _result, overridableKeys, keyTag, keyNode, valu
       state.position = startPos || state.position;
       throwError(state, "duplicated mapping key");
     }
-    _result[keyNode] = valueNode;
+    setProperty(_result, keyNode, valueNode);
     delete overridableKeys[keyNode];
   }
   return _result;

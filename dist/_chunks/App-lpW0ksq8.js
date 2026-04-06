@@ -8,10 +8,11 @@ const reactIntl = require("react-intl");
 const designSystem = require("@strapi/design-system");
 require("react-dom/client");
 require("@strapi/icons");
-const index = require("./index-CqEh7CPk.js");
+const index = require("./index-BpPlqSME.js");
 require("@strapi/icons/symbols");
 require("yup");
-const index$1 = require("./index-6cfJOT3z.js");
+require("styled-components");
+const index$1 = require("./index-TjC2gBJN.js");
 const recharts = require("recharts");
 function _interopNamespace(e) {
   if (e && e.__esModule) return e;
