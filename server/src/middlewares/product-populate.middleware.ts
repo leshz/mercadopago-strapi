@@ -13,7 +13,6 @@ export const populating = () => {
       promotion: {
         fields: ["*"],
       },
-      ...ctx.query.populate,
     };
 
     return next();

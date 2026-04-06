@@ -747,10 +747,9 @@ const checkout$1 = ({ strapi: strapi2 }) => ({
       });
     } catch (error2) {
       strapi2.log.error("Checkout failed", {
-        error: error2.message,
-        customerEmail: customer?.email
+        error: error2.message
       });
-      return ctx.badRequest(error2.message);
+      return ctx.badRequest("Checkout processing failed. Please try again.");
     }
   }
 });
@@ -809,6 +808,20 @@ const notification$1 = ({ strapi: strapi2 }) => ({
     }
   }
 });
+const configurationSchema = yup.object({
+  isActive: yup.boolean().required("isActive is required"),
+  mercadoPagoToken: yup.string().required("MercadoPago token is required").max(500, "Token too long").trim(),
+  defaultCurrency: yup.string().required("Currency is required").max(10, "Currency code too long").matches(/^[A-Z]{3}$/, "Currency must be a 3-letter ISO code"),
+  backUrls: yup.object({
+    success: yup.string().url("Invalid success URL").max(2e3).required(),
+    failure: yup.string().url("Invalid failure URL").max(2e3).required(),
+    pending: yup.string().url("Invalid pending URL").max(2e3).required()
+  }).required("Back URLs are required"),
+  webhookPass: yup.string().max(500, "Webhook password too long").trim(),
+  notificationUrl: yup.string().url("Invalid notification URL").max(2e3, "Notification URL too long"),
+  bussinessDescription: yup.string().max(500, "Business description too long").trim(),
+  isActiveVerification: yup.boolean().default(true)
+});
 const configuration$1 = ({ strapi: strapi2 }) => ({
   async get(ctx) {
     const pluginStore = strapi2.store({
@@ -829,6 +842,17 @@ const configuration$1 = ({ strapi: strapi2 }) => ({
   },
   async update(ctx) {
     const { data } = ctx.request.body;
+    let validated;
+    try {
+      validated = await configurationSchema.validate(data, {
+        abortEarly: false,
+        stripUnknown: true
+      });
+    } catch (error2) {
+      return ctx.badRequest("Invalid configuration data", {
+        errors: error2.errors
+      });
+    }
     const {
       isActive,
       mercadoPagoToken,
@@ -838,7 +862,7 @@ const configuration$1 = ({ strapi: strapi2 }) => ({
       notificationUrl,
       bussinessDescription,
       isActiveVerification
-    } = data;
+    } = validated;
     const pluginStore = strapi2.store({
       environment: strapi2.config.environment,
       type: "plugin",
@@ -906,10 +930,10 @@ const loadConfig = (options2, { strapi: strapi2 }) => {
 };
 const verifySign = (config2, { strapi: strapi2 }) => {
   return async (ctx, next) => {
-    const { isActiveVerification = false } = ctx.state.config;
+    const { isActiveVerification = true } = ctx.state.config;
     try {
       if (!isActiveVerification) {
-        strapi2.log.warn("Webhook signature verification is DISABLED");
+        strapi2.log.warn("Webhook signature verification is DISABLED - this is a security risk");
         return next();
       }
       const queryParams = ctx.request.query || {};
@@ -949,7 +973,10 @@ const verifySign = (config2, { strapi: strapi2 }) => {
         const hmac = crypto.createHmac("sha256", secret);
         hmac.update(manifest);
         const sha = hmac.digest("hex");
-        if (sha === hash) {
+        const shaBuffer = Buffer.from(sha, "utf8");
+        const hashBuffer = Buffer.from(hash, "utf8");
+        const isValid = shaBuffer.length === hashBuffer.length && crypto.timingSafeEqual(shaBuffer, hashBuffer);
+        if (isValid) {
           strapi2.log.info("Webhook signature verified successfully");
           return next();
         } else {
@@ -1041,8 +1068,7 @@ const populating = () => {
       },
       promotion: {
         fields: ["*"]
-      },
-      ...ctx.query.populate
+      }
     };
     return next();
   };
@@ -26115,8 +26141,7 @@ const checkoutService = ({ strapi: strapi2 }) => ({
   async processCheckout(data, config2) {
     const { items, customer, fulfillment } = data;
     strapi2.log.info("Processing checkout", {
-      itemsCount: items.length,
-      customerEmail: customer.email
+      itemsCount: items.length
     });
     const products = await strapi2.service("plugin::strapi-mercadopago.product").getProducts(items);
     const order2 = await strapi2.service("plugin::strapi-mercadopago.order-creation").createInitialOrder({
@@ -26341,41 +26366,43 @@ const paymentVerificationService = ({ strapi: strapi2 }) => ({
 });
 const stockReductionService = ({ strapi: strapi2 }) => ({
   /**
-   * Reduce el stock de múltiples productos
-   * Usa las operaciones de Strapi directamente
+   * Reduce el stock de múltiples productos de forma atómica
+   * Usa transacción para evitar race conditions
    */
   async reduceStock(items) {
-    for (const item of items) {
-      const quantity = Number(item.quantity);
-      const product2 = await strapi2.db.query("plugin::strapi-mercadopago.product").findOne({
-        where: { sku: item.id }
-      });
-      if (!product2) {
-        strapi2.log.warn("Product not found for stock reduction", {
-          sku: item.id
+    await strapi2.db.transaction(async () => {
+      for (const item of items) {
+        const quantity = Number(item.quantity);
+        const product2 = await strapi2.db.query("plugin::strapi-mercadopago.product").findOne({
+          where: { sku: item.id }
         });
-        continue;
-      }
-      const newStock = Number(product2.stock) - quantity;
-      if (newStock < 0) {
-        strapi2.log.error("Insufficient stock for reduction", {
+        if (!product2) {
+          strapi2.log.warn("Product not found for stock reduction", {
+            sku: item.id
+          });
+          continue;
+        }
+        const newStock = Number(product2.stock) - quantity;
+        if (newStock < 0) {
+          strapi2.log.error("Insufficient stock for reduction", {
+            sku: item.id,
+            currentStock: product2.stock,
+            requested: quantity
+          });
+          throw new Error(`Insufficient stock for ${item.id}`);
+        }
+        await strapi2.db.query("plugin::strapi-mercadopago.product").update({
+          where: { sku: item.id },
+          data: { stock: newStock }
+        });
+        strapi2.log.info("Stock reduced successfully", {
           sku: item.id,
-          currentStock: product2.stock,
-          requested: quantity
+          previousStock: product2.stock,
+          newStock,
+          quantityReduced: quantity
         });
-        throw new Error(`Insufficient stock for ${item.id}`);
       }
-      await strapi2.db.query("plugin::strapi-mercadopago.product").update({
-        where: { sku: item.id },
-        data: { stock: newStock }
-      });
-      strapi2.log.info("Stock reduced successfully", {
-        sku: item.id,
-        previousStock: product2.stock,
-        newStock,
-        quantityReduced: quantity
-      });
-    }
+    });
   }
 });
 const paymentServices = {

@@ -8,8 +8,8 @@ declare const _default: ({ strapi }: {
     strapi: Core.Strapi;
 }) => {
     /**
-     * Reduce el stock de múltiples productos
-     * Usa las operaciones de Strapi directamente
+     * Reduce el stock de múltiples productos de forma atómica
+     * Usa transacción para evitar race conditions
      */
     reduceStock(items: StockItem[]): Promise<void>;
 };
