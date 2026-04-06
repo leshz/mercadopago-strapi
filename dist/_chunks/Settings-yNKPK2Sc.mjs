@@ -4,12 +4,12 @@ import { useIntl } from "react-intl";
 import { Main, Button, Box, Typography, Divider, Grid, Field, Toggle, SingleSelect, SingleSelectOption } from "@strapi/design-system";
 import "react-dom/client";
 import { Check, Eye, EyeStriked } from "@strapi/icons";
-import { b as getConfig, L as Layouts, s as setConfig } from "./index-BSjFQn-a.mjs";
+import { b as getConfig, L as Layouts, s as setConfig } from "./index-C4jVHAl2.mjs";
 import "react-router-dom";
 import "@strapi/icons/symbols";
 import "yup";
 import "styled-components";
-import { g as getTranslation } from "./index-C5657In2.mjs";
+import { g as getTranslation } from "./index-RZuWfDRJ.mjs";
 const SettingsPage = () => {
   const { formatMessage } = useIntl();
   const [isLoading, setIsLoading] = useState(true);

@@ -1,3 +1,4 @@
+/// <reference types="koa" />
 declare const _default: {
     register: ({ strapi }: {
         strapi: import("@strapi/types/dist/core").Strapi;
@@ -18,7 +19,9 @@ declare const _default: {
         }) => Partial<import("@strapi/types/dist/core/core-api/controller").Base> & import("@strapi/types/dist/core/core-api/controller").Generic & import("@strapi/types/dist/core/core-api/controller").Base;
         product: ({ strapi, }: {
             strapi: import("@strapi/types/dist/core").Strapi;
-        }) => Partial<import("@strapi/types/dist/core/core-api/controller").Base> & import("@strapi/types/dist/core/core-api/controller").Generic & import("@strapi/types/dist/core/core-api/controller").Base;
+        }) => {
+            findOne: (ctx: import("koa").Context) => Promise<import("koa").Context>;
+        } & import("@strapi/types/dist/core/core-api/controller").Base;
         order: ({ strapi, }: {
             strapi: import("@strapi/types/dist/core").Strapi;
         }) => Partial<import("@strapi/types/dist/core/core-api/controller").Base> & import("@strapi/types/dist/core/core-api/controller").Generic & import("@strapi/types/dist/core/core-api/controller").Base;

@@ -24,8 +24,13 @@ export default factories.createCoreController(
       });
 
       if (!entity) return ctx.notFound();
-      const sanitizedEntity = await this.sanitizeOutput(entity, ctx);
-      return ctx.send(this.transformResponse(sanitizedEntity));
+
+      const sanitized = await strapi.contentAPI.sanitize.output(
+        entity,
+        strapi.contentType('plugin::strapi-mercadopago.product')
+      );
+
+      ctx.send({ data: sanitized });
     },
   })
 );

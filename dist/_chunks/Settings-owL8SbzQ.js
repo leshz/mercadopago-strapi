@@ -6,12 +6,12 @@ const reactIntl = require("react-intl");
 const designSystem = require("@strapi/design-system");
 require("react-dom/client");
 const icons = require("@strapi/icons");
-const index = require("./index-BpPlqSME.js");
+const index = require("./index-BlNzvlEs.js");
 require("react-router-dom");
 require("@strapi/icons/symbols");
 require("yup");
 require("styled-components");
-const index$1 = require("./index-TjC2gBJN.js");
+const index$1 = require("./index-ki1V8Gf8.js");
 const SettingsPage = () => {
   const { formatMessage } = reactIntl.useIntl();
   const [isLoading, setIsLoading] = React.useState(true);

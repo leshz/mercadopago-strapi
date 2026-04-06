@@ -758,8 +758,11 @@ const product$1 = strapi$1.factories.createCoreController(
         ...locale !== "all" && { locale }
       });
       if (!entity) return ctx.notFound();
-      const sanitizedEntity = await this.sanitizeOutput(entity, ctx);
-      return ctx.send(this.transformResponse(sanitizedEntity));
+      const sanitized = await strapi2.contentAPI.sanitize.output(
+        entity,
+        strapi2.contentType("plugin::strapi-mercadopago.product")
+      );
+      ctx.send({ data: sanitized });
     }
   })
 );
