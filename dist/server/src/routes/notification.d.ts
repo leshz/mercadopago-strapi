@@ -5,8 +5,8 @@ declare const _default: {
         path: "/notifications";
         handler: string;
         config: {
-            auth: boolean;
             middlewares: string[];
+            auth: boolean;
         };
     }[];
 };

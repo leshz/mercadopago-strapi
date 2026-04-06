@@ -1,14 +1,35 @@
-import { jsx, jsxs, Fragment } from "react/jsx-runtime";
-import * as React from "react";
-import React__default, { useContext, useRef, useCallback, useDebugValue, createContext as createContext$1, useState, createElement, useEffect, useLayoutEffect, useReducer, useMemo } from "react";
-import ReactDOM, { unstable_batchedUpdates as unstable_batchedUpdates$1 } from "react-dom";
-import { Flex, Popover, Button, LinkButton, Box, Typography, Portal, Alert, useCallbackRef, Field, SubNav, Badge } from "@strapi/design-system";
-import { WarningCircle, CaretDown } from "@strapi/icons";
-import { FormattedMessage } from "react-intl";
-import { NavLink } from "react-router-dom";
-import { styled, createGlobalStyle } from "styled-components";
-import * as yup from "yup";
-import "@strapi/icons/symbols";
+"use strict";
+const jsxRuntime = require("react/jsx-runtime");
+const React = require("react");
+const ReactDOM = require("react-dom");
+const designSystem = require("@strapi/design-system");
+const icons = require("@strapi/icons");
+const reactIntl = require("react-intl");
+const reactRouterDom = require("react-router-dom");
+const styled = require("styled-components");
+const yup = require("yup");
+require("@strapi/icons/symbols");
+const _interopDefault = (e2) => e2 && e2.__esModule ? e2 : { default: e2 };
+function _interopNamespace(e2) {
+  if (e2 && e2.__esModule) return e2;
+  const n2 = Object.create(null, { [Symbol.toStringTag]: { value: "Module" } });
+  if (e2) {
+    for (const k2 in e2) {
+      if (k2 !== "default") {
+        const d2 = Object.getOwnPropertyDescriptor(e2, k2);
+        Object.defineProperty(n2, k2, d2.get ? d2 : {
+          enumerable: true,
+          get: () => e2[k2]
+        });
+      }
+    }
+  }
+  n2.default = e2;
+  return Object.freeze(n2);
+}
+const React__namespace = /* @__PURE__ */ _interopNamespace(React);
+const ReactDOM__default = /* @__PURE__ */ _interopDefault(ReactDOM);
+const yup__namespace = /* @__PURE__ */ _interopNamespace(yup);
 var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
 function getDefaultExportFromCjs(x2) {
   return x2 && x2.__esModule && Object.prototype.hasOwnProperty.call(x2, "default") ? x2["default"] : x2;
@@ -453,10 +474,10 @@ var baseFor$1 = createBaseFor();
 var _baseFor = baseFor$1;
 var _cloneBuffer = { exports: {} };
 _cloneBuffer.exports;
-(function(module, exports) {
+(function(module2, exports2) {
   var root2 = _root;
-  var freeExports = exports && !exports.nodeType && exports;
-  var freeModule = freeExports && true && module && !module.nodeType && module;
+  var freeExports = exports2 && !exports2.nodeType && exports2;
+  var freeModule = freeExports && true && module2 && !module2.nodeType && module2;
   var moduleExports = freeModule && freeModule.exports === freeExports;
   var Buffer2 = moduleExports ? root2.Buffer : void 0, allocUnsafe = Buffer2 ? Buffer2.allocUnsafe : void 0;
   function cloneBuffer2(buffer, isDeep) {
@@ -467,7 +488,7 @@ _cloneBuffer.exports;
     buffer.copy(result);
     return result;
   }
-  module.exports = cloneBuffer2;
+  module2.exports = cloneBuffer2;
 })(_cloneBuffer, _cloneBuffer.exports);
 var _cloneBufferExports = _cloneBuffer.exports;
 var root$8 = _root;
@@ -577,15 +598,15 @@ function stubFalse() {
 }
 var stubFalse_1 = stubFalse;
 isBuffer$6.exports;
-(function(module, exports) {
+(function(module2, exports2) {
   var root2 = _root, stubFalse2 = stubFalse_1;
-  var freeExports = exports && !exports.nodeType && exports;
-  var freeModule = freeExports && true && module && !module.nodeType && module;
+  var freeExports = exports2 && !exports2.nodeType && exports2;
+  var freeModule = freeExports && true && module2 && !module2.nodeType && module2;
   var moduleExports = freeModule && freeModule.exports === freeExports;
   var Buffer2 = moduleExports ? root2.Buffer : void 0;
   var nativeIsBuffer = Buffer2 ? Buffer2.isBuffer : void 0;
   var isBuffer3 = nativeIsBuffer || stubFalse2;
-  module.exports = isBuffer3;
+  module2.exports = isBuffer3;
 })(isBuffer$6, isBuffer$6.exports);
 var isBufferExports = isBuffer$6.exports;
 var baseGetTag$4 = _baseGetTag, getPrototype$1 = _getPrototype, isObjectLike$7 = isObjectLike_1;
@@ -624,10 +645,10 @@ function baseUnary$3(func2) {
 var _baseUnary = baseUnary$3;
 var _nodeUtil = { exports: {} };
 _nodeUtil.exports;
-(function(module, exports) {
+(function(module2, exports2) {
   var freeGlobal2 = _freeGlobal;
-  var freeExports = exports && !exports.nodeType && exports;
-  var freeModule = freeExports && true && module && !module.nodeType && module;
+  var freeExports = exports2 && !exports2.nodeType && exports2;
+  var freeModule = freeExports && true && module2 && !module2.nodeType && module2;
   var moduleExports = freeModule && freeModule.exports === freeExports;
   var freeProcess = moduleExports && freeGlobal2.process;
   var nodeUtil2 = function() {
@@ -640,7 +661,7 @@ _nodeUtil.exports;
     } catch (e2) {
     }
   }();
-  module.exports = nodeUtil2;
+  module2.exports = nodeUtil2;
 })(_nodeUtil, _nodeUtil.exports);
 var _nodeUtilExports = _nodeUtil.exports;
 var baseIsTypedArray = _baseIsTypedArray, baseUnary$2 = _baseUnary, nodeUtil$2 = _nodeUtilExports;
@@ -1739,14 +1760,14 @@ var hasRequiredUseSyncExternalStoreShim_production;
 function requireUseSyncExternalStoreShim_production() {
   if (hasRequiredUseSyncExternalStoreShim_production) return useSyncExternalStoreShim_production;
   hasRequiredUseSyncExternalStoreShim_production = 1;
-  var React2 = React__default;
+  var React2 = React__namespace.default;
   function is2(x2, y2) {
     return x2 === y2 && (0 !== x2 || 1 / x2 === 1 / y2) || x2 !== x2 && y2 !== y2;
   }
-  var objectIs = "function" === typeof Object.is ? Object.is : is2, useState2 = React2.useState, useEffect2 = React2.useEffect, useLayoutEffect2 = React2.useLayoutEffect, useDebugValue2 = React2.useDebugValue;
+  var objectIs = "function" === typeof Object.is ? Object.is : is2, useState = React2.useState, useEffect = React2.useEffect, useLayoutEffect = React2.useLayoutEffect, useDebugValue = React2.useDebugValue;
   function useSyncExternalStore$2(subscribe, getSnapshot) {
-    var value = getSnapshot(), _useState = useState2({ inst: { value, getSnapshot } }), inst = _useState[0].inst, forceUpdate = _useState[1];
-    useLayoutEffect2(
+    var value = getSnapshot(), _useState = useState({ inst: { value, getSnapshot } }), inst = _useState[0].inst, forceUpdate = _useState[1];
+    useLayoutEffect(
       function() {
         inst.value = value;
         inst.getSnapshot = getSnapshot;
@@ -1754,7 +1775,7 @@ function requireUseSyncExternalStoreShim_production() {
       },
       [subscribe, value, getSnapshot]
     );
-    useEffect2(
+    useEffect(
       function() {
         checkIfSnapshotChanged(inst) && forceUpdate({ inst });
         return subscribe(function() {
@@ -1763,7 +1784,7 @@ function requireUseSyncExternalStoreShim_production() {
       },
       [subscribe]
     );
-    useDebugValue2(value);
+    useDebugValue(value);
     return value;
   }
   function checkIfSnapshotChanged(inst) {
@@ -1812,11 +1833,11 @@ function requireUseSyncExternalStoreShim_development() {
           "The result of getSnapshot should be cached to avoid an infinite loop"
         ), didWarnUncachedGetSnapshot = true);
       }
-      cachedValue = useState2({
+      cachedValue = useState({
         inst: { value, getSnapshot }
       });
       var inst = cachedValue[0].inst, forceUpdate = cachedValue[1];
-      useLayoutEffect2(
+      useLayoutEffect(
         function() {
           inst.value = value;
           inst.getSnapshot = getSnapshot;
@@ -1824,7 +1845,7 @@ function requireUseSyncExternalStoreShim_development() {
         },
         [subscribe, value, getSnapshot]
       );
-      useEffect2(
+      useEffect(
         function() {
           checkIfSnapshotChanged(inst) && forceUpdate({ inst });
           return subscribe(function() {
@@ -1833,7 +1854,7 @@ function requireUseSyncExternalStoreShim_development() {
         },
         [subscribe]
       );
-      useDebugValue2(value);
+      useDebugValue(value);
       return value;
     }
     function checkIfSnapshotChanged(inst) {
@@ -1850,7 +1871,7 @@ function requireUseSyncExternalStoreShim_development() {
       return getSnapshot();
     }
     "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-    var React2 = React__default, objectIs = "function" === typeof Object.is ? Object.is : is2, useState2 = React2.useState, useEffect2 = React2.useEffect, useLayoutEffect2 = React2.useLayoutEffect, useDebugValue2 = React2.useDebugValue, didWarnOld18Alpha = false, didWarnUncachedGetSnapshot = false, shim2 = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
+    var React2 = React__namespace.default, objectIs = "function" === typeof Object.is ? Object.is : is2, useState = React2.useState, useEffect = React2.useEffect, useLayoutEffect = React2.useLayoutEffect, useDebugValue = React2.useDebugValue, didWarnOld18Alpha = false, didWarnUncachedGetSnapshot = false, shim2 = "undefined" === typeof window || "undefined" === typeof window.document || "undefined" === typeof window.document.createElement ? useSyncExternalStore$1 : useSyncExternalStore$2;
     useSyncExternalStoreShim_development.useSyncExternalStore = void 0 !== React2.useSyncExternalStore ? React2.useSyncExternalStore : shim2;
     "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(Error());
   }();
@@ -1877,18 +1898,18 @@ var hasRequiredWithSelector_production;
 function requireWithSelector_production() {
   if (hasRequiredWithSelector_production) return withSelector_production;
   hasRequiredWithSelector_production = 1;
-  var React2 = React__default, shim2 = shimExports;
+  var React2 = React__namespace.default, shim2 = shimExports;
   function is2(x2, y2) {
     return x2 === y2 && (0 !== x2 || 1 / x2 === 1 / y2) || x2 !== x2 && y2 !== y2;
   }
-  var objectIs = "function" === typeof Object.is ? Object.is : is2, useSyncExternalStore = shim2.useSyncExternalStore, useRef2 = React2.useRef, useEffect2 = React2.useEffect, useMemo2 = React2.useMemo, useDebugValue2 = React2.useDebugValue;
+  var objectIs = "function" === typeof Object.is ? Object.is : is2, useSyncExternalStore = shim2.useSyncExternalStore, useRef = React2.useRef, useEffect = React2.useEffect, useMemo = React2.useMemo, useDebugValue = React2.useDebugValue;
   withSelector_production.useSyncExternalStoreWithSelector = function(subscribe, getSnapshot, getServerSnapshot, selector, isEqual) {
-    var instRef = useRef2(null);
+    var instRef = useRef(null);
     if (null === instRef.current) {
       var inst = { hasValue: false, value: null };
       instRef.current = inst;
     } else inst = instRef.current;
-    instRef = useMemo2(
+    instRef = useMemo(
       function() {
         function memoizedSelector(nextSnapshot) {
           if (!hasMemo) {
@@ -1923,14 +1944,14 @@ function requireWithSelector_production() {
       [getSnapshot, getServerSnapshot, selector, isEqual]
     );
     var value = useSyncExternalStore(subscribe, instRef[0], instRef[1]);
-    useEffect2(
+    useEffect(
       function() {
         inst.hasValue = true;
         inst.value = value;
       },
       [value]
     );
-    useDebugValue2(value);
+    useDebugValue(value);
     return value;
   };
   return withSelector_production;
@@ -1954,14 +1975,14 @@ function requireWithSelector_development() {
       return x2 === y2 && (0 !== x2 || 1 / x2 === 1 / y2) || x2 !== x2 && y2 !== y2;
     }
     "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-    var React2 = React__default, shim2 = shimExports, objectIs = "function" === typeof Object.is ? Object.is : is2, useSyncExternalStore = shim2.useSyncExternalStore, useRef2 = React2.useRef, useEffect2 = React2.useEffect, useMemo2 = React2.useMemo, useDebugValue2 = React2.useDebugValue;
+    var React2 = React__namespace.default, shim2 = shimExports, objectIs = "function" === typeof Object.is ? Object.is : is2, useSyncExternalStore = shim2.useSyncExternalStore, useRef = React2.useRef, useEffect = React2.useEffect, useMemo = React2.useMemo, useDebugValue = React2.useDebugValue;
     withSelector_development.useSyncExternalStoreWithSelector = function(subscribe, getSnapshot, getServerSnapshot, selector, isEqual) {
-      var instRef = useRef2(null);
+      var instRef = useRef(null);
       if (null === instRef.current) {
         var inst = { hasValue: false, value: null };
         instRef.current = inst;
       } else inst = instRef.current;
-      instRef = useMemo2(
+      instRef = useMemo(
         function() {
           function memoizedSelector(nextSnapshot) {
             if (!hasMemo) {
@@ -1997,14 +2018,14 @@ function requireWithSelector_development() {
         [getSnapshot, getServerSnapshot, selector, isEqual]
       );
       var value = useSyncExternalStore(subscribe, instRef[0], instRef[1]);
-      useEffect2(
+      useEffect(
         function() {
           inst.hasValue = true;
           inst.value = value;
         },
         [value]
       );
-      useDebugValue2(value);
+      useDebugValue(value);
       return value;
     };
     "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(Error());
@@ -2024,22 +2045,22 @@ const gT = typeof globalThis !== "undefined" ? globalThis : (
 );
 function getContext() {
   var _gT$ContextKey;
-  if (!React.createContext) return {};
+  if (!React__namespace.createContext) return {};
   const contextMap = (_gT$ContextKey = gT[ContextKey]) != null ? _gT$ContextKey : gT[ContextKey] = /* @__PURE__ */ new Map();
-  let realContext = contextMap.get(React.createContext);
+  let realContext = contextMap.get(React__namespace.createContext);
   if (!realContext) {
-    realContext = React.createContext(null);
+    realContext = React__namespace.createContext(null);
     if (process.env.NODE_ENV !== "production") {
       realContext.displayName = "ReactRedux";
     }
-    contextMap.set(React.createContext, realContext);
+    contextMap.set(React__namespace.createContext, realContext);
   }
   return realContext;
 }
 const ReactReduxContext = /* @__PURE__ */ getContext();
 function createReduxContextHook(context = ReactReduxContext) {
   return function useReduxContext2() {
-    const contextValue = useContext(context);
+    const contextValue = React.useContext(context);
     if (process.env.NODE_ENV !== "production" && !contextValue) {
       throw new Error("could not find react-redux context value; please ensure the component is wrapped in a <Provider>");
     }
@@ -2083,8 +2104,8 @@ function createSelectorHook(context = ReactReduxContext) {
       stabilityCheck: globalStabilityCheck,
       noopCheck: globalNoopCheck
     } = useReduxContext$1();
-    const firstRun = useRef(true);
-    const wrappedSelector = useCallback({
+    const firstRun = React.useRef(true);
+    const wrappedSelector = React.useCallback({
       [selector.name](state) {
         const selected = selector(state);
         if (process.env.NODE_ENV !== "production") {
@@ -2130,7 +2151,7 @@ function createSelectorHook(context = ReactReduxContext) {
       }
     }[selector.name], [selector, globalStabilityCheck, stabilityCheck]);
     const selectedState = useSyncExternalStoreWithSelector(subscription.addNestedSub, store.getState, getServerState || store.getState, wrappedSelector, equalityFn);
-    useDebugValue(selectedState);
+    React.useDebugValue(selectedState);
     return selectedState;
   };
 }
@@ -2325,10 +2346,10 @@ function requireReactIs_development$1() {
       var ContextProvider = REACT_PROVIDER_TYPE;
       var Element = REACT_ELEMENT_TYPE;
       var ForwardRef = REACT_FORWARD_REF_TYPE;
-      var Fragment2 = REACT_FRAGMENT_TYPE;
+      var Fragment = REACT_FRAGMENT_TYPE;
       var Lazy = REACT_LAZY_TYPE;
       var Memo = REACT_MEMO_TYPE;
-      var Portal2 = REACT_PORTAL_TYPE;
+      var Portal = REACT_PORTAL_TYPE;
       var Profiler = REACT_PROFILER_TYPE;
       var StrictMode = REACT_STRICT_MODE_TYPE;
       var Suspense = REACT_SUSPENSE_TYPE;
@@ -2384,10 +2405,10 @@ function requireReactIs_development$1() {
       reactIs_development$1.ContextProvider = ContextProvider;
       reactIs_development$1.Element = Element;
       reactIs_development$1.ForwardRef = ForwardRef;
-      reactIs_development$1.Fragment = Fragment2;
+      reactIs_development$1.Fragment = Fragment;
       reactIs_development$1.Lazy = Lazy;
       reactIs_development$1.Memo = Memo;
-      reactIs_development$1.Portal = Portal2;
+      reactIs_development$1.Portal = Portal;
       reactIs_development$1.Profiler = Profiler;
       reactIs_development$1.StrictMode = StrictMode;
       reactIs_development$1.Suspense = Suspense;
@@ -2635,10 +2656,10 @@ function requireReactIs_development() {
       var ContextProvider = REACT_PROVIDER_TYPE;
       var Element = REACT_ELEMENT_TYPE;
       var ForwardRef = REACT_FORWARD_REF_TYPE;
-      var Fragment2 = REACT_FRAGMENT_TYPE;
+      var Fragment = REACT_FRAGMENT_TYPE;
       var Lazy = REACT_LAZY_TYPE;
       var Memo = REACT_MEMO_TYPE;
-      var Portal2 = REACT_PORTAL_TYPE;
+      var Portal = REACT_PORTAL_TYPE;
       var Profiler = REACT_PROFILER_TYPE;
       var StrictMode = REACT_STRICT_MODE_TYPE;
       var Suspense = REACT_SUSPENSE_TYPE;
@@ -2703,10 +2724,10 @@ function requireReactIs_development() {
       reactIs_development.ContextProvider = ContextProvider;
       reactIs_development.Element = Element;
       reactIs_development.ForwardRef = ForwardRef;
-      reactIs_development.Fragment = Fragment2;
+      reactIs_development.Fragment = Fragment;
       reactIs_development.Lazy = Lazy;
       reactIs_development.Memo = Memo;
-      reactIs_development.Portal = Portal2;
+      reactIs_development.Portal = Portal;
       reactIs_development.Profiler = Profiler;
       reactIs_development.StrictMode = StrictMode;
       reactIs_development.Suspense = Suspense;
@@ -2801,7 +2822,7 @@ var hasRequiredScheduler_production_min;
 function requireScheduler_production_min() {
   if (hasRequiredScheduler_production_min) return scheduler_production_min;
   hasRequiredScheduler_production_min = 1;
-  (function(exports) {
+  (function(exports2) {
     function f2(a2, b2) {
       var c2 = a2.length;
       a2.push(b2);
@@ -2834,12 +2855,12 @@ function requireScheduler_production_min() {
     }
     if ("object" === typeof performance && "function" === typeof performance.now) {
       var l2 = performance;
-      exports.unstable_now = function() {
+      exports2.unstable_now = function() {
         return l2.now();
       };
     } else {
       var p2 = Date, q2 = p2.now();
-      exports.unstable_now = function() {
+      exports2.unstable_now = function() {
         return p2.now() - q2;
       };
     }
@@ -2875,7 +2896,7 @@ function requireScheduler_production_min() {
             v2.callback = null;
             y2 = v2.priorityLevel;
             var e2 = d2(v2.expirationTime <= b2);
-            b2 = exports.unstable_now();
+            b2 = exports2.unstable_now();
             "function" === typeof e2 ? v2.callback = e2 : v2 === h2(r2) && k2(r2);
             G2(b2);
           } else k2(r2);
@@ -2894,11 +2915,11 @@ function requireScheduler_production_min() {
     }
     var N2 = false, O2 = null, L2 = -1, P2 = 5, Q2 = -1;
     function M2() {
-      return exports.unstable_now() - Q2 < P2 ? false : true;
+      return exports2.unstable_now() - Q2 < P2 ? false : true;
     }
     function R2() {
       if (null !== O2) {
-        var a2 = exports.unstable_now();
+        var a2 = exports2.unstable_now();
         Q2 = a2;
         var b2 = true;
         try {
@@ -2927,31 +2948,31 @@ function requireScheduler_production_min() {
     }
     function K(a2, b2) {
       L2 = D2(function() {
-        a2(exports.unstable_now());
+        a2(exports2.unstable_now());
       }, b2);
     }
-    exports.unstable_IdlePriority = 5;
-    exports.unstable_ImmediatePriority = 1;
-    exports.unstable_LowPriority = 4;
-    exports.unstable_NormalPriority = 3;
-    exports.unstable_Profiling = null;
-    exports.unstable_UserBlockingPriority = 2;
-    exports.unstable_cancelCallback = function(a2) {
+    exports2.unstable_IdlePriority = 5;
+    exports2.unstable_ImmediatePriority = 1;
+    exports2.unstable_LowPriority = 4;
+    exports2.unstable_NormalPriority = 3;
+    exports2.unstable_Profiling = null;
+    exports2.unstable_UserBlockingPriority = 2;
+    exports2.unstable_cancelCallback = function(a2) {
       a2.callback = null;
     };
-    exports.unstable_continueExecution = function() {
+    exports2.unstable_continueExecution = function() {
       A2 || z2 || (A2 = true, I2(J));
     };
-    exports.unstable_forceFrameRate = function(a2) {
+    exports2.unstable_forceFrameRate = function(a2) {
       0 > a2 || 125 < a2 ? console.error("forceFrameRate takes a positive int between 0 and 125, forcing frame rates higher than 125 fps is not supported") : P2 = 0 < a2 ? Math.floor(1e3 / a2) : 5;
     };
-    exports.unstable_getCurrentPriorityLevel = function() {
+    exports2.unstable_getCurrentPriorityLevel = function() {
       return y2;
     };
-    exports.unstable_getFirstCallbackNode = function() {
+    exports2.unstable_getFirstCallbackNode = function() {
       return h2(r2);
     };
-    exports.unstable_next = function(a2) {
+    exports2.unstable_next = function(a2) {
       switch (y2) {
         case 1:
         case 2:
@@ -2969,11 +2990,11 @@ function requireScheduler_production_min() {
         y2 = c2;
       }
     };
-    exports.unstable_pauseExecution = function() {
+    exports2.unstable_pauseExecution = function() {
     };
-    exports.unstable_requestPaint = function() {
+    exports2.unstable_requestPaint = function() {
     };
-    exports.unstable_runWithPriority = function(a2, b2) {
+    exports2.unstable_runWithPriority = function(a2, b2) {
       switch (a2) {
         case 1:
         case 2:
@@ -2992,8 +3013,8 @@ function requireScheduler_production_min() {
         y2 = c2;
       }
     };
-    exports.unstable_scheduleCallback = function(a2, b2, c2) {
-      var d2 = exports.unstable_now();
+    exports2.unstable_scheduleCallback = function(a2, b2, c2) {
+      var d2 = exports2.unstable_now();
       "object" === typeof c2 && null !== c2 ? (c2 = c2.delay, c2 = "number" === typeof c2 && 0 < c2 ? d2 + c2 : d2) : c2 = d2;
       switch (a2) {
         case 1:
@@ -3016,8 +3037,8 @@ function requireScheduler_production_min() {
       c2 > d2 ? (a2.sortIndex = c2, f2(t2, a2), null === h2(r2) && a2 === h2(t2) && (B2 ? (E2(L2), L2 = -1) : B2 = true, K(H2, c2 - d2))) : (a2.sortIndex = e2, f2(r2, a2), A2 || z2 || (A2 = true, I2(J)));
       return a2;
     };
-    exports.unstable_shouldYield = M2;
-    exports.unstable_wrapCallback = function(a2) {
+    exports2.unstable_shouldYield = M2;
+    exports2.unstable_wrapCallback = function(a2) {
       var b2 = y2;
       return function() {
         var c2 = y2;
@@ -3046,7 +3067,7 @@ var hasRequiredScheduler_development;
 function requireScheduler_development() {
   if (hasRequiredScheduler_development) return scheduler_development;
   hasRequiredScheduler_development = 1;
-  (function(exports) {
+  (function(exports2) {
     if (process.env.NODE_ENV !== "production") {
       (function() {
         if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart === "function") {
@@ -3130,13 +3151,13 @@ function requireScheduler_development() {
         var hasPerformanceNow = typeof performance === "object" && typeof performance.now === "function";
         if (hasPerformanceNow) {
           var localPerformance = performance;
-          exports.unstable_now = function() {
+          exports2.unstable_now = function() {
             return localPerformance.now();
           };
         } else {
           var localDate = Date;
           var initialTime = localDate.now();
-          exports.unstable_now = function() {
+          exports2.unstable_now = function() {
             return localDate.now() - initialTime;
           };
         }
@@ -3222,7 +3243,7 @@ function requireScheduler_development() {
               currentPriorityLevel = currentTask.priorityLevel;
               var didUserCallbackTimeout = currentTask.expirationTime <= currentTime;
               var continuationCallback = callback(didUserCallbackTimeout);
-              currentTime = exports.unstable_now();
+              currentTime = exports2.unstable_now();
               if (typeof continuationCallback === "function") {
                 currentTask.callback = continuationCallback;
               } else {
@@ -3298,7 +3319,7 @@ function requireScheduler_development() {
           };
         }
         function unstable_scheduleCallback(priorityLevel, callback, options) {
-          var currentTime = exports.unstable_now();
+          var currentTime = exports2.unstable_now();
           var startTime2;
           if (typeof options === "object" && options !== null) {
             var delay = options.delay;
@@ -3382,7 +3403,7 @@ function requireScheduler_development() {
         var frameInterval = frameYieldMs;
         var startTime = -1;
         function shouldYieldToHost() {
-          var timeElapsed = exports.unstable_now() - startTime;
+          var timeElapsed = exports2.unstable_now() - startTime;
           if (timeElapsed < frameInterval) {
             return false;
           }
@@ -3403,7 +3424,7 @@ function requireScheduler_development() {
         }
         var performWorkUntilDeadline = function() {
           if (scheduledHostCallback !== null) {
-            var currentTime = exports.unstable_now();
+            var currentTime = exports2.unstable_now();
             startTime = currentTime;
             var hasTimeRemaining = true;
             var hasMoreWork = true;
@@ -3447,7 +3468,7 @@ function requireScheduler_development() {
         }
         function requestHostTimeout(callback, ms) {
           taskTimeoutID = localSetTimeout(function() {
-            callback(exports.unstable_now());
+            callback(exports2.unstable_now());
           }, ms);
         }
         function cancelHostTimeout() {
@@ -3456,24 +3477,24 @@ function requireScheduler_development() {
         }
         var unstable_requestPaint = requestPaint;
         var unstable_Profiling = null;
-        exports.unstable_IdlePriority = IdlePriority;
-        exports.unstable_ImmediatePriority = ImmediatePriority;
-        exports.unstable_LowPriority = LowPriority;
-        exports.unstable_NormalPriority = NormalPriority;
-        exports.unstable_Profiling = unstable_Profiling;
-        exports.unstable_UserBlockingPriority = UserBlockingPriority;
-        exports.unstable_cancelCallback = unstable_cancelCallback;
-        exports.unstable_continueExecution = unstable_continueExecution;
-        exports.unstable_forceFrameRate = forceFrameRate;
-        exports.unstable_getCurrentPriorityLevel = unstable_getCurrentPriorityLevel;
-        exports.unstable_getFirstCallbackNode = unstable_getFirstCallbackNode;
-        exports.unstable_next = unstable_next;
-        exports.unstable_pauseExecution = unstable_pauseExecution;
-        exports.unstable_requestPaint = unstable_requestPaint;
-        exports.unstable_runWithPriority = unstable_runWithPriority;
-        exports.unstable_scheduleCallback = unstable_scheduleCallback;
-        exports.unstable_shouldYield = shouldYieldToHost;
-        exports.unstable_wrapCallback = unstable_wrapCallback;
+        exports2.unstable_IdlePriority = IdlePriority;
+        exports2.unstable_ImmediatePriority = ImmediatePriority;
+        exports2.unstable_LowPriority = LowPriority;
+        exports2.unstable_NormalPriority = NormalPriority;
+        exports2.unstable_Profiling = unstable_Profiling;
+        exports2.unstable_UserBlockingPriority = UserBlockingPriority;
+        exports2.unstable_cancelCallback = unstable_cancelCallback;
+        exports2.unstable_continueExecution = unstable_continueExecution;
+        exports2.unstable_forceFrameRate = forceFrameRate;
+        exports2.unstable_getCurrentPriorityLevel = unstable_getCurrentPriorityLevel;
+        exports2.unstable_getFirstCallbackNode = unstable_getFirstCallbackNode;
+        exports2.unstable_next = unstable_next;
+        exports2.unstable_pauseExecution = unstable_pauseExecution;
+        exports2.unstable_requestPaint = unstable_requestPaint;
+        exports2.unstable_runWithPriority = unstable_runWithPriority;
+        exports2.unstable_scheduleCallback = unstable_scheduleCallback;
+        exports2.unstable_shouldYield = shouldYieldToHost;
+        exports2.unstable_wrapCallback = unstable_wrapCallback;
         if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop === "function") {
           __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(new Error());
         }
@@ -3488,17 +3509,17 @@ if (process.env.NODE_ENV === "production") {
   scheduler.exports = requireScheduler_development();
 }
 var schedulerExports = scheduler.exports;
-const d = Symbol(), f = Symbol(), v = "undefined" == typeof window || /ServerSideRendering/.test(window.navigator && window.navigator.userAgent) ? useEffect : useLayoutEffect, a = schedulerExports.unstable_runWithPriority ? (e2) => schedulerExports.unstable_runWithPriority(schedulerExports.unstable_NormalPriority, e2) : (e2) => e2();
+const d = Symbol(), f = Symbol(), v = "undefined" == typeof window || /ServerSideRendering/.test(window.navigator && window.navigator.userAgent) ? React.useEffect : React.useLayoutEffect, a = schedulerExports.unstable_runWithPriority ? (e2) => schedulerExports.unstable_runWithPriority(schedulerExports.unstable_NormalPriority, e2) : (e2) => e2();
 function E(r2) {
-  const t2 = createContext$1({ [d]: { v: { current: r2 }, n: { current: -1 }, l: /* @__PURE__ */ new Set(), u: (e2) => e2() } });
+  const t2 = React.createContext({ [d]: { v: { current: r2 }, n: { current: -1 }, l: /* @__PURE__ */ new Set(), u: (e2) => e2() } });
   var o2;
   return t2[f] = t2.Provider, t2.Provider = (o2 = t2.Provider, ({ value: e2, children: r3 }) => {
-    const t3 = useRef(e2), c2 = useRef(0), [i2, p2] = useState(null);
+    const t3 = React.useRef(e2), c2 = React.useRef(0), [i2, p2] = React.useState(null);
     i2 && (i2(e2), p2(null));
-    const f2 = useRef();
+    const f2 = React.useRef();
     if (!f2.current) {
       const e3 = /* @__PURE__ */ new Set(), r4 = (r5, t4) => {
-        unstable_batchedUpdates$1(() => {
+        ReactDOM.unstable_batchedUpdates(() => {
           c2.current += 1;
           const n2 = { n: c2.current };
           null != t4 && t4.suspense && (n2.n *= -1, n2.p = new Promise((e4) => {
@@ -3516,13 +3537,13 @@ function E(r2) {
           r4({ n: c2.current, v: e2 });
         });
       });
-    }, [e2]), createElement(o2, { value: f2.current }, r3);
+    }, [e2]), React.createElement(o2, { value: f2.current }, r3);
   }), delete t2.Consumer, t2;
 }
 function h(e2, n2) {
-  const o2 = useContext(e2)[d];
+  const o2 = React.useContext(e2)[d];
   if ("object" == typeof process && "production" !== process.env.NODE_ENV && !o2) throw new Error("useContextSelector requires special context");
-  const { v: { current: c2 }, n: { current: u2 }, l: s2 } = o2, i2 = n2(c2), [p2, l2] = useReducer((e3, r2) => {
+  const { v: { current: c2 }, n: { current: u2 }, l: s2 } = o2, i2 = n2(c2), [p2, l2] = React.useReducer((e3, r2) => {
     if (!r2) return [c2, i2];
     if ("p" in r2) throw r2.p;
     if (r2.n === u2) return Object.is(e3[1], i2) ? e3 : [c2, i2];
@@ -3544,13 +3565,13 @@ function createContext(rootComponentName, defaultContext) {
   const Context = E(defaultContext);
   const Provider = (props) => {
     const { children, ...context } = props;
-    const value = React.useMemo(() => context, Object.values(context));
-    return /* @__PURE__ */ jsx(Context.Provider, {
+    const value = React__namespace.useMemo(() => context, Object.values(context));
+    return /* @__PURE__ */ jsxRuntime.jsx(Context.Provider, {
       value,
       children
     });
   };
-  function useContext2(consumerName, selector, shouldThrowOnMissingContext) {
+  function useContext(consumerName, selector, shouldThrowOnMissingContext) {
     return h(Context, (ctx) => {
       if (ctx) return selector(ctx);
       if (shouldThrowOnMissingContext) {
@@ -3562,7 +3583,7 @@ function createContext(rootComponentName, defaultContext) {
   Provider.displayName = rootComponentName + "Provider";
   return [
     Provider,
-    useContext2
+    useContext
   ];
 }
 function formatProdErrorMessage(code) {
@@ -8906,14 +8927,14 @@ var __spreadProps = function(a2, b2) {
   return __defProps(a2, __getOwnPropDescs(b2));
 };
 function useStableQueryArgs(queryArgs, serialize, endpointDefinition, endpointName) {
-  var incoming = useMemo(function() {
+  var incoming = React.useMemo(function() {
     return {
       queryArgs,
       serialized: typeof queryArgs == "object" ? serialize({ queryArgs, endpointDefinition, endpointName }) : queryArgs
     };
   }, [queryArgs, serialize, endpointDefinition, endpointName]);
-  var cache2 = useRef(incoming);
-  useEffect(function() {
+  var cache2 = React.useRef(incoming);
+  React.useEffect(function() {
     if (cache2.current.serialized !== incoming.serialized) {
       cache2.current = incoming;
     }
@@ -8922,8 +8943,8 @@ function useStableQueryArgs(queryArgs, serialize, endpointDefinition, endpointNa
 }
 var UNINITIALIZED_VALUE = Symbol();
 function useShallowStableValue(value) {
-  var cache2 = useRef(value);
-  useEffect(function() {
+  var cache2 = React.useRef(value);
+  React.useEffect(function() {
     if (!shallowEqual(cache2.current, value)) {
       cache2.current = value;
     }
@@ -8951,7 +8972,7 @@ var defaultSerializeQueryArgs = function(_c) {
   }
   return endpointName + "(" + serialized + ")";
 };
-var useIsomorphicLayoutEffect = typeof window !== "undefined" && !!window.document && !!window.document.createElement ? useLayoutEffect : useEffect;
+var useIsomorphicLayoutEffect = typeof window !== "undefined" && !!window.document && !!window.document.createElement ? React.useLayoutEffect : React.useEffect;
 var defaultMutationStateSelector = function(x2) {
   return x2;
 };
@@ -8970,7 +8991,7 @@ function buildHooks(_c) {
   var api = _c.api, _d = _c.moduleOptions, batch = _d.batch, useDispatch2 = _d.useDispatch, useSelector2 = _d.useSelector, useStore2 = _d.useStore, unstable__sideEffectsInRender = _d.unstable__sideEffectsInRender, serializeQueryArgs = _c.serializeQueryArgs, context = _c.context;
   var usePossiblyImmediateEffect = unstable__sideEffectsInRender ? function(cb) {
     return cb();
-  } : useEffect;
+  } : React.useEffect;
   return { buildQueryHooks, buildMutationHook, usePrefetch };
   function queryStatePreSelector(currentState, lastResult, queryArgs) {
     if ((lastResult == null ? void 0 : lastResult.endpointName) && currentState.isUninitialized) {
@@ -9005,7 +9026,7 @@ function buildHooks(_c) {
   function usePrefetch(endpointName, defaultOptions) {
     var dispatch = useDispatch2();
     var stableDefaultOptions = useShallowStableValue(defaultOptions);
-    return useCallback(function(arg, options) {
+    return React.useCallback(function(arg, options) {
       return dispatch(api.util.prefetch(endpointName, arg, __spreadValues(__spreadValues({}, stableDefaultOptions), options)));
     }, [endpointName, dispatch, stableDefaultOptions]);
   }
@@ -9020,8 +9041,8 @@ function buildHooks(_c) {
         refetchOnFocus,
         pollingInterval
       });
-      var lastRenderHadSubscription = useRef(false);
-      var promiseRef = useRef();
+      var lastRenderHadSubscription = React.useRef(false);
+      var promiseRef = React.useRef();
       var _g = promiseRef.current || {}, queryCacheKey = _g.queryCacheKey, requestId = _g.requestId;
       var currentRenderHasSubscription = false;
       if (queryCacheKey && requestId) {
@@ -9075,14 +9096,14 @@ function buildHooks(_c) {
         stableSubscriptionOptions,
         subscriptionRemoved
       ]);
-      useEffect(function() {
+      React.useEffect(function() {
         return function() {
           var _a;
           (_a = promiseRef.current) == null ? void 0 : _a.unsubscribe();
           promiseRef.current = void 0;
         };
       }, []);
-      return useMemo(function() {
+      return React.useMemo(function() {
         return {
           refetch: function() {
             var _a;
@@ -9097,8 +9118,8 @@ function buildHooks(_c) {
       var _d2 = _c2 === void 0 ? {} : _c2, refetchOnReconnect = _d2.refetchOnReconnect, refetchOnFocus = _d2.refetchOnFocus, _e = _d2.pollingInterval, pollingInterval = _e === void 0 ? 0 : _e;
       var initiate = api.endpoints[name].initiate;
       var dispatch = useDispatch2();
-      var _f = useState(UNINITIALIZED_VALUE), arg = _f[0], setArg = _f[1];
-      var promiseRef = useRef();
+      var _f = React.useState(UNINITIALIZED_VALUE), arg = _f[0], setArg = _f[1];
+      var promiseRef = React.useRef();
       var stableSubscriptionOptions = useShallowStableValue({
         refetchOnReconnect,
         refetchOnFocus,
@@ -9111,11 +9132,11 @@ function buildHooks(_c) {
           (_b = promiseRef.current) == null ? void 0 : _b.updateSubscriptionOptions(stableSubscriptionOptions);
         }
       }, [stableSubscriptionOptions]);
-      var subscriptionOptionsRef = useRef(stableSubscriptionOptions);
+      var subscriptionOptionsRef = React.useRef(stableSubscriptionOptions);
       usePossiblyImmediateEffect(function() {
         subscriptionOptionsRef.current = stableSubscriptionOptions;
       }, [stableSubscriptionOptions]);
-      var trigger = useCallback(function(arg2, preferCacheValue) {
+      var trigger = React.useCallback(function(arg2, preferCacheValue) {
         if (preferCacheValue === void 0) {
           preferCacheValue = false;
         }
@@ -9131,18 +9152,18 @@ function buildHooks(_c) {
         });
         return promise2;
       }, [dispatch, initiate]);
-      useEffect(function() {
+      React.useEffect(function() {
         return function() {
           var _a;
           (_a = promiseRef == null ? void 0 : promiseRef.current) == null ? void 0 : _a.unsubscribe();
         };
       }, []);
-      useEffect(function() {
+      React.useEffect(function() {
         if (arg !== UNINITIALIZED_VALUE && !promiseRef.current) {
           trigger(arg, true);
         }
       }, [arg, trigger]);
-      return useMemo(function() {
+      return React.useMemo(function() {
         return [trigger, arg];
       }, [trigger, arg]);
     };
@@ -9150,8 +9171,8 @@ function buildHooks(_c) {
       var _d2 = _c2 === void 0 ? {} : _c2, _e = _d2.skip, skip = _e === void 0 ? false : _e, selectFromResult = _d2.selectFromResult;
       var select = api.endpoints[name].select;
       var stableArg = useStableQueryArgs(skip ? skipToken : arg, serializeQueryArgs, context.endpointDefinitions[name], name);
-      var lastValue = useRef();
-      var selectDefaultResult = useMemo(function() {
+      var lastValue = React.useRef();
+      var selectDefaultResult = React.useMemo(function() {
         return createSelector([
           select(stableArg),
           function(_2, lastResult) {
@@ -9162,7 +9183,7 @@ function buildHooks(_c) {
           }
         ], queryStatePreSelector);
       }, [select, stableArg]);
-      var querySelector = useMemo(function() {
+      var querySelector = React.useMemo(function() {
         return selectFromResult ? createSelector([selectDefaultResult], selectFromResult) : selectDefaultResult;
       }, [selectDefaultResult, selectFromResult]);
       var currentState = useSelector2(function(state) {
@@ -9184,10 +9205,10 @@ function buildHooks(_c) {
         var queryStateResults = useQueryState(arg, __spreadProps(__spreadValues({}, options), {
           skip: arg === UNINITIALIZED_VALUE
         }));
-        var info = useMemo(function() {
+        var info = React.useMemo(function() {
           return { lastArg: arg };
         }, [arg]);
-        return useMemo(function() {
+        return React.useMemo(function() {
           return [trigger, queryStateResults, info];
         }, [trigger, queryStateResults, info]);
       },
@@ -9197,8 +9218,8 @@ function buildHooks(_c) {
           selectFromResult: arg === skipToken || (options == null ? void 0 : options.skip) ? void 0 : noPendingQueryStateSelector
         }, options));
         var data = queryStateResults.data, status = queryStateResults.status, isLoading = queryStateResults.isLoading, isSuccess = queryStateResults.isSuccess, isError2 = queryStateResults.isError, error = queryStateResults.error;
-        useDebugValue({ data, status, isLoading, isSuccess, isError: isError2, error });
-        return useMemo(function() {
+        React.useDebugValue({ data, status, isLoading, isSuccess, isError: isError2, error });
+        return React.useMemo(function() {
           return __spreadValues(__spreadValues({}, queryStateResults), querySubscriptionResults);
         }, [queryStateResults, querySubscriptionResults]);
       }
@@ -9209,26 +9230,26 @@ function buildHooks(_c) {
       var _d2 = _c2 === void 0 ? {} : _c2, _e = _d2.selectFromResult, selectFromResult = _e === void 0 ? defaultMutationStateSelector : _e, fixedCacheKey = _d2.fixedCacheKey;
       var _f = api.endpoints[name], select = _f.select, initiate = _f.initiate;
       var dispatch = useDispatch2();
-      var _g = useState(), promise2 = _g[0], setPromise = _g[1];
-      useEffect(function() {
+      var _g = React.useState(), promise2 = _g[0], setPromise = _g[1];
+      React.useEffect(function() {
         return function() {
           if (!(promise2 == null ? void 0 : promise2.arg.fixedCacheKey)) {
             promise2 == null ? void 0 : promise2.reset();
           }
         };
       }, [promise2]);
-      var triggerMutation = useCallback(function(arg) {
+      var triggerMutation = React.useCallback(function(arg) {
         var promise22 = dispatch(initiate(arg, { fixedCacheKey }));
         setPromise(promise22);
         return promise22;
       }, [dispatch, initiate, fixedCacheKey]);
       var requestId = (promise2 || {}).requestId;
-      var mutationSelector = useMemo(function() {
+      var mutationSelector = React.useMemo(function() {
         return createSelector([select({ fixedCacheKey, requestId: promise2 == null ? void 0 : promise2.requestId })], selectFromResult);
       }, [select, promise2, selectFromResult, fixedCacheKey]);
       var currentState = useSelector2(mutationSelector, shallowEqual);
       var originalArgs = fixedCacheKey == null ? promise2 == null ? void 0 : promise2.arg.originalArgs : void 0;
-      var reset = useCallback(function() {
+      var reset = React.useCallback(function() {
         batch(function() {
           if (promise2) {
             setPromise(void 0);
@@ -9242,7 +9263,7 @@ function buildHooks(_c) {
         });
       }, [dispatch, fixedCacheKey, promise2, requestId]);
       var endpointName = currentState.endpointName, data = currentState.data, status = currentState.status, isLoading = currentState.isLoading, isSuccess = currentState.isSuccess, isError2 = currentState.isError, error = currentState.error;
-      useDebugValue({
+      React.useDebugValue({
         endpointName,
         data,
         status,
@@ -9251,10 +9272,10 @@ function buildHooks(_c) {
         isError: isError2,
         error
       });
-      var finalState = useMemo(function() {
+      var finalState = React.useMemo(function() {
         return __spreadProps(__spreadValues({}, currentState), { originalArgs, reset });
       }, [currentState, originalArgs, reset]);
-      return useMemo(function() {
+      return React.useMemo(function() {
         return [triggerMutation, finalState];
       }, [triggerMutation, finalState]);
     };
@@ -9283,7 +9304,7 @@ function safeAssign(target) {
 }
 var reactHooksModuleName = /* @__PURE__ */ Symbol();
 var reactHooksModule = function(_c) {
-  var _d = {}, _e = _d.batch, batch = _e === void 0 ? unstable_batchedUpdates$1 : _e, _f = _d.useDispatch, useDispatch$1 = _f === void 0 ? useDispatch : _f, _g = _d.useSelector, useSelector$1 = _g === void 0 ? useSelector : _g, _h = _d.useStore, useStore$1 = _h === void 0 ? useStore : _h, _j = _d.unstable__sideEffectsInRender, unstable__sideEffectsInRender = _j === void 0 ? false : _j;
+  var _d = {}, _e = _d.batch, batch = _e === void 0 ? ReactDOM.unstable_batchedUpdates : _e, _f = _d.useDispatch, useDispatch$1 = _f === void 0 ? useDispatch : _f, _g = _d.useSelector, useSelector$1 = _g === void 0 ? useSelector : _g, _h = _d.useStore, useStore$1 = _h === void 0 ? useStore : _h, _j = _d.unstable__sideEffectsInRender, unstable__sideEffectsInRender = _j === void 0 ? false : _j;
   return {
     name: reactHooksModuleName,
     init: function(api, _c2, context) {
@@ -9330,8 +9351,8 @@ var reactHooksModule = function(_c) {
 };
 var createApi = /* @__PURE__ */ buildCreateApi(coreModule(), reactHooksModule());
 var _mapping = {};
-(function(exports) {
-  exports.aliasToReal = {
+(function(exports2) {
+  exports2.aliasToReal = {
     // Lodash aliases.
     "each": "forEach",
     "eachRight": "forEachRight",
@@ -9396,7 +9417,7 @@ var _mapping = {};
     "whereEq": "isMatch",
     "zipObj": "zipObject"
   };
-  exports.aryMethod = {
+  exports2.aryMethod = {
     "1": [
       "assignAll",
       "assignInAll",
@@ -9631,12 +9652,12 @@ var _mapping = {};
       "updateWith"
     ]
   };
-  exports.aryRearg = {
+  exports2.aryRearg = {
     "2": [1, 0],
     "3": [2, 0, 1],
     "4": [3, 2, 0, 1]
   };
-  exports.iterateeAry = {
+  exports2.iterateeAry = {
     "dropRightWhile": 1,
     "dropWhile": 1,
     "every": 1,
@@ -9674,11 +9695,11 @@ var _mapping = {};
     "times": 1,
     "transform": 2
   };
-  exports.iterateeRearg = {
+  exports2.iterateeRearg = {
     "mapKeys": [1],
     "reduceRight": [1, 0]
   };
-  exports.methodRearg = {
+  exports2.methodRearg = {
     "assignInAllWith": [1, 0],
     "assignInWith": [1, 2, 0],
     "assignAllWith": [1, 0],
@@ -9709,7 +9730,7 @@ var _mapping = {};
     "xorWith": [1, 2, 0],
     "zipWith": [1, 2, 0]
   };
-  exports.methodSpread = {
+  exports2.methodSpread = {
     "assignAll": { "start": 0 },
     "assignAllWith": { "start": 0 },
     "assignInAll": { "start": 0 },
@@ -9725,7 +9746,7 @@ var _mapping = {};
     "without": { "start": 1 },
     "zipAll": { "start": 0 }
   };
-  exports.mutate = {
+  exports2.mutate = {
     "array": {
       "fill": true,
       "pull": true,
@@ -9762,8 +9783,8 @@ var _mapping = {};
       "updateWith": true
     }
   };
-  exports.realToAlias = function() {
-    var hasOwnProperty2 = Object.prototype.hasOwnProperty, object = exports.aliasToReal, result = {};
+  exports2.realToAlias = function() {
+    var hasOwnProperty2 = Object.prototype.hasOwnProperty, object = exports2.aliasToReal, result = {};
     for (var key in object) {
       var value = object[key];
       if (hasOwnProperty2.call(result, value)) {
@@ -9774,7 +9795,7 @@ var _mapping = {};
     }
     return result;
   }();
-  exports.remap = {
+  exports2.remap = {
     "assignAll": "assign",
     "assignAllWith": "assignWith",
     "assignInAll": "assignIn",
@@ -9808,7 +9829,7 @@ var _mapping = {};
     "trimCharsStart": "trimStart",
     "zipAll": "zip"
   };
-  exports.skipFixed = {
+  exports2.skipFixed = {
     "castArray": true,
     "flow": true,
     "flowRight": true,
@@ -9817,7 +9838,7 @@ var _mapping = {};
     "rearg": true,
     "runInContext": true
   };
-  exports.skipRearg = {
+  exports2.skipRearg = {
     "add": true,
     "assign": true,
     "assignIn": true,
@@ -13753,7 +13774,7 @@ var QueryClient = /* @__PURE__ */ function() {
   };
   return QueryClient2;
 }();
-var unstable_batchedUpdates = ReactDOM.unstable_batchedUpdates;
+var unstable_batchedUpdates = ReactDOM__default.default.unstable_batchedUpdates;
 notifyManager.setBatchNotifyFunction(unstable_batchedUpdates);
 var logger = console;
 setLogger(logger);
@@ -13770,26 +13791,26 @@ createContext("History", {
   }
 });
 function $c512c27ab02ef895$export$fd42f52fd3ae1109(rootComponentName, defaultContext) {
-  const Context = /* @__PURE__ */ createContext$1(defaultContext);
+  const Context = /* @__PURE__ */ React.createContext(defaultContext);
   function Provider(props) {
     const { children, ...context } = props;
-    const value = useMemo(
+    const value = React.useMemo(
       () => context,
       Object.values(context)
     );
-    return /* @__PURE__ */ createElement(Context.Provider, {
+    return /* @__PURE__ */ React.createElement(Context.Provider, {
       value
     }, children);
   }
-  function useContext$1(consumerName) {
-    const context = useContext(Context);
+  function useContext(consumerName) {
+    const context = React.useContext(Context);
     if (context) return context;
     throw new Error(`\`${consumerName}\` must be used within \`${rootComponentName}\``);
   }
   Provider.displayName = rootComponentName + "Provider";
   return [
     Provider,
-    useContext$1
+    useContext
   ];
 }
 function getByteSize(value) {
@@ -16303,13 +16324,13 @@ const {
   mergeConfig
 } = axios;
 const [AppInfoProvider, useAppInfo] = createContext("AppInfo", {});
-const TrackingContext = /* @__PURE__ */ React.createContext({
+const TrackingContext = /* @__PURE__ */ React__namespace.createContext({
   uuid: false
 });
 const useTracking = () => {
-  const { uuid, telemetryProperties } = React.useContext(TrackingContext);
+  const { uuid, telemetryProperties } = React__namespace.useContext(TrackingContext);
   const userId = useAppInfo("useTracking", (state) => state.userId);
-  const trackUsage = React.useCallback(async (event, properties) => {
+  const trackUsage = React__namespace.useCallback(async (event, properties) => {
     try {
       if (uuid && !window.strapi.telemetryDisabled) {
         const res = await axios.post(`${process.env.STRAPI_ANALYTICS_URL || "https://analytics.strapi.io"}/api/v2/track`, {
@@ -16345,10 +16366,10 @@ const useTracking = () => {
   };
 };
 $c512c27ab02ef895$export$fd42f52fd3ae1109("ConfigurationContext");
-const ActionsContainer = styled(Flex)`
+const ActionsContainer = styled.styled(designSystem.Flex)`
   border-top: ${({ theme }) => `1px solid ${theme.colors.neutral150}`};
 `;
-const PopoverArrow = styled(Popover.Arrow)`
+const PopoverArrow = styled.styled(designSystem.Popover.Arrow)`
   fill: ${({ theme }) => theme.colors.neutral0};
   transform: translateY(-16px) rotate(-90deg);
 `;
@@ -16356,10 +16377,10 @@ const StepCount = ({ tourName }) => {
   const state = useGuidedTour("GuidedTourPopover", (s2) => s2.state);
   const currentStep = state.tours[tourName].currentStep + 1;
   const displayedLength = state.tours[tourName].length - 1;
-  return /* @__PURE__ */ jsx(Typography, {
+  return /* @__PURE__ */ jsxRuntime.jsx(designSystem.Typography, {
     variant: "omega",
     fontSize: "12px",
-    children: /* @__PURE__ */ jsx(FormattedMessage, {
+    children: /* @__PURE__ */ jsxRuntime.jsx(reactIntl.FormattedMessage, {
       id: "tours.stepCount",
       defaultMessage: "Step {currentStep} of {tourLength}",
       values: {
@@ -16370,8 +16391,8 @@ const StepCount = ({ tourName }) => {
   });
 };
 const createStepComponents = (tourName) => ({
-  Root: /* @__PURE__ */ React.forwardRef(({ withArrow = true, ...props }, ref2) => {
-    return /* @__PURE__ */ jsxs(Popover.Content, {
+  Root: /* @__PURE__ */ React__namespace.forwardRef(({ withArrow = true, ...props }, ref2) => {
+    return /* @__PURE__ */ jsxRuntime.jsxs(designSystem.Popover.Content, {
       ref: ref2,
       "aria-labelledby": "guided-tour-title",
       side: "top",
@@ -16381,20 +16402,20 @@ const createStepComponents = (tourName) => ({
       },
       ...props,
       children: [
-        withArrow && /* @__PURE__ */ jsx(PopoverArrow, {
+        withArrow && /* @__PURE__ */ jsxRuntime.jsx(PopoverArrow, {
           asChild: true,
-          children: /* @__PURE__ */ jsx("svg", {
+          children: /* @__PURE__ */ jsxRuntime.jsx("svg", {
             xmlns: "http://www.w3.org/2000/svg",
             width: "23",
             height: "25",
             viewBox: "0 0 23 25",
             fill: "none",
-            children: /* @__PURE__ */ jsx("path", {
+            children: /* @__PURE__ */ jsxRuntime.jsx("path", {
               d: "M11 24.5L1.82843 15.3284C0.266332 13.7663 0.26633 11.2337 1.82843 9.67157L11 0.5L23 12.5L11 24.5Z"
             })
           })
         }),
-        /* @__PURE__ */ jsx(Flex, {
+        /* @__PURE__ */ jsxRuntime.jsx(designSystem.Flex, {
           width: "360px",
           direction: "column",
           alignItems: "start",
@@ -16404,33 +16425,33 @@ const createStepComponents = (tourName) => ({
     });
   }),
   Title: (props) => {
-    return /* @__PURE__ */ jsx(Box, {
+    return /* @__PURE__ */ jsxRuntime.jsx(designSystem.Box, {
       paddingTop: 5,
       paddingLeft: 5,
       paddingRight: 5,
       paddingBottom: 1,
       width: "100%",
-      children: "children" in props ? props.children : /* @__PURE__ */ jsx(Typography, {
+      children: "children" in props ? props.children : /* @__PURE__ */ jsxRuntime.jsx(designSystem.Typography, {
         tag: "h1",
         id: "guided-tour-title",
         variant: "omega",
         fontWeight: "bold",
-        children: /* @__PURE__ */ jsx(FormattedMessage, {
+        children: /* @__PURE__ */ jsxRuntime.jsx(reactIntl.FormattedMessage, {
           id: props.id,
           defaultMessage: props.defaultMessage
         })
       })
     });
   },
-  Content: (props) => /* @__PURE__ */ jsx(Box, {
+  Content: (props) => /* @__PURE__ */ jsxRuntime.jsx(designSystem.Box, {
     paddingBottom: 5,
     paddingLeft: 5,
     paddingRight: 5,
     width: "100%",
-    children: "children" in props ? props.children : /* @__PURE__ */ jsx(Typography, {
+    children: "children" in props ? props.children : /* @__PURE__ */ jsxRuntime.jsx(designSystem.Typography, {
       tag: "div",
       variant: "omega",
-      children: /* @__PURE__ */ jsx(FormattedMessage, {
+      children: /* @__PURE__ */ jsxRuntime.jsx(reactIntl.FormattedMessage, {
         id: props.id,
         defaultMessage: props.defaultMessage
       })
@@ -16462,39 +16483,39 @@ const createStepComponents = (tourName) => ({
         payload: tourName
       });
     };
-    return /* @__PURE__ */ jsx(ActionsContainer, {
+    return /* @__PURE__ */ jsxRuntime.jsx(ActionsContainer, {
       width: "100%",
       padding: 3,
       paddingLeft: 5,
       justifyContent: showStepCount ? "space-between" : "flex-end",
       ...flexProps,
-      children: children ? children : /* @__PURE__ */ jsxs(Fragment, {
+      children: children ? children : /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, {
         children: [
-          showStepCount && /* @__PURE__ */ jsx(StepCount, {
+          showStepCount && /* @__PURE__ */ jsxRuntime.jsx(StepCount, {
             tourName
           }),
-          /* @__PURE__ */ jsxs(Flex, {
+          /* @__PURE__ */ jsxRuntime.jsxs(designSystem.Flex, {
             gap: 2,
             children: [
-              showSkip && /* @__PURE__ */ jsx(Button, {
+              showSkip && /* @__PURE__ */ jsxRuntime.jsx(designSystem.Button, {
                 variant: "tertiary",
                 onClick: handleSkipAction,
-                children: /* @__PURE__ */ jsx(FormattedMessage, {
+                children: /* @__PURE__ */ jsxRuntime.jsx(reactIntl.FormattedMessage, {
                   id: "tours.skip",
                   defaultMessage: "Skip"
                 })
               }),
-              to ? /* @__PURE__ */ jsx(LinkButton, {
-                tag: NavLink,
+              to ? /* @__PURE__ */ jsxRuntime.jsx(designSystem.LinkButton, {
+                tag: reactRouterDom.NavLink,
                 to,
                 onClick: handleNextStep,
-                children: /* @__PURE__ */ jsx(FormattedMessage, {
+                children: /* @__PURE__ */ jsxRuntime.jsx(reactIntl.FormattedMessage, {
                   id: "tours.next",
                   defaultMessage: "Next"
                 })
-              }) : /* @__PURE__ */ jsx(Button, {
+              }) : /* @__PURE__ */ jsxRuntime.jsx(designSystem.Button, {
                 onClick: handleNextStep,
-                children: /* @__PURE__ */ jsx(FormattedMessage, {
+                children: /* @__PURE__ */ jsxRuntime.jsx(reactIntl.FormattedMessage, {
                   id: "tours.next",
                   defaultMessage: "Next"
                 })
@@ -16507,9 +16528,9 @@ const createStepComponents = (tourName) => ({
   }
 });
 const GotItAction = ({ onClick }) => {
-  return /* @__PURE__ */ jsx(Button, {
+  return /* @__PURE__ */ jsxRuntime.jsx(designSystem.Button, {
     onClick,
-    children: /* @__PURE__ */ jsx(FormattedMessage, {
+    children: /* @__PURE__ */ jsxRuntime.jsx(reactIntl.FormattedMessage, {
       id: "tours.gotIt",
       defaultMessage: "Got it"
     })
@@ -16519,19 +16540,19 @@ const GotItAction = ({ onClick }) => {
   contentTypeBuilder: createTour("contentTypeBuilder", [
     {
       name: "Introduction",
-      content: (Step) => /* @__PURE__ */ jsxs(Step.Root, {
+      content: (Step) => /* @__PURE__ */ jsxRuntime.jsxs(Step.Root, {
         side: "bottom",
         withArrow: false,
         children: [
-          /* @__PURE__ */ jsx(Step.Title, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Title, {
             id: "tours.contentTypeBuilder.Introduction.title",
             defaultMessage: "Content-Type Builder"
           }),
-          /* @__PURE__ */ jsx(Step.Content, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Content, {
             id: "tours.contentTypeBuilder.Introduction.content",
             defaultMessage: "Create and manage your content structure with collection types, single types and components."
           }),
-          /* @__PURE__ */ jsx(Step.Actions, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Actions, {
             showSkip: true
           })
         ]
@@ -16539,60 +16560,60 @@ const GotItAction = ({ onClick }) => {
     },
     {
       name: "CollectionTypes",
-      content: (Step) => /* @__PURE__ */ jsxs(Step.Root, {
+      content: (Step) => /* @__PURE__ */ jsxRuntime.jsxs(Step.Root, {
         side: "right",
         sideOffset: 16,
         children: [
-          /* @__PURE__ */ jsx(Step.Title, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Title, {
             id: "tours.contentTypeBuilder.CollectionTypes.title",
             defaultMessage: "Collection Types"
           }),
-          /* @__PURE__ */ jsx(Step.Content, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Content, {
             id: "tours.contentTypeBuilder.CollectionTypes.content",
             defaultMessage: "A content structure that can manage multiple entries, such as articles or products."
           }),
-          /* @__PURE__ */ jsx(Step.Actions, {})
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Actions, {})
         ]
       })
     },
     {
       name: "SingleTypes",
-      content: (Step) => /* @__PURE__ */ jsxs(Step.Root, {
+      content: (Step) => /* @__PURE__ */ jsxRuntime.jsxs(Step.Root, {
         side: "right",
         sideOffset: 16,
         children: [
-          /* @__PURE__ */ jsx(Step.Title, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Title, {
             id: "tours.contentTypeBuilder.SingleTypes.title",
             defaultMessage: "Single Types"
           }),
-          /* @__PURE__ */ jsx(Step.Content, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Content, {
             id: "tours.contentTypeBuilder.SingleTypes.content",
             defaultMessage: "A content structure that can manage a single entry, such as a homepage or a header."
           }),
-          /* @__PURE__ */ jsx(Step.Actions, {})
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Actions, {})
         ]
       })
     },
     {
       name: "Components",
-      content: (Step, { dispatch }) => /* @__PURE__ */ jsxs(Step.Root, {
+      content: (Step, { dispatch }) => /* @__PURE__ */ jsxRuntime.jsxs(Step.Root, {
         side: "right",
         sideOffset: 16,
         children: [
-          /* @__PURE__ */ jsx(Step.Title, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Title, {
             id: "tours.contentTypeBuilder.Components.title",
             defaultMessage: "Components"
           }),
-          /* @__PURE__ */ jsx(Step.Content, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Content, {
             id: "tours.contentTypeBuilder.Components.content",
             defaultMessage: "A reusable content structure that can be used across multiple content types, such as buttons, sliders or cards."
           }),
-          /* @__PURE__ */ jsxs(Step.Actions, {
+          /* @__PURE__ */ jsxRuntime.jsxs(Step.Actions, {
             children: [
-              /* @__PURE__ */ jsx(StepCount, {
+              /* @__PURE__ */ jsxRuntime.jsx(StepCount, {
                 tourName: "contentTypeBuilder"
               }),
-              /* @__PURE__ */ jsx(GotItAction, {
+              /* @__PURE__ */ jsxRuntime.jsx(GotItAction, {
                 onClick: () => dispatch({
                   type: "next_step",
                   payload: "contentTypeBuilder"
@@ -16605,18 +16626,18 @@ const GotItAction = ({ onClick }) => {
     },
     {
       name: "Finish",
-      content: (Step) => /* @__PURE__ */ jsxs(Step.Root, {
+      content: (Step) => /* @__PURE__ */ jsxRuntime.jsxs(Step.Root, {
         side: "right",
         children: [
-          /* @__PURE__ */ jsx(Step.Title, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Title, {
             id: "tours.contentTypeBuilder.Finish.title",
             defaultMessage: "It's time to create content!"
           }),
-          /* @__PURE__ */ jsx(Step.Content, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Content, {
             id: "tours.contentTypeBuilder.Finish.content",
             defaultMessage: "Now that you created content types, you'll be able to create content in the content manager."
           }),
-          /* @__PURE__ */ jsx(Step.Actions, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Actions, {
             showStepCount: false,
             to: "/content-manager"
           })
@@ -16629,19 +16650,19 @@ const GotItAction = ({ onClick }) => {
     {
       name: "Introduction",
       when: (completedActions) => completedActions.includes("didCreateContentTypeSchema"),
-      content: (Step) => /* @__PURE__ */ jsxs(Step.Root, {
+      content: (Step) => /* @__PURE__ */ jsxRuntime.jsxs(Step.Root, {
         side: "top",
         withArrow: false,
         children: [
-          /* @__PURE__ */ jsx(Step.Title, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Title, {
             id: "tours.contentManager.Introduction.title",
             defaultMessage: "Content manager"
           }),
-          /* @__PURE__ */ jsx(Step.Content, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Content, {
             id: "tours.contentManager.Introduction.content",
             defaultMessage: "Create and manage content from your collection types and single types."
           }),
-          /* @__PURE__ */ jsx(Step.Actions, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Actions, {
             showSkip: true
           })
         ]
@@ -16649,41 +16670,41 @@ const GotItAction = ({ onClick }) => {
     },
     {
       name: "Fields",
-      content: (Step) => /* @__PURE__ */ jsxs(Step.Root, {
+      content: (Step) => /* @__PURE__ */ jsxRuntime.jsxs(Step.Root, {
         sideOffset: -12,
         children: [
-          /* @__PURE__ */ jsx(Step.Title, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Title, {
             id: "tours.contentManager.Fields.title",
             defaultMessage: "Fields"
           }),
-          /* @__PURE__ */ jsx(Step.Content, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Content, {
             id: "tours.contentManager.Fields.content",
             defaultMessage: "Add content to the fields created in the Content-Type Builder."
           }),
-          /* @__PURE__ */ jsx(Step.Actions, {})
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Actions, {})
         ]
       })
     },
     {
       name: "Publish",
-      content: (Step, { dispatch }) => /* @__PURE__ */ jsxs(Step.Root, {
+      content: (Step, { dispatch }) => /* @__PURE__ */ jsxRuntime.jsxs(Step.Root, {
         side: "left",
         align: "center",
         children: [
-          /* @__PURE__ */ jsx(Step.Title, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Title, {
             id: "tours.contentManager.Publish.title",
             defaultMessage: "Publish"
           }),
-          /* @__PURE__ */ jsx(Step.Content, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Content, {
             id: "tours.contentManager.Publish.content",
             defaultMessage: "Publish entries to make their content available through the Document Service API."
           }),
-          /* @__PURE__ */ jsxs(Step.Actions, {
+          /* @__PURE__ */ jsxRuntime.jsxs(Step.Actions, {
             children: [
-              /* @__PURE__ */ jsx(StepCount, {
+              /* @__PURE__ */ jsxRuntime.jsx(StepCount, {
                 tourName: "contentManager"
               }),
-              /* @__PURE__ */ jsx(GotItAction, {
+              /* @__PURE__ */ jsxRuntime.jsx(GotItAction, {
                 onClick: () => dispatch({
                   type: "next_step",
                   payload: "contentManager"
@@ -16696,18 +16717,18 @@ const GotItAction = ({ onClick }) => {
     },
     {
       name: "Finish",
-      content: (Step) => /* @__PURE__ */ jsxs(Step.Root, {
+      content: (Step) => /* @__PURE__ */ jsxRuntime.jsxs(Step.Root, {
         side: "right",
         children: [
-          /* @__PURE__ */ jsx(Step.Title, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Title, {
             id: "tours.contentManager.FinalStep.title",
             defaultMessage: "It's time to create API Tokens!"
           }),
-          /* @__PURE__ */ jsx(Step.Content, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Content, {
             id: "tours.contentManager.FinalStep.content",
             defaultMessage: "Now that you've created and published content, time to create API tokens and set up permissions."
           }),
-          /* @__PURE__ */ jsx(Step.Actions, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Actions, {
             showStepCount: false,
             to: "/settings/api-tokens"
           })
@@ -16719,19 +16740,19 @@ const GotItAction = ({ onClick }) => {
   apiTokens: createTour("apiTokens", [
     {
       name: "Introduction",
-      content: (Step) => /* @__PURE__ */ jsxs(Step.Root, {
+      content: (Step) => /* @__PURE__ */ jsxRuntime.jsxs(Step.Root, {
         sideOffset: -36,
         withArrow: false,
         children: [
-          /* @__PURE__ */ jsx(Step.Title, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Title, {
             id: "tours.apiTokens.Introduction.title",
             defaultMessage: "API tokens"
           }),
-          /* @__PURE__ */ jsx(Step.Content, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Content, {
             id: "tours.apiTokens.Introduction.content",
             defaultMessage: "Create and manage API tokens with highly customizable permissions."
           }),
-          /* @__PURE__ */ jsx(Step.Actions, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Actions, {
             showSkip: true
           })
         ]
@@ -16739,44 +16760,44 @@ const GotItAction = ({ onClick }) => {
     },
     {
       name: "CreateAnAPIToken",
-      content: (Step) => /* @__PURE__ */ jsxs(Step.Root, {
+      content: (Step) => /* @__PURE__ */ jsxRuntime.jsxs(Step.Root, {
         side: "bottom",
         align: "end",
         sideOffset: -10,
         children: [
-          /* @__PURE__ */ jsx(Step.Title, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Title, {
             id: "tours.apiTokens.CreateAnAPIToken.title",
             defaultMessage: "Create an API token"
           }),
-          /* @__PURE__ */ jsx(Step.Content, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Content, {
             id: "tours.apiTokens.CreateAnAPIToken.content",
             defaultMessage: "Create a new API token. Choose a name, duration and type."
           }),
-          /* @__PURE__ */ jsx(Step.Actions, {})
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Actions, {})
         ]
       })
     },
     {
       name: "CopyAPIToken",
-      content: (Step, { dispatch }) => /* @__PURE__ */ jsxs(Step.Root, {
+      content: (Step, { dispatch }) => /* @__PURE__ */ jsxRuntime.jsxs(Step.Root, {
         side: "bottom",
         align: "start",
         sideOffset: -5,
         children: [
-          /* @__PURE__ */ jsx(Step.Title, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Title, {
             id: "tours.apiTokens.CopyAPIToken.title",
             defaultMessage: "Copy your new API token"
           }),
-          /* @__PURE__ */ jsx(Step.Content, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Content, {
             id: "tours.apiTokens.CopyAPIToken.content",
             defaultMessage: "Make sure to do it now, you won’t be able to see it again. You’ll need to generate a new one if you lose it."
           }),
-          /* @__PURE__ */ jsxs(Step.Actions, {
+          /* @__PURE__ */ jsxRuntime.jsxs(Step.Actions, {
             children: [
-              /* @__PURE__ */ jsx(StepCount, {
+              /* @__PURE__ */ jsxRuntime.jsx(StepCount, {
                 tourName: "apiTokens"
               }),
-              /* @__PURE__ */ jsx(GotItAction, {
+              /* @__PURE__ */ jsxRuntime.jsx(GotItAction, {
                 onClick: () => dispatch({
                   type: "next_step",
                   payload: "apiTokens"
@@ -16790,19 +16811,19 @@ const GotItAction = ({ onClick }) => {
     },
     {
       name: "Finish",
-      content: (Step) => /* @__PURE__ */ jsxs(Step.Root, {
+      content: (Step) => /* @__PURE__ */ jsxRuntime.jsxs(Step.Root, {
         side: "right",
         align: "start",
         children: [
-          /* @__PURE__ */ jsx(Step.Title, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Title, {
             id: "tours.apiTokens.FinalStep.title",
             defaultMessage: "It's time to deploy your application!"
           }),
-          /* @__PURE__ */ jsx(Step.Content, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Content, {
             id: "tours.apiTokens.FinalStep.content",
             defaultMessage: "Your application is ready to be deployed and its content to be shared with the world!"
           }),
-          /* @__PURE__ */ jsx(Step.Actions, {
+          /* @__PURE__ */ jsxRuntime.jsx(Step.Actions, {
             showStepCount: false,
             to: "/"
           })
@@ -16816,16 +16837,16 @@ const GotItAction = ({ onClick }) => {
 const GuidedTourTooltip = ({ children, ...props }) => {
   const state = useGuidedTour("TooltipWrapper", (s2) => s2.state);
   if (!state.enabled) {
-    return /* @__PURE__ */ jsx(Fragment, {
+    return /* @__PURE__ */ jsxRuntime.jsx(jsxRuntime.Fragment, {
       children
     });
   }
-  return /* @__PURE__ */ jsx(GuidedTourTooltipImpl, {
+  return /* @__PURE__ */ jsxRuntime.jsx(GuidedTourTooltipImpl, {
     ...props,
     children
   });
 };
-const GuidedTourOverlay = styled(Box)`
+const GuidedTourOverlay = styled.styled(designSystem.Box)`
   position: fixed;
   top: 0;
   left: 0;
@@ -16841,7 +16862,7 @@ const GuidedTourTooltipImpl = ({ children, content, tourName, step, when }) => {
   const isCurrentStep = state.tours[tourName].currentStep === step;
   const isStepConditionMet = when ? when(state.completedActions) : true;
   const isPopoverOpen = guidedTourMeta?.data?.isFirstSuperAdminUser && !state.tours[tourName].isCompleted && isCurrentStep && isStepConditionMet;
-  React.useEffect(() => {
+  React__namespace.useEffect(() => {
     if (!isPopoverOpen) return;
     const originalStyle = window.getComputedStyle(document.body).overflow;
     document.body.style.overflow = "hidden";
@@ -16851,7 +16872,7 @@ const GuidedTourTooltipImpl = ({ children, content, tourName, step, when }) => {
   }, [
     isPopoverOpen
   ]);
-  React.useEffect(() => {
+  React__namespace.useEffect(() => {
     dispatch({
       type: "set_completed_actions",
       payload: guidedTourMeta?.data?.completedActions ?? []
@@ -16860,18 +16881,18 @@ const GuidedTourTooltipImpl = ({ children, content, tourName, step, when }) => {
     dispatch,
     guidedTourMeta?.data?.completedActions
   ]);
-  const Step = React.useMemo(() => createStepComponents(tourName), [
+  const Step = React__namespace.useMemo(() => createStepComponents(tourName), [
     tourName
   ]);
-  return /* @__PURE__ */ jsxs(Fragment, {
+  return /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, {
     children: [
-      isPopoverOpen && /* @__PURE__ */ jsx(Portal, {
-        children: /* @__PURE__ */ jsx(GuidedTourOverlay, {})
+      isPopoverOpen && /* @__PURE__ */ jsxRuntime.jsx(designSystem.Portal, {
+        children: /* @__PURE__ */ jsxRuntime.jsx(GuidedTourOverlay, {})
       }),
-      /* @__PURE__ */ jsxs(Popover.Root, {
+      /* @__PURE__ */ jsxRuntime.jsxs(designSystem.Popover.Root, {
         open: isPopoverOpen,
         children: [
-          /* @__PURE__ */ jsx(Popover.Anchor, {
+          /* @__PURE__ */ jsxRuntime.jsx(designSystem.Popover.Anchor, {
             children
           }),
           content(Step, {
@@ -16889,7 +16910,7 @@ function createTour(tourName, steps) {
       throw Error(`The tour: ${tourName} with step: ${step.name} has already been registered`);
     }
     acc[step.name] = ({ children }) => {
-      return /* @__PURE__ */ jsx(GuidedTourTooltip, {
+      return /* @__PURE__ */ jsxRuntime.jsx(GuidedTourTooltip, {
         tourName,
         step: index,
         content: step.content,
@@ -16922,7 +16943,7 @@ baseRest(function(args) {
   args.push(void 0, customDefaultsMerge);
   return apply(mergeWith, void 0, args);
 });
-createGlobalStyle`
+styled.createGlobalStyle`
   body {
     background: ${({ theme }) => theme.colors.neutral100};
   }
@@ -16934,7 +16955,7 @@ new QueryClient({
     }
   }
 });
-styled(Alert)`
+styled.styled(designSystem.Alert)`
   & > div:first-child {
     display: none;
   }
@@ -16943,12 +16964,12 @@ styled(Alert)`
     display: none;
   }
 `;
-styled(Typography)`
+styled.styled(designSystem.Typography)`
   word-break: break-all;
   color: ${({ theme }) => theme.colors.danger600};
 `;
 const ContentLayout = ({ children }) => {
-  return /* @__PURE__ */ jsx(Box, {
+  return /* @__PURE__ */ jsxRuntime.jsx(designSystem.Box, {
     paddingLeft: 10,
     paddingRight: 10,
     children
@@ -16958,7 +16979,7 @@ const GridColSize = {
   S: 180,
   M: 250
 };
-styled(Box)`
+styled.styled(designSystem.Box)`
   display: grid;
   grid-template-columns: repeat(
     auto-fit,
@@ -16967,8 +16988,8 @@ styled(Box)`
   grid-gap: ${({ theme }) => theme.spaces[4]};
 `;
 const useElementOnScreen = (onVisiblityChange, options) => {
-  const containerRef = React.useRef(null);
-  React.useEffect(() => {
+  const containerRef = React__namespace.useRef(null);
+  React__namespace.useEffect(() => {
     const containerEl = containerRef.current;
     const observer = new IntersectionObserver(([entry]) => {
       onVisiblityChange(entry.isIntersecting);
@@ -16988,10 +17009,10 @@ const useElementOnScreen = (onVisiblityChange, options) => {
   ]);
   return containerRef;
 };
-const BaseHeaderLayout = /* @__PURE__ */ React.forwardRef(({ navigationAction, primaryAction, secondaryAction, subtitle, title, sticky, width, ...props }, ref2) => {
+const BaseHeaderLayout = /* @__PURE__ */ React__namespace.forwardRef(({ navigationAction, primaryAction, secondaryAction, subtitle, title, sticky, width, ...props }, ref2) => {
   const isSubtitleString = typeof subtitle === "string";
   if (sticky) {
-    return /* @__PURE__ */ jsx(Box, {
+    return /* @__PURE__ */ jsxRuntime.jsx(designSystem.Box, {
       paddingLeft: 6,
       paddingRight: 6,
       paddingTop: 3,
@@ -17004,38 +17025,38 @@ const BaseHeaderLayout = /* @__PURE__ */ React.forwardRef(({ navigationAction, p
       width: `${width}px`,
       zIndex: 3,
       "data-strapi-header-sticky": true,
-      children: /* @__PURE__ */ jsxs(Flex, {
+      children: /* @__PURE__ */ jsxRuntime.jsxs(designSystem.Flex, {
         justifyContent: "space-between",
         children: [
-          /* @__PURE__ */ jsxs(Flex, {
+          /* @__PURE__ */ jsxRuntime.jsxs(designSystem.Flex, {
             children: [
-              navigationAction && /* @__PURE__ */ jsx(Box, {
+              navigationAction && /* @__PURE__ */ jsxRuntime.jsx(designSystem.Box, {
                 paddingRight: 3,
                 children: navigationAction
               }),
-              /* @__PURE__ */ jsxs(Box, {
+              /* @__PURE__ */ jsxRuntime.jsxs(designSystem.Box, {
                 children: [
-                  /* @__PURE__ */ jsx(Typography, {
+                  /* @__PURE__ */ jsxRuntime.jsx(designSystem.Typography, {
                     variant: "beta",
                     tag: "h1",
                     ...props,
                     children: title
                   }),
-                  isSubtitleString ? /* @__PURE__ */ jsx(Typography, {
+                  isSubtitleString ? /* @__PURE__ */ jsxRuntime.jsx(designSystem.Typography, {
                     variant: "pi",
                     textColor: "neutral600",
                     children: subtitle
                   }) : subtitle
                 ]
               }),
-              secondaryAction ? /* @__PURE__ */ jsx(Box, {
+              secondaryAction ? /* @__PURE__ */ jsxRuntime.jsx(designSystem.Box, {
                 paddingLeft: 4,
                 children: secondaryAction
               }) : null
             ]
           }),
-          /* @__PURE__ */ jsx(Flex, {
-            children: primaryAction ? /* @__PURE__ */ jsx(Box, {
+          /* @__PURE__ */ jsxRuntime.jsx(designSystem.Flex, {
+            children: primaryAction ? /* @__PURE__ */ jsxRuntime.jsx(designSystem.Box, {
               paddingLeft: 2,
               children: primaryAction
             }) : void 0
@@ -17044,7 +17065,7 @@ const BaseHeaderLayout = /* @__PURE__ */ React.forwardRef(({ navigationAction, p
       })
     });
   }
-  return /* @__PURE__ */ jsxs(Box, {
+  return /* @__PURE__ */ jsxRuntime.jsxs(designSystem.Box, {
     ref: ref2,
     paddingLeft: 10,
     paddingRight: 10,
@@ -17053,23 +17074,23 @@ const BaseHeaderLayout = /* @__PURE__ */ React.forwardRef(({ navigationAction, p
     background: "neutral100",
     "data-strapi-header": true,
     children: [
-      navigationAction ? /* @__PURE__ */ jsx(Box, {
+      navigationAction ? /* @__PURE__ */ jsxRuntime.jsx(designSystem.Box, {
         paddingBottom: 2,
         children: navigationAction
       }) : null,
-      /* @__PURE__ */ jsxs(Flex, {
+      /* @__PURE__ */ jsxRuntime.jsxs(designSystem.Flex, {
         justifyContent: "space-between",
         children: [
-          /* @__PURE__ */ jsxs(Flex, {
+          /* @__PURE__ */ jsxRuntime.jsxs(designSystem.Flex, {
             minWidth: 0,
             children: [
-              /* @__PURE__ */ jsx(Typography, {
+              /* @__PURE__ */ jsxRuntime.jsx(designSystem.Typography, {
                 tag: "h1",
                 variant: "alpha",
                 ...props,
                 children: title
               }),
-              secondaryAction ? /* @__PURE__ */ jsx(Box, {
+              secondaryAction ? /* @__PURE__ */ jsxRuntime.jsx(designSystem.Box, {
                 paddingLeft: 4,
                 children: secondaryAction
               }) : null
@@ -17078,7 +17099,7 @@ const BaseHeaderLayout = /* @__PURE__ */ React.forwardRef(({ navigationAction, p
           primaryAction
         ]
       }),
-      isSubtitleString ? /* @__PURE__ */ jsx(Typography, {
+      isSubtitleString ? /* @__PURE__ */ jsxRuntime.jsx(designSystem.Typography, {
         variant: "epsilon",
         textColor: "neutral600",
         tag: "p",
@@ -17088,9 +17109,9 @@ const BaseHeaderLayout = /* @__PURE__ */ React.forwardRef(({ navigationAction, p
   });
 });
 const HeaderLayout = (props) => {
-  const baseHeaderLayoutRef = React.useRef(null);
-  const [headerSize, setHeaderSize] = React.useState(null);
-  const [isVisible, setIsVisible] = React.useState(true);
+  const baseHeaderLayoutRef = React__namespace.useRef(null);
+  const [headerSize, setHeaderSize] = React__namespace.useState(null);
+  const [isVisible, setIsVisible] = React__namespace.useState(true);
   const containerRef = useElementOnScreen(setIsVisible, {
     root: null,
     rootMargin: "0px",
@@ -17101,26 +17122,26 @@ const HeaderLayout = (props) => {
       setHeaderSize(containerRef.current.getBoundingClientRect());
     }
   });
-  React.useEffect(() => {
+  React__namespace.useEffect(() => {
     if (baseHeaderLayoutRef.current) {
       setHeaderSize(baseHeaderLayoutRef.current.getBoundingClientRect());
     }
   }, [
     baseHeaderLayoutRef
   ]);
-  return /* @__PURE__ */ jsxs(Fragment, {
+  return /* @__PURE__ */ jsxRuntime.jsxs(jsxRuntime.Fragment, {
     children: [
-      /* @__PURE__ */ jsx("div", {
+      /* @__PURE__ */ jsxRuntime.jsx("div", {
         style: {
           height: headerSize?.height
         },
         ref: containerRef,
-        children: isVisible && /* @__PURE__ */ jsx(BaseHeaderLayout, {
+        children: isVisible && /* @__PURE__ */ jsxRuntime.jsx(BaseHeaderLayout, {
           ref: baseHeaderLayoutRef,
           ...props
         })
       }),
-      !isVisible && /* @__PURE__ */ jsx(BaseHeaderLayout, {
+      !isVisible && /* @__PURE__ */ jsxRuntime.jsx(BaseHeaderLayout, {
         ...props,
         sticky: true,
         width: headerSize?.width
@@ -17130,8 +17151,8 @@ const HeaderLayout = (props) => {
 };
 HeaderLayout.displayName = "HeaderLayout";
 const useResizeObserver = (sources, onResize) => {
-  const handleResize = useCallbackRef(onResize);
-  React.useLayoutEffect(() => {
+  const handleResize = designSystem.useCallbackRef(onResize);
+  React__namespace.useLayoutEffect(() => {
     const resizeObs = new ResizeObserver(handleResize);
     if (Array.isArray(sources)) {
       sources.forEach((source) => {
@@ -17150,11 +17171,11 @@ const useResizeObserver = (sources, onResize) => {
     handleResize
   ]);
 };
-styled(Box)`
+styled.styled(designSystem.Box)`
   display: grid;
   grid-template-columns: ${({ $hasSideNav }) => $hasSideNav ? `auto 1fr` : "1fr"};
 `;
-styled(Box)`
+styled.styled(designSystem.Box)`
   overflow-x: hidden;
 `;
 const Layouts = {
@@ -17197,14 +17218,14 @@ createContext("Form", {
   },
   values: {}
 });
-styled.img`
+styled.styled.img`
   height: 7.2rem;
 `;
-styled(Box)`
+styled.styled(designSystem.Box)`
   margin: 0 auto;
   width: 552px;
 `;
-styled(Flex)`
+styled.styled(designSystem.Flex)`
   flex-direction: column;
 `;
 const errorsTrads = {
@@ -17222,13 +17243,13 @@ const errorsTrads = {
     defaultMessage: "This value is required."
   }
 };
-yup.object().shape({
-  email: yup.string().nullable().email({
+yup__namespace.object().shape({
+  email: yup__namespace.string().nullable().email({
     id: errorsTrads.email.id,
     defaultMessage: "Not a valid email"
   }).required(errorsTrads.required),
-  password: yup.string().required(errorsTrads.required).nullable(),
-  rememberMe: yup.bool().nullable()
+  password: yup__namespace.string().required(errorsTrads.required).nullable(),
+  rememberMe: yup__namespace.bool().nullable()
 });
 function last$1(array) {
   var length = array == null ? 0 : array.length;
@@ -17275,7 +17296,7 @@ flatRest(function(object, paths) {
   }
   return result;
 });
-styled(Field.Root)`
+styled.styled(designSystem.Field.Root)`
   height: 3.2rem;
   width: 3.2rem;
 
@@ -17312,10 +17333,10 @@ styled(Field.Root)`
 [
   ...Array(11).keys()
 ];
-yup.object().shape({
-  firstname: yup.string().trim().required(errorsTrads.required).nullable(),
-  lastname: yup.string().nullable(),
-  password: yup.string().min(8, {
+yup__namespace.object().shape({
+  firstname: yup__namespace.string().trim().required(errorsTrads.required).nullable(),
+  lastname: yup__namespace.string().nullable(),
+  password: yup__namespace.string().min(8, {
     id: errorsTrads.minLength.id,
     defaultMessage: "Password must be at least 8 characters",
     values: {
@@ -17347,28 +17368,28 @@ yup.object().shape({
     id: errorsTrads.required.id,
     defaultMessage: "Password is required"
   }).nullable(),
-  confirmPassword: yup.string().required({
+  confirmPassword: yup__namespace.string().required({
     id: errorsTrads.required.id,
     defaultMessage: "Confirm password is required"
   }).oneOf([
-    yup.ref("password"),
+    yup__namespace.ref("password"),
     null
   ], {
     id: "components.Input.error.password.noMatch",
     defaultMessage: "Passwords must match"
   }).nullable(),
-  registrationToken: yup.string().required({
+  registrationToken: yup__namespace.string().required({
     id: errorsTrads.required.id,
     defaultMessage: "Registration token is required"
   })
 });
-yup.object().shape({
-  firstname: yup.string().trim().required({
+yup__namespace.object().shape({
+  firstname: yup__namespace.string().trim().required({
     id: errorsTrads.required.id,
     defaultMessage: "Firstname is required"
   }).nullable(),
-  lastname: yup.string().nullable(),
-  password: yup.string().min(8, {
+  lastname: yup__namespace.string().nullable(),
+  password: yup__namespace.string().min(8, {
     id: errorsTrads.minLength.id,
     defaultMessage: "Password must be at least 8 characters",
     values: {
@@ -17399,17 +17420,17 @@ yup.object().shape({
     id: errorsTrads.required.id,
     defaultMessage: "Password is required"
   }).nullable(),
-  confirmPassword: yup.string().required({
+  confirmPassword: yup__namespace.string().required({
     id: errorsTrads.required.id,
     defaultMessage: "Confirm password is required"
   }).nullable().oneOf([
-    yup.ref("password"),
+    yup__namespace.ref("password"),
     null
   ], {
     id: "components.Input.error.password.noMatch",
     defaultMessage: "Passwords must match"
   }),
-  email: yup.string().email({
+  email: yup__namespace.string().email({
     id: errorsTrads.email.id,
     defaultMessage: "Not a valid email"
   }).strict().lowercase({
@@ -17420,11 +17441,11 @@ yup.object().shape({
     defaultMessage: "Email is required"
   }).nullable()
 });
-styled.a`
+styled.styled.a`
   color: ${({ theme }) => theme.colors.primary600};
 `;
-yup.object().shape({
-  password: yup.string().min(8, {
+yup__namespace.object().shape({
+  password: yup__namespace.string().min(8, {
     id: errorsTrads.minLength.id,
     defaultMessage: "Password must be at least 8 characters",
     values: {
@@ -17456,11 +17477,11 @@ yup.object().shape({
     id: errorsTrads.required.id,
     defaultMessage: "Password is required"
   }).nullable(),
-  confirmPassword: yup.string().required({
+  confirmPassword: yup__namespace.string().required({
     id: errorsTrads.required.id,
     defaultMessage: "Confirm password is required"
   }).oneOf([
-    yup.ref("password"),
+    yup__namespace.ref("password"),
     null
   ], {
     id: "components.Input.error.password.noMatch",
@@ -17470,7 +17491,7 @@ yup.object().shape({
 ({
   [adminApi.reducerPath]: adminApi.reducer
 });
-styled(WarningCircle)`
+styled.styled(icons.WarningCircle)`
   width: 24px;
   height: 24px;
 
@@ -17481,10 +17502,10 @@ styled(WarningCircle)`
 createContext("Filters");
 createContext("Pagination");
 createContext("Table");
-styled(CaretDown)`
+styled.styled(icons.CaretDown)`
   transform: ${({ $isUp }) => `rotate(${$isUp ? "180" : "0"}deg)`};
 `;
-styled(Flex)`
+styled.styled(designSystem.Flex)`
   margin-right: ${({ theme }) => theme.spaces[6]};
 
   svg {
@@ -17492,11 +17513,11 @@ styled(Flex)`
     height: 3.2rem;
   }
 `;
-styled(Typography)`
+styled.styled(designSystem.Typography)`
   color: ${({ theme }) => theme.colors.neutral800};
   word-break: break-all;
 `;
-styled(SubNav)`
+styled.styled(designSystem.SubNav)`
   background-color: ${({ theme }) => theme.colors.neutral0};
   border-right: 1px solid ${({ theme }) => theme.colors.neutral150};
 
@@ -17507,7 +17528,7 @@ styled(SubNav)`
     display: none;
   }
 `;
-const StyledLink = styled(NavLink)`
+const StyledLink = styled.styled(reactRouterDom.NavLink)`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -17546,13 +17567,13 @@ const StyledLink = styled(NavLink)`
     outline-offset: -2px;
   }
 `;
-styled(Box)`
+styled.styled(designSystem.Box)`
   height: 56px;
   display: flex;
   align-items: center;
   padding-left: ${({ theme }) => theme.spaces[5]};
 `;
-styled.button`
+styled.styled.button`
   cursor: pointer;
   width: 100%;
   border: none;
@@ -17574,12 +17595,12 @@ styled.button`
     background-color: ${({ theme }) => theme.colors.neutral100};
   }
 `;
-styled.li`
+styled.styled.li`
   ${StyledLink} > div {
     padding-left: 36px;
   }
 `;
-styled(Badge)`
+styled.styled(designSystem.Badge)`
   background: linear-gradient(
     90deg,
     ${({ theme }) => theme.colors.primary600} 0%,
@@ -17816,10 +17837,10 @@ const usersService = adminApi.enhanceEndpoints({
 });
 const { useCreateUserMutation, useGetUsersQuery, useUpdateUserMutation, useDeleteManyUsersMutation, useGetRolesQuery, useCreateRoleMutation, useUpdateRoleMutation, useGetRolePermissionsQuery, useGetRolePermissionLayoutQuery, useUpdateRolePermissionsMutation } = usersService;
 var logic = { exports: {} };
-(function(module, exports) {
+(function(module2, exports2) {
   (function(root2, factory) {
     {
-      module.exports = factory();
+      module2.exports = factory();
     }
   })(commonjsGlobal, function() {
     if (!Array.isArray) {
@@ -21778,10 +21799,8 @@ const getDashboardStats = async (fetchClient, days = 30) => {
   const { data } = await fetchClient.get(`/strapi-mercadopago/dashboard/stats?days=${days}`);
   return data;
 };
-export {
-  Layouts as L,
-  getDashboardStats as a,
-  getConfig as b,
-  getFetchClient as g,
-  setConfig as s
-};
+exports.Layouts = Layouts;
+exports.getConfig = getConfig;
+exports.getDashboardStats = getDashboardStats;
+exports.getFetchClient = getFetchClient;
+exports.setConfig = setConfig;
