@@ -1,8 +1,8 @@
 "use strict";
 const crypto = require("crypto");
 const strapi$1 = require("@strapi/strapi");
-const require$$0$1 = require("child_process");
 const yup = require("yup");
+const require$$0$1 = require("child_process");
 const require$$0$2 = require("os");
 const require$$0$4 = require("path");
 const require$$0$3 = require("fs");
@@ -33,8 +33,8 @@ function _interopNamespace(e) {
   return Object.freeze(n);
 }
 const crypto__default = /* @__PURE__ */ _interopDefault(crypto);
-const require$$0__default = /* @__PURE__ */ _interopDefault(require$$0$1);
 const yup__namespace = /* @__PURE__ */ _interopNamespace(yup);
+const require$$0__default = /* @__PURE__ */ _interopDefault(require$$0$1);
 const require$$0__default$1 = /* @__PURE__ */ _interopDefault(require$$0$2);
 const require$$0__default$3 = /* @__PURE__ */ _interopDefault(require$$0$4);
 const require$$0__default$2 = /* @__PURE__ */ _interopDefault(require$$0$3);
@@ -744,6 +744,516 @@ const schema$1 = {
 const product$2 = { schema: schema$1 };
 const contentTypes = { order: order$2, category: category$3, product: product$2 };
 const category$2 = strapi$1.factories.createCoreController("plugin::strapi-mercadopago.category");
+const product$1 = strapi$1.factories.createCoreController(
+  "plugin::strapi-mercadopago.product",
+  ({ strapi: strapi2 }) => ({
+    async findOne(ctx) {
+      await this.validateQuery(ctx);
+      const { slug } = ctx.params;
+      const locale = ctx.query.locale ?? "all";
+      const sanitizedQuery = await this.sanitizeQuery(ctx);
+      const entity = await strapi2.documents("plugin::strapi-mercadopago.product").findFirst({
+        filters: { slug },
+        populate: sanitizedQuery.populate ?? ["pictures", "categories", "promotion", "information"],
+        ...locale !== "all" && { locale }
+      });
+      if (!entity) return ctx.notFound();
+      const sanitizedEntity = await this.sanitizeOutput(entity, ctx);
+      return ctx.send(this.transformResponse(sanitizedEntity));
+    }
+  })
+);
+const order$1 = strapi$1.factories.createCoreController("plugin::strapi-mercadopago.order");
+const checkout$1 = ({ strapi: strapi2 }) => ({
+  async checkout(ctx) {
+    const { config: config2 } = ctx.state;
+    const { items, customer, fulfillment } = ctx.state.validated;
+    try {
+      const result = await strapi2.service("plugin::strapi-mercadopago.checkout").processCheckout({ items, customer, fulfillment }, config2);
+      return ctx.send({
+        init_point: result.paymentUrl,
+        preferenceId: result.preferenceId,
+        collector_id: result.collectorId,
+        invoiceId: result.orderId
+      });
+    } catch (error2) {
+      strapi2.log.error("Checkout failed", {
+        error: error2.message
+      });
+      return ctx.badRequest("Checkout processing failed. Please try again.");
+    }
+  }
+});
+const INVOICES_STATUS = {
+  PENDING: "pending",
+  APPROVED: "approved",
+  AUTHORIZED: "authorized",
+  IN_PROCESS: "in_process",
+  IN_MEDIATION: "in_mediation",
+  REJECTED: "rejected",
+  CANCELLED: "cancelled",
+  REFUNDED: "refunded",
+  CHARGED_BACK: "charged_back",
+  INITIAL: "initial"
+};
+const SHIPPING_STATUS = {
+  INITIAL: "initial",
+  IN_PROCESS: "in_process",
+  ON_DELIVERY: "on_delivery",
+  DELIVERED: "delivered",
+  CANCELLED: "cancelled",
+  REFUNDED: "refunded"
+};
+const URLS = {
+  CHECKOUT: "/checkout",
+  WEBHOOK: "/notifications"
+};
+const METHODS = {
+  POST: "POST"
+};
+const NOTIFICATION_TYPES = {
+  PAYMENT: "payment"
+};
+const notification$1 = ({ strapi: strapi2 }) => ({
+  async notification(ctx) {
+    const payload = ctx?.request?.body || {};
+    const { config: config2 } = ctx.state;
+    const { type: type2 = "", action = "" } = payload;
+    strapi2.log.info("Webhook received", { type: type2, action });
+    try {
+      switch (type2) {
+        case NOTIFICATION_TYPES.PAYMENT:
+          await strapi2.service("plugin::strapi-mercadopago.payment-notification").processPaymentNotification(payload, config2);
+          return ctx.send({ message: "Webhook processed successfully" }, 200);
+        default:
+          strapi2.log.info("Webhook type not handled", { type: type2 });
+          return ctx.send({ message: "Webhook received but not processed" }, 200);
+      }
+    } catch (error2) {
+      strapi2.log.error("Failed to process webhook", {
+        error: error2.message,
+        type: type2,
+        action
+      });
+      return ctx.send({ message: "Webhook received with errors" }, 200);
+    }
+  }
+});
+const configurationSchema = yup__namespace.object({
+  isActive: yup__namespace.boolean().required("isActive is required"),
+  mercadoPagoToken: yup__namespace.string().required("MercadoPago token is required").max(500, "Token too long").trim(),
+  defaultCurrency: yup__namespace.string().required("Currency is required").max(10, "Currency code too long").matches(/^[A-Z]{3}$/, "Currency must be a 3-letter ISO code"),
+  backUrls: yup__namespace.object({
+    success: yup__namespace.string().url("Invalid success URL").max(2e3).required(),
+    failure: yup__namespace.string().url("Invalid failure URL").max(2e3).required(),
+    pending: yup__namespace.string().url("Invalid pending URL").max(2e3).required()
+  }).required("Back URLs are required"),
+  webhookPass: yup__namespace.string().max(500, "Webhook password too long").trim(),
+  notificationUrl: yup__namespace.string().url("Invalid notification URL").max(2e3, "Notification URL too long"),
+  bussinessDescription: yup__namespace.string().max(500, "Business description too long").trim(),
+  isActiveVerification: yup__namespace.boolean().default(true)
+});
+const configuration$1 = ({ strapi: strapi2 }) => ({
+  async get(ctx) {
+    const pluginStore = strapi2.store({
+      environment: strapi2.config.environment,
+      type: "plugin",
+      name: "strapi-mercadopago"
+    });
+    const config2 = await pluginStore.get({ key: "mercadopagoSetting" });
+    if (!config2) {
+      return ctx.send({ ok: true, data: null });
+    }
+    const decryptedConfig = {
+      ...config2,
+      mercadoPagoToken: config2.mercadoPagoToken ? decrypt(config2.mercadoPagoToken, strapi2) : "",
+      webhookPass: config2.webhookPass ? decrypt(config2.webhookPass, strapi2) : ""
+    };
+    return ctx.send({ ok: true, data: decryptedConfig });
+  },
+  async update(ctx) {
+    const { data } = ctx.request.body;
+    let validated;
+    try {
+      validated = await configurationSchema.validate(data, {
+        abortEarly: false,
+        stripUnknown: true
+      });
+    } catch (error2) {
+      return ctx.badRequest("Invalid configuration data", {
+        errors: error2.errors
+      });
+    }
+    const {
+      isActive,
+      mercadoPagoToken,
+      defaultCurrency,
+      backUrls,
+      webhookPass,
+      notificationUrl,
+      bussinessDescription,
+      isActiveVerification
+    } = validated;
+    const pluginStore = strapi2.store({
+      environment: strapi2.config.environment,
+      type: "plugin",
+      name: "strapi-mercadopago"
+    });
+    const response = await pluginStore.set({
+      key: "mercadopagoSetting",
+      value: {
+        isActive,
+        mercadoPagoToken: mercadoPagoToken ? encrypt(mercadoPagoToken, strapi2) : "",
+        defaultCurrency,
+        backUrls,
+        webhookPass: webhookPass ? encrypt(webhookPass, strapi2) : "",
+        notificationUrl,
+        bussinessDescription,
+        isActiveVerification
+      }
+    });
+    return ctx.send({ ok: true, response });
+  }
+});
+const VALID_DAYS = [30, 60, 90];
+const dashboard$2 = ({ strapi: strapi2 }) => ({
+  async stats(ctx) {
+    const days = Number(ctx.query.days) || 30;
+    if (!VALID_DAYS.includes(days)) {
+      return ctx.badRequest("Invalid period. Use 30, 60, or 90.");
+    }
+    const stats = await strapi2.service("plugin::strapi-mercadopago.dashboard").getStats(days);
+    ctx.body = stats;
+  }
+});
+const controllers = {
+  category: category$2,
+  product: product$1,
+  order: order$1,
+  checkout: checkout$1,
+  notification: notification$1,
+  configuration: configuration$1,
+  dashboard: dashboard$2
+};
+const loadConfig = (options2, { strapi: strapi2 }) => {
+  return async (ctx, next) => {
+    const pluginStore = strapi2.store({
+      environment: strapi2.config.environment,
+      type: "plugin",
+      name: "strapi-mercadopago"
+    });
+    const storedConfig = await pluginStore.get({ key: "mercadopagoSetting" });
+    if (!storedConfig?.mercadoPagoToken) {
+      strapi2.log.error("MercadoPago token not configured");
+      return ctx.serviceUnavailable("Payment service not configured");
+    }
+    const { isActive = false } = storedConfig;
+    if (!isActive) {
+      return ctx.serviceUnavailable("Payment service is disabled");
+    }
+    ctx.state.config = {
+      ...storedConfig,
+      mercadoPagoToken: decrypt(storedConfig.mercadoPagoToken, strapi2),
+      webhookPass: storedConfig.webhookPass ? decrypt(storedConfig.webhookPass, strapi2) : ""
+    };
+    return next();
+  };
+};
+const verifySign = (config2, { strapi: strapi2 }) => {
+  return async (ctx, next) => {
+    const { isActiveVerification = true } = ctx.state.config;
+    try {
+      if (!isActiveVerification) {
+        strapi2.log.warn("Webhook signature verification is DISABLED - this is a security risk");
+        return next();
+      }
+      const queryParams = ctx.request.query || {};
+      const xSignature = ctx.request.headers["x-signature"] || "";
+      const xRequestId = ctx.request.headers["x-request-id"] || "";
+      const dataID = queryParams?.["data.id"] || "";
+      const {
+        config: { webhookPass }
+      } = ctx.state;
+      let ts = "";
+      let hash = "";
+      if (xSignature) {
+        const parts = xSignature.split(",");
+        parts.forEach((part) => {
+          const [key, value] = part.split("=");
+          if (key && value) {
+            const trimmedKey = key.trim();
+            const trimmedValue = value.trim();
+            if (trimmedKey === "ts") {
+              ts = trimmedValue;
+            } else if (trimmedKey === "v1") {
+              hash = trimmedValue;
+            }
+          }
+        });
+      }
+      strapi2.log.debug("Webhook verification attempt", {
+        hasSignature: !!xSignature,
+        hasRequestId: !!xRequestId,
+        hasDataId: !!dataID,
+        hasTimestamp: !!ts,
+        hasHash: !!hash
+      });
+      if (ts && hash && dataID && xRequestId) {
+        const secret = webhookPass;
+        const manifest = `id:${dataID};request-id:${xRequestId};ts:${ts};`;
+        const hmac = crypto__default.default.createHmac("sha256", secret);
+        hmac.update(manifest);
+        const sha = hmac.digest("hex");
+        const shaBuffer = Buffer.from(sha, "utf8");
+        const hashBuffer = Buffer.from(hash, "utf8");
+        const isValid = shaBuffer.length === hashBuffer.length && crypto__default.default.timingSafeEqual(shaBuffer, hashBuffer);
+        if (isValid) {
+          strapi2.log.info("Webhook signature verified successfully");
+          return next();
+        } else {
+          strapi2.log.warn("Webhook signature verification failed", {
+            dataId: dataID,
+            requestId: xRequestId
+          });
+          return ctx.unauthorized("Invalid signature");
+        }
+      } else {
+        strapi2.log.warn("Missing webhook signature parameters", {
+          hasTs: !!ts,
+          hasHash: !!hash,
+          hasDataId: !!dataID,
+          hasRequestId: !!xRequestId
+        });
+        return ctx.badRequest("Missing signature parameters");
+      }
+    } catch (error2) {
+      strapi2.log.error("Error in webhook signature verification", {
+        error: error2.message
+      });
+      return ctx.internalServerError("Signature verification error");
+    }
+  };
+};
+function calculateProductPricing(product2) {
+  const { quantity = 1, price, promotion } = product2;
+  const { price_with_discount = 0, with_discount = false } = promotion || {};
+  const fullPrice = price * quantity;
+  const fullPriceDiscount = with_discount ? (price_with_discount || 0) * quantity : fullPrice;
+  const totalDiscounted = fullPrice - fullPriceDiscount;
+  const finalPrice = fullPrice - totalDiscounted;
+  return { fullPrice, fullPriceDiscount, totalDiscounted, finalPrice };
+}
+function calculateCartPricing(products) {
+  const pricingInfo = products.map((product2) => ({
+    ...product2,
+    ...calculateProductPricing(product2)
+  }));
+  const totalFullPrice = pricingInfo.reduce(
+    (acc, item) => acc + item.fullPrice,
+    0
+  );
+  const totalFullPriceDiscount = pricingInfo.reduce(
+    (acc, item) => acc + item.fullPriceDiscount,
+    0
+  );
+  const totalDiscounted = pricingInfo.reduce(
+    (acc, item) => acc + item.totalDiscounted,
+    0
+  );
+  const total = totalFullPrice - totalDiscounted;
+  return {
+    totalFullPrice,
+    totalFullPriceDiscount,
+    totalDiscounted,
+    total,
+    items: pricingInfo
+  };
+}
+const COUNTRY_CONFIGS = {
+  CO: { areaCode: "57", identificationType: "CC", currency: "COP" }
+};
+const productsPricesSummary = (products) => {
+  const result = calculateCartPricing(products);
+  return {
+    totalFullPrice: result.totalFullPrice,
+    totalFullPriceDiscount: result.totalFullPriceDiscount,
+    totalDiscounted: result.totalDiscounted,
+    total: result.total
+  };
+};
+const fieldsImage = [
+  "url",
+  "width",
+  "height",
+  "alternativeText",
+  "formats"
+];
+const populating = () => {
+  return async (ctx, next) => {
+    ctx.query.populate = {
+      pictures: {
+        fields: fieldsImage
+      },
+      categories: {
+        fields: ["name", "slug"]
+      },
+      promotion: {
+        fields: ["*"]
+      }
+    };
+    return next();
+  };
+};
+const checkoutSchema = yup__namespace.object({
+  items: yup__namespace.array().of(
+    yup__namespace.object({
+      sku: yup__namespace.string().required("SKU is required").max(100, "SKU too long").matches(/^[A-Za-z0-9-_]+$/, "Invalid SKU format"),
+      quantity: yup__namespace.number().integer("Quantity must be integer").min(1, "Minimum quantity is 1").max(999, "Maximum quantity is 999").required("Quantity is required")
+    })
+  ).min(1, "At least one item is required").max(50, "Maximum 50 items per order").required("Items are required"),
+  customer: yup__namespace.object({
+    name: yup__namespace.string().required("Name is required").max(200, "Name too long").trim(),
+    lastName: yup__namespace.string().required("Last name is required").max(200, "Last name too long").trim(),
+    email: yup__namespace.string().email("Invalid email format").required("Email is required").lowercase().trim(),
+    dni: yup__namespace.string().required("DNI is required").matches(/^[0-9]{6,12}$/, "DNI must be 6-12 digits"),
+    phone: yup__namespace.string().required("Phone is required").matches(/^[0-9]{7,15}$/, "Phone must be 7-15 digits")
+  }).required("Customer information is required"),
+  fulfillment: yup__namespace.object({
+    address: yup__namespace.string().required("Address is required").max(500, "Address too long").trim(),
+    city: yup__namespace.string().required("City is required").max(100, "City name too long").trim(),
+    department: yup__namespace.string().required("Department is required").max(100, "Department name too long").trim(),
+    postalCode: yup__namespace.string().optional().max(20, "Postal code too long").matches(/^[0-9A-Za-z\s-]*$/, "Invalid postal code format"),
+    message: yup__namespace.string().optional().max(500, "Message too long")
+  }).required("Fulfillment information is required")
+});
+const validateCheckout = (config2, { strapi: strapi2 }) => {
+  return async (ctx, next) => {
+    try {
+      const validated = await checkoutSchema.validate(ctx.request.body, {
+        abortEarly: false,
+        stripUnknown: true
+      });
+      ctx.state.validated = validated;
+      await next();
+    } catch (error2) {
+      if (error2.name === "ValidationError") {
+        strapi2.log.warn("Checkout validation failed", {
+          errors: error2.errors
+        });
+        return ctx.badRequest("Validation failed", {
+          errors: error2.errors,
+          details: error2.inner?.map((err) => ({
+            path: err.path,
+            message: err.message
+          }))
+        });
+      }
+      throw error2;
+    }
+  };
+};
+const middlewares = { loadConfig, verifySign, populating, validateCheckout };
+const policies = {};
+const category$1 = strapi$1.factories.createCoreRouter("plugin::strapi-mercadopago.category");
+const product = {
+  type: "content-api",
+  routes: [
+    {
+      method: "GET",
+      path: "/products/:slug",
+      handler: "product.findOne",
+      config: {
+        middlewares: ["plugin::strapi-mercadopago.populating"]
+      }
+    },
+    {
+      method: "GET",
+      path: "/products",
+      handler: "product.find",
+      config: {
+        middlewares: ["plugin::strapi-mercadopago.populating"]
+      }
+    }
+  ]
+};
+const invoice = strapi$1.factories.createCoreRouter("plugin::strapi-mercadopago.order");
+const checkout = {
+  type: "content-api",
+  routes: [
+    {
+      method: METHODS.POST,
+      path: URLS.CHECKOUT,
+      handler: "checkout.checkout",
+      config: {
+        middlewares: [
+          "plugin::strapi-mercadopago.loadConfig",
+          "plugin::strapi-mercadopago.validateCheckout"
+        ]
+      }
+    }
+  ]
+};
+const notification = {
+  type: "content-api",
+  routes: [
+    {
+      method: METHODS.POST,
+      path: URLS.WEBHOOK,
+      handler: "notification.notification",
+      config: {
+        middlewares: [
+          "plugin::strapi-mercadopago.loadConfig",
+          "plugin::strapi-mercadopago.verifySign"
+        ],
+        auth: false
+      }
+    }
+  ]
+};
+const configuration = {
+  type: "admin",
+  routes: [
+    {
+      method: "GET",
+      path: "/configuration",
+      handler: "configuration.get",
+      config: {
+        auth: false
+      }
+    },
+    {
+      method: "POST",
+      path: "/configuration",
+      handler: "configuration.update",
+      config: {
+        auth: false
+      }
+    }
+  ]
+};
+const dashboard$1 = {
+  type: "admin",
+  routes: [
+    {
+      method: "GET",
+      path: "/dashboard/stats",
+      handler: "dashboard.stats",
+      config: {
+        auth: {}
+      }
+    }
+  ]
+};
+const routes = {
+  category: category$1,
+  product,
+  invoice,
+  checkout,
+  notification,
+  configuration,
+  dashboard: dashboard$1
+};
+const category = strapi$1.factories.createCoreService("plugin::strapi-mercadopago.category");
 var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
 function getDefaultExportFromCjs(x) {
   return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, "default") ? x["default"] : x;
@@ -25449,515 +25959,6 @@ _enum([
   "published"
 ]).describe("Filter by publication status");
 string().describe("Search query string");
-const product$1 = strapi$1.factories.createCoreController(
-  "plugin::strapi-mercadopago.product",
-  ({ strapi: strapi2 }) => ({
-    async findOne(ctx) {
-      await this.validateQuery(ctx);
-      const { slug } = ctx.params;
-      if (!strapi2.db)
-        throw new ApplicationError("Service not Available");
-      const entity = await strapi2.db.query("plugin::strapi-mercadopago.product").findOne({
-        where: { slug },
-        populate: true
-      });
-      if (entity === null) return ctx.notFound();
-      const sanitizedEntity = await this.sanitizeOutput(entity, ctx);
-      return ctx.send(this.transformResponse(sanitizedEntity));
-    }
-  })
-);
-const order$1 = strapi$1.factories.createCoreController("plugin::strapi-mercadopago.order");
-const checkout$1 = ({ strapi: strapi2 }) => ({
-  async checkout(ctx) {
-    const { config: config2 } = ctx.state;
-    const { items, customer, fulfillment } = ctx.state.validated;
-    try {
-      const result = await strapi2.service("plugin::strapi-mercadopago.checkout").processCheckout({ items, customer, fulfillment }, config2);
-      return ctx.send({
-        init_point: result.paymentUrl,
-        preferenceId: result.preferenceId,
-        collector_id: result.collectorId,
-        invoiceId: result.orderId
-      });
-    } catch (error2) {
-      strapi2.log.error("Checkout failed", {
-        error: error2.message
-      });
-      return ctx.badRequest("Checkout processing failed. Please try again.");
-    }
-  }
-});
-const INVOICES_STATUS = {
-  PENDING: "pending",
-  APPROVED: "approved",
-  AUTHORIZED: "authorized",
-  IN_PROCESS: "in_process",
-  IN_MEDIATION: "in_mediation",
-  REJECTED: "rejected",
-  CANCELLED: "cancelled",
-  REFUNDED: "refunded",
-  CHARGED_BACK: "charged_back",
-  INITIAL: "initial"
-};
-const SHIPPING_STATUS = {
-  INITIAL: "initial",
-  IN_PROCESS: "in_process",
-  ON_DELIVERY: "on_delivery",
-  DELIVERED: "delivered",
-  CANCELLED: "cancelled",
-  REFUNDED: "refunded"
-};
-const URLS = {
-  CHECKOUT: "/checkout",
-  WEBHOOK: "/notifications"
-};
-const METHODS = {
-  POST: "POST"
-};
-const NOTIFICATION_TYPES = {
-  PAYMENT: "payment"
-};
-const notification$1 = ({ strapi: strapi2 }) => ({
-  async notification(ctx) {
-    const payload = ctx?.request?.body || {};
-    const { config: config2 } = ctx.state;
-    const { type: type2 = "", action = "" } = payload;
-    strapi2.log.info("Webhook received", { type: type2, action });
-    try {
-      switch (type2) {
-        case NOTIFICATION_TYPES.PAYMENT:
-          await strapi2.service("plugin::strapi-mercadopago.payment-notification").processPaymentNotification(payload, config2);
-          return ctx.send({ message: "Webhook processed successfully" }, 200);
-        default:
-          strapi2.log.info("Webhook type not handled", { type: type2 });
-          return ctx.send({ message: "Webhook received but not processed" }, 200);
-      }
-    } catch (error2) {
-      strapi2.log.error("Failed to process webhook", {
-        error: error2.message,
-        type: type2,
-        action
-      });
-      return ctx.send({ message: "Webhook received with errors" }, 200);
-    }
-  }
-});
-const configurationSchema = yup__namespace.object({
-  isActive: yup__namespace.boolean().required("isActive is required"),
-  mercadoPagoToken: yup__namespace.string().required("MercadoPago token is required").max(500, "Token too long").trim(),
-  defaultCurrency: yup__namespace.string().required("Currency is required").max(10, "Currency code too long").matches(/^[A-Z]{3}$/, "Currency must be a 3-letter ISO code"),
-  backUrls: yup__namespace.object({
-    success: yup__namespace.string().url("Invalid success URL").max(2e3).required(),
-    failure: yup__namespace.string().url("Invalid failure URL").max(2e3).required(),
-    pending: yup__namespace.string().url("Invalid pending URL").max(2e3).required()
-  }).required("Back URLs are required"),
-  webhookPass: yup__namespace.string().max(500, "Webhook password too long").trim(),
-  notificationUrl: yup__namespace.string().url("Invalid notification URL").max(2e3, "Notification URL too long"),
-  bussinessDescription: yup__namespace.string().max(500, "Business description too long").trim(),
-  isActiveVerification: yup__namespace.boolean().default(true)
-});
-const configuration$1 = ({ strapi: strapi2 }) => ({
-  async get(ctx) {
-    const pluginStore = strapi2.store({
-      environment: strapi2.config.environment,
-      type: "plugin",
-      name: "strapi-mercadopago"
-    });
-    const config2 = await pluginStore.get({ key: "mercadopagoSetting" });
-    if (!config2) {
-      return ctx.send({ ok: true, data: null });
-    }
-    const decryptedConfig = {
-      ...config2,
-      mercadoPagoToken: config2.mercadoPagoToken ? decrypt(config2.mercadoPagoToken, strapi2) : "",
-      webhookPass: config2.webhookPass ? decrypt(config2.webhookPass, strapi2) : ""
-    };
-    return ctx.send({ ok: true, data: decryptedConfig });
-  },
-  async update(ctx) {
-    const { data } = ctx.request.body;
-    let validated;
-    try {
-      validated = await configurationSchema.validate(data, {
-        abortEarly: false,
-        stripUnknown: true
-      });
-    } catch (error2) {
-      return ctx.badRequest("Invalid configuration data", {
-        errors: error2.errors
-      });
-    }
-    const {
-      isActive,
-      mercadoPagoToken,
-      defaultCurrency,
-      backUrls,
-      webhookPass,
-      notificationUrl,
-      bussinessDescription,
-      isActiveVerification
-    } = validated;
-    const pluginStore = strapi2.store({
-      environment: strapi2.config.environment,
-      type: "plugin",
-      name: "strapi-mercadopago"
-    });
-    const response = await pluginStore.set({
-      key: "mercadopagoSetting",
-      value: {
-        isActive,
-        mercadoPagoToken: mercadoPagoToken ? encrypt(mercadoPagoToken, strapi2) : "",
-        defaultCurrency,
-        backUrls,
-        webhookPass: webhookPass ? encrypt(webhookPass, strapi2) : "",
-        notificationUrl,
-        bussinessDescription,
-        isActiveVerification
-      }
-    });
-    return ctx.send({ ok: true, response });
-  }
-});
-const VALID_DAYS = [30, 60, 90];
-const dashboard$2 = ({ strapi: strapi2 }) => ({
-  async stats(ctx) {
-    const days = Number(ctx.query.days) || 30;
-    if (!VALID_DAYS.includes(days)) {
-      return ctx.badRequest("Invalid period. Use 30, 60, or 90.");
-    }
-    const stats = await strapi2.service("plugin::strapi-mercadopago.dashboard").getStats(days);
-    ctx.body = stats;
-  }
-});
-const controllers = {
-  category: category$2,
-  product: product$1,
-  order: order$1,
-  checkout: checkout$1,
-  notification: notification$1,
-  configuration: configuration$1,
-  dashboard: dashboard$2
-};
-const loadConfig = (options2, { strapi: strapi2 }) => {
-  return async (ctx, next) => {
-    const pluginStore = strapi2.store({
-      environment: strapi2.config.environment,
-      type: "plugin",
-      name: "strapi-mercadopago"
-    });
-    const storedConfig = await pluginStore.get({ key: "mercadopagoSetting" });
-    if (!storedConfig?.mercadoPagoToken) {
-      strapi2.log.error("MercadoPago token not configured");
-      return ctx.serviceUnavailable("Payment service not configured");
-    }
-    const { isActive = false } = storedConfig;
-    if (!isActive) {
-      return ctx.serviceUnavailable("Payment service is disabled");
-    }
-    ctx.state.config = {
-      ...storedConfig,
-      mercadoPagoToken: decrypt(storedConfig.mercadoPagoToken, strapi2),
-      webhookPass: storedConfig.webhookPass ? decrypt(storedConfig.webhookPass, strapi2) : ""
-    };
-    return next();
-  };
-};
-const verifySign = (config2, { strapi: strapi2 }) => {
-  return async (ctx, next) => {
-    const { isActiveVerification = true } = ctx.state.config;
-    try {
-      if (!isActiveVerification) {
-        strapi2.log.warn("Webhook signature verification is DISABLED - this is a security risk");
-        return next();
-      }
-      const queryParams = ctx.request.query || {};
-      const xSignature = ctx.request.headers["x-signature"] || "";
-      const xRequestId = ctx.request.headers["x-request-id"] || "";
-      const dataID = queryParams?.["data.id"] || "";
-      const {
-        config: { webhookPass }
-      } = ctx.state;
-      let ts = "";
-      let hash = "";
-      if (xSignature) {
-        const parts = xSignature.split(",");
-        parts.forEach((part) => {
-          const [key, value] = part.split("=");
-          if (key && value) {
-            const trimmedKey = key.trim();
-            const trimmedValue = value.trim();
-            if (trimmedKey === "ts") {
-              ts = trimmedValue;
-            } else if (trimmedKey === "v1") {
-              hash = trimmedValue;
-            }
-          }
-        });
-      }
-      strapi2.log.debug("Webhook verification attempt", {
-        hasSignature: !!xSignature,
-        hasRequestId: !!xRequestId,
-        hasDataId: !!dataID,
-        hasTimestamp: !!ts,
-        hasHash: !!hash
-      });
-      if (ts && hash && dataID && xRequestId) {
-        const secret = webhookPass;
-        const manifest = `id:${dataID};request-id:${xRequestId};ts:${ts};`;
-        const hmac = crypto__default.default.createHmac("sha256", secret);
-        hmac.update(manifest);
-        const sha = hmac.digest("hex");
-        const shaBuffer = Buffer.from(sha, "utf8");
-        const hashBuffer = Buffer.from(hash, "utf8");
-        const isValid = shaBuffer.length === hashBuffer.length && crypto__default.default.timingSafeEqual(shaBuffer, hashBuffer);
-        if (isValid) {
-          strapi2.log.info("Webhook signature verified successfully");
-          return next();
-        } else {
-          strapi2.log.warn("Webhook signature verification failed", {
-            dataId: dataID,
-            requestId: xRequestId
-          });
-          return ctx.unauthorized("Invalid signature");
-        }
-      } else {
-        strapi2.log.warn("Missing webhook signature parameters", {
-          hasTs: !!ts,
-          hasHash: !!hash,
-          hasDataId: !!dataID,
-          hasRequestId: !!xRequestId
-        });
-        return ctx.badRequest("Missing signature parameters");
-      }
-    } catch (error2) {
-      strapi2.log.error("Error in webhook signature verification", {
-        error: error2.message
-      });
-      return ctx.internalServerError("Signature verification error");
-    }
-  };
-};
-function calculateProductPricing(product2) {
-  const { quantity = 1, price, promotion } = product2;
-  const { price_with_discount = 0, with_discount = false } = promotion || {};
-  const fullPrice = price * quantity;
-  const fullPriceDiscount = with_discount ? (price_with_discount || 0) * quantity : fullPrice;
-  const totalDiscounted = fullPrice - fullPriceDiscount;
-  const finalPrice = fullPrice - totalDiscounted;
-  return { fullPrice, fullPriceDiscount, totalDiscounted, finalPrice };
-}
-function calculateCartPricing(products) {
-  const pricingInfo = products.map((product2) => ({
-    ...product2,
-    ...calculateProductPricing(product2)
-  }));
-  const totalFullPrice = pricingInfo.reduce(
-    (acc, item) => acc + item.fullPrice,
-    0
-  );
-  const totalFullPriceDiscount = pricingInfo.reduce(
-    (acc, item) => acc + item.fullPriceDiscount,
-    0
-  );
-  const totalDiscounted = pricingInfo.reduce(
-    (acc, item) => acc + item.totalDiscounted,
-    0
-  );
-  const total = totalFullPrice - totalDiscounted;
-  return {
-    totalFullPrice,
-    totalFullPriceDiscount,
-    totalDiscounted,
-    total,
-    items: pricingInfo
-  };
-}
-const COUNTRY_CONFIGS = {
-  CO: { areaCode: "57", identificationType: "CC", currency: "COP" }
-};
-const productsPricesSummary = (products) => {
-  const result = calculateCartPricing(products);
-  return {
-    totalFullPrice: result.totalFullPrice,
-    totalFullPriceDiscount: result.totalFullPriceDiscount,
-    totalDiscounted: result.totalDiscounted,
-    total: result.total
-  };
-};
-const fieldsImage = [
-  "url",
-  "width",
-  "height",
-  "alternativeText",
-  "formats"
-];
-const populating = () => {
-  return async (ctx, next) => {
-    ctx.query.populate = {
-      pictures: {
-        fields: fieldsImage
-      },
-      categories: {
-        fields: ["name", "slug"]
-      },
-      promotion: {
-        fields: ["*"]
-      }
-    };
-    return next();
-  };
-};
-const checkoutSchema = yup__namespace.object({
-  items: yup__namespace.array().of(
-    yup__namespace.object({
-      sku: yup__namespace.string().required("SKU is required").max(100, "SKU too long").matches(/^[A-Za-z0-9-_]+$/, "Invalid SKU format"),
-      quantity: yup__namespace.number().integer("Quantity must be integer").min(1, "Minimum quantity is 1").max(999, "Maximum quantity is 999").required("Quantity is required")
-    })
-  ).min(1, "At least one item is required").max(50, "Maximum 50 items per order").required("Items are required"),
-  customer: yup__namespace.object({
-    name: yup__namespace.string().required("Name is required").max(200, "Name too long").trim(),
-    lastName: yup__namespace.string().required("Last name is required").max(200, "Last name too long").trim(),
-    email: yup__namespace.string().email("Invalid email format").required("Email is required").lowercase().trim(),
-    dni: yup__namespace.string().required("DNI is required").matches(/^[0-9]{6,12}$/, "DNI must be 6-12 digits"),
-    phone: yup__namespace.string().required("Phone is required").matches(/^[0-9]{7,15}$/, "Phone must be 7-15 digits")
-  }).required("Customer information is required"),
-  fulfillment: yup__namespace.object({
-    address: yup__namespace.string().required("Address is required").max(500, "Address too long").trim(),
-    city: yup__namespace.string().required("City is required").max(100, "City name too long").trim(),
-    department: yup__namespace.string().required("Department is required").max(100, "Department name too long").trim(),
-    postalCode: yup__namespace.string().optional().max(20, "Postal code too long").matches(/^[0-9A-Za-z\s-]*$/, "Invalid postal code format"),
-    message: yup__namespace.string().optional().max(500, "Message too long")
-  }).required("Fulfillment information is required")
-});
-const validateCheckout = (config2, { strapi: strapi2 }) => {
-  return async (ctx, next) => {
-    try {
-      const validated = await checkoutSchema.validate(ctx.request.body, {
-        abortEarly: false,
-        stripUnknown: true
-      });
-      ctx.state.validated = validated;
-      await next();
-    } catch (error2) {
-      if (error2.name === "ValidationError") {
-        strapi2.log.warn("Checkout validation failed", {
-          errors: error2.errors
-        });
-        return ctx.badRequest("Validation failed", {
-          errors: error2.errors,
-          details: error2.inner?.map((err) => ({
-            path: err.path,
-            message: err.message
-          }))
-        });
-      }
-      throw error2;
-    }
-  };
-};
-const middlewares = { loadConfig, verifySign, populating, validateCheckout };
-const policies = {};
-const category$1 = strapi$1.factories.createCoreRouter("plugin::strapi-mercadopago.category");
-const product = {
-  type: "content-api",
-  routes: [
-    {
-      method: "GET",
-      path: "/products/:slug",
-      handler: "product.findOne",
-      config: {
-        middlewares: ["plugin::strapi-mercadopago.populating"]
-      }
-    },
-    {
-      method: "GET",
-      path: "/products",
-      handler: "product.find",
-      config: {
-        middlewares: ["plugin::strapi-mercadopago.populating"]
-      }
-    }
-  ]
-};
-const invoice = strapi$1.factories.createCoreRouter("plugin::strapi-mercadopago.order");
-const checkout = {
-  type: "content-api",
-  routes: [
-    {
-      method: METHODS.POST,
-      path: URLS.CHECKOUT,
-      handler: "checkout.checkout",
-      config: {
-        middlewares: [
-          "plugin::strapi-mercadopago.loadConfig",
-          "plugin::strapi-mercadopago.validateCheckout"
-        ]
-      }
-    }
-  ]
-};
-const notification = {
-  type: "content-api",
-  routes: [
-    {
-      method: METHODS.POST,
-      path: URLS.WEBHOOK,
-      handler: "notification.notification",
-      config: {
-        middlewares: [
-          "plugin::strapi-mercadopago.loadConfig",
-          "plugin::strapi-mercadopago.verifySign"
-        ],
-        auth: false
-      }
-    }
-  ]
-};
-const configuration = {
-  type: "admin",
-  routes: [
-    {
-      method: "GET",
-      path: "/configuration",
-      handler: "configuration.get",
-      config: {
-        auth: false
-      }
-    },
-    {
-      method: "POST",
-      path: "/configuration",
-      handler: "configuration.update",
-      config: {
-        auth: false
-      }
-    }
-  ]
-};
-const dashboard$1 = {
-  type: "admin",
-  routes: [
-    {
-      method: "GET",
-      path: "/dashboard/stats",
-      handler: "dashboard.stats",
-      config: {
-        auth: {}
-      }
-    }
-  ]
-};
-const routes = {
-  category: category$1,
-  product,
-  invoice,
-  checkout,
-  notification,
-  configuration,
-  dashboard: dashboard$1
-};
-const category = strapi$1.factories.createCoreService("plugin::strapi-mercadopago.category");
 const order = strapi$1.factories.createCoreService(
   "plugin::strapi-mercadopago.order",
   ({ strapi: strapi2 }) => ({
