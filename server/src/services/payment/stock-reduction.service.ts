@@ -11,7 +11,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
    * Usa transacción para evitar race conditions
    */
   async reduceStock(items: StockItem[]) {
-    await strapi.db.transaction(async ({ trx }) => {
+    await strapi.db.transaction(async () => {
       for (const item of items) {
         const quantity = Number(item.quantity);
 
@@ -19,7 +19,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           .query('plugin::strapi-mercadopago.product')
           .findOne({
             where: { sku: item.id },
-          }, trx);
+          });
 
         if (!product) {
           strapi.log.warn('Product not found for stock reduction', {
@@ -44,7 +44,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           .update({
             where: { sku: item.id },
             data: { stock: newStock },
-          }, trx);
+          });
 
         strapi.log.info('Stock reduced successfully', {
           sku: item.id,
