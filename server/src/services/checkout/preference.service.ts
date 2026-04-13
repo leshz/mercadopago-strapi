@@ -40,11 +40,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       external_reference: order.id.toString(),
       items: formattedProducts,
       payer: formattedCustomer,
-      back_urls: {
-        success: config.backUrls,
-        failure: config.backUrls,
-        pending: config.backUrls,
-      },
+      back_urls: config.backUrls,
       notification_url: config.notificationUrl,
       binary_mode: true,
       payment_methods: {

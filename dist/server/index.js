@@ -26321,11 +26321,7 @@ const preferenceService = ({ strapi: strapi2 }) => ({
       external_reference: order2.id.toString(),
       items: formattedProducts,
       payer: formattedCustomer,
-      back_urls: {
-        success: config2.backUrls,
-        failure: config2.backUrls,
-        pending: config2.backUrls
-      },
+      back_urls: config2.backUrls,
       notification_url: config2.notificationUrl,
       binary_mode: true,
       payment_methods: {
