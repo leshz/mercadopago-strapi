@@ -18,11 +18,10 @@ export const configurationSchema = yup.object({
     .required('Currency is required')
     .max(10, 'Currency code too long')
     .matches(/^[A-Z]{3}$/, 'Currency must be a 3-letter ISO code'),
-  backUrls: yup.object({
-    success: yup.string().url('Invalid success URL').max(2000).required(),
-    failure: yup.string().url('Invalid failure URL').max(2000).required(),
-    pending: yup.string().url('Invalid pending URL').max(2000).required(),
-  }).required('Back URLs are required'),
+  backUrls: yup
+    .string()
+    .url('Invalid back URL')
+    .max(2000, 'Back URL too long'),
   webhookPass: yup
     .string()
     .max(500, 'Webhook password too long')

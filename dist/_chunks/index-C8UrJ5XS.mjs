@@ -56,7 +56,7 @@ const index = {
         defaultMessage: "Mercado Pago"
       },
       Component: async () => {
-        const { App } = await import("./App--8hiufxI.mjs");
+        const { App } = await import("./App-8FwMrjfa.mjs");
         return App;
       }
     });
@@ -77,7 +77,7 @@ const index = {
             defaultMessage: "Configuration"
           },
           Component: async () => {
-            const { SettingsPage } = await import("./Settings-yNKPK2Sc.mjs");
+            const { SettingsPage } = await import("./Settings-Dc2DNdpE.mjs");
             return SettingsPage;
           }
         }

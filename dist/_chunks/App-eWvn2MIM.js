@@ -8,11 +8,11 @@ const reactIntl = require("react-intl");
 const designSystem = require("@strapi/design-system");
 require("react-dom/client");
 require("@strapi/icons");
-const index = require("./index-BlNzvlEs.js");
+const index = require("./index-Cdpa_RqF.js");
 require("@strapi/icons/symbols");
 require("yup");
 require("styled-components");
-const index$1 = require("./index-ki1V8Gf8.js");
+const index$1 = require("./index-lVwVgdyK.js");
 const recharts = require("recharts");
 function _interopNamespace(e) {
   if (e && e.__esModule) return e;
@@ -346,3 +346,4 @@ const App = () => {
   ] });
 };
 exports.App = App;
+//# sourceMappingURL=App-eWvn2MIM.js.map

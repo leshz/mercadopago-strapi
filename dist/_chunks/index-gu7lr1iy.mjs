@@ -9810,10 +9810,10 @@ function requireObject_getPrototypeOf() {
   Object_getPrototypeOf = $Object2.getPrototypeOf || null;
   return Object_getPrototypeOf;
 }
-var implementation;
+var implementation$1;
 var hasRequiredImplementation;
 function requireImplementation() {
-  if (hasRequiredImplementation) return implementation;
+  if (hasRequiredImplementation) return implementation$1;
   hasRequiredImplementation = 1;
   var ERROR_MESSAGE = "Function.prototype.bind called on incompatible ";
   var toStr2 = Object.prototype.toString;
@@ -9846,7 +9846,7 @@ function requireImplementation() {
     }
     return str;
   };
-  implementation = function bind2(that) {
+  implementation$1 = function bind2(that) {
     var target = this;
     if (typeof target !== "function" || toStr2.apply(target) !== funcType) {
       throw new TypeError(ERROR_MESSAGE + target);
@@ -9884,17 +9884,10 @@ function requireImplementation() {
     }
     return bound;
   };
-  return implementation;
+  return implementation$1;
 }
-var functionBind;
-var hasRequiredFunctionBind;
-function requireFunctionBind() {
-  if (hasRequiredFunctionBind) return functionBind;
-  hasRequiredFunctionBind = 1;
-  var implementation2 = requireImplementation();
-  functionBind = Function.prototype.bind || implementation2;
-  return functionBind;
-}
+var implementation = requireImplementation();
+var functionBind = Function.prototype.bind || implementation;
 var functionCall;
 var hasRequiredFunctionCall;
 function requireFunctionCall() {
@@ -9912,12 +9905,12 @@ function requireFunctionApply() {
   return functionApply;
 }
 var reflectApply = typeof Reflect !== "undefined" && Reflect && Reflect.apply;
-var bind$3 = requireFunctionBind();
+var bind$3 = functionBind;
 var $apply$1 = requireFunctionApply();
 var $call$2 = requireFunctionCall();
 var $reflectApply = reflectApply;
 var actualApply = $reflectApply || bind$3.call($call$2, $apply$1);
-var bind$2 = requireFunctionBind();
+var bind$2 = functionBind;
 var $TypeError$4 = type;
 var $call$1 = requireFunctionCall();
 var $actualApply = actualApply;
@@ -9985,7 +9978,7 @@ function requireHasown() {
   hasRequiredHasown = 1;
   var call = Function.prototype.call;
   var $hasOwn = Object.prototype.hasOwnProperty;
-  var bind2 = requireFunctionBind();
+  var bind2 = functionBind;
   hasown = bind2.call(call, $hasOwn);
   return hasown;
 }
@@ -10205,7 +10198,7 @@ var LEGACY_ALIASES = {
   "%WeakMapPrototype%": ["WeakMap", "prototype"],
   "%WeakSetPrototype%": ["WeakSet", "prototype"]
 };
-var bind$1 = requireFunctionBind();
+var bind$1 = functionBind;
 var hasOwn = requireHasown();
 var $concat = bind$1.call($call, Array.prototype.concat);
 var $spliceApply = bind$1.call($apply, Array.prototype.splice);
@@ -23335,3 +23328,4 @@ export {
   getFetchClient as g,
   setConfig as s
 };
+//# sourceMappingURL=index-gu7lr1iy.mjs.map

@@ -12,7 +12,7 @@ import {
   Typography,
   Divider,
 } from '@strapi/design-system';
-import { Layouts } from '@strapi/admin/strapi-admin';
+import { Layouts, useNotification } from '@strapi/admin/strapi-admin';
 import { getTranslation } from '../utils/getTranslation';
 import { Check, Eye, EyeStriked } from '@strapi/icons';
 
@@ -31,9 +31,11 @@ type Configuration = {
 
 const SettingsPage = () => {
   const { formatMessage } = useIntl();
+  const { toggleNotification } = useNotification();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [showToken, setShowToken] = useState<boolean>(false);
   const [showWebhookSecret, setShowWebhookSecret] = useState<boolean>(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const [data, setData] = useState<Configuration>({
     isActive: false,
@@ -53,12 +55,68 @@ const SettingsPage = () => {
     });
   }, []);
 
-  const handleSubmit = () => {
-    setIsLoading(true);
-    setConfig(data).then(() => {
-      setIsLoading(false);
-    });
+  const validateClient = (): Record<string, string> => {
+    const errors: Record<string, string> = {};
+    if (!data.backUrls?.trim()) {
+      errors.backUrls = 'La URL de retorno es requerida';
+    } else {
+      try {
+        new URL(data.backUrls);
+      } catch {
+        errors.backUrls = 'Debe ser una URL válida (ej: https://mitienda.com/retorno)';
+      }
+    }
+    if (!data.mercadoPagoToken?.trim()) {
+      errors.mercadoPagoToken = 'El token de MercadoPago es requerido';
+    }
+    if (!data.defaultCurrency) {
+      errors.defaultCurrency = 'Selecciona una moneda';
+    }
+    if (data.notificationUrl?.trim()) {
+      try {
+        new URL(data.notificationUrl);
+      } catch {
+        errors.notificationUrl = 'Debe ser una URL válida';
+      }
+    }
+    return errors;
   };
+
+  const handleSubmit = async () => {
+    const clientErrors = validateClient();
+    if (Object.keys(clientErrors).length) {
+      setFieldErrors(clientErrors);
+      toggleNotification({ type: 'warning', message: 'Revisa los campos marcados en rojo' });
+      return;
+    }
+    setIsLoading(true);
+    setFieldErrors({});
+    try {
+      await setConfig(data);
+      toggleNotification({ type: 'success', message: 'Configuración guardada correctamente' });
+    } catch (err: any) {
+      const strapiError = err?.response?.data?.error;
+      const errors: Record<string, string> = {};
+
+      if (Array.isArray(strapiError?.details?.errors)) {
+        for (const e of strapiError.details.errors) {
+          if (e.path) errors[e.path] = e.message;
+        }
+      }
+
+      setFieldErrors(errors);
+      toggleNotification({
+        type: 'danger',
+        title: 'Error al guardar',
+        message: Object.keys(errors).length
+          ? 'Revisa los campos marcados en rojo'
+          : strapiError?.message ?? 'Error al guardar la configuración',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
 
   return (
     <Main>
@@ -115,13 +173,14 @@ const SettingsPage = () => {
             </Grid.Item>
 
             <Grid.Item col={6} s={12}>
-              <Field.Root style={{ width: '100%' }}>
+              <Field.Root style={{ width: '100%' }} error={fieldErrors.defaultCurrency}>
                 <Field.Label>
                   {formatMessage({ id: getTranslation('setting.field.currency.label') })}
                 </Field.Label>
                 <SingleSelect
                   value={data.defaultCurrency}
                   onChange={(value: string) => setData({ ...data, defaultCurrency: value })}
+                  error={fieldErrors.defaultCurrency}
                 >
                   <SingleSelectOption value="ARS">ARS - Peso argentino</SingleSelectOption>
                   <SingleSelectOption value="BRL">BRL - Real brasileño</SingleSelectOption>
@@ -131,11 +190,12 @@ const SettingsPage = () => {
                   <SingleSelectOption value="PEN">PEN - Sol peruano</SingleSelectOption>
                   <SingleSelectOption value="UYU">UYU - Peso uruguayo</SingleSelectOption>
                 </SingleSelect>
+                {fieldErrors.defaultCurrency && <Field.Error />}
               </Field.Root>
             </Grid.Item>
 
             <Grid.Item col={12} s={12}>
-              <Field.Root style={{ width: '100%' }}>
+              <Field.Root style={{ width: '100%' }} error={fieldErrors.bussinessDescription}>
                 <Field.Label>
                   {formatMessage({ id: getTranslation('setting.field.description.label') })}
                 </Field.Label>
@@ -150,6 +210,9 @@ const SettingsPage = () => {
                 <Field.Hint>
                   {formatMessage({ id: getTranslation('setting.field.description.hint') })}
                 </Field.Hint>
+                {fieldErrors.bussinessDescription && (
+                  <Field.Error />
+                )}
               </Field.Root>
             </Grid.Item>
           </Grid.Root>
@@ -175,7 +238,7 @@ const SettingsPage = () => {
 
           <Grid.Root gap={6}>
             <Grid.Item col={12} s={12}>
-              <Field.Root style={{ width: '100%' }}>
+              <Field.Root style={{ width: '100%' }} error={fieldErrors.mercadoPagoToken}>
                 <Field.Label>
                   {formatMessage({ id: getTranslation('setting.field.token.label') })}
                 </Field.Label>
@@ -197,6 +260,7 @@ const SettingsPage = () => {
                 <Field.Hint>
                   {formatMessage({ id: getTranslation('setting.field.token.hint') })}
                 </Field.Hint>
+                {fieldErrors.mercadoPagoToken && <Field.Error />}
               </Field.Root>
             </Grid.Item>
           </Grid.Root>
@@ -222,7 +286,7 @@ const SettingsPage = () => {
 
           <Grid.Root gap={6}>
             <Grid.Item col={6} s={12}>
-              <Field.Root style={{ width: '100%' }}>
+              <Field.Root style={{ width: '100%' }} error={fieldErrors.backUrls}>
                 <Field.Label>
                   {formatMessage({ id: getTranslation('setting.field.backUrls.label') })}
                 </Field.Label>
@@ -237,11 +301,12 @@ const SettingsPage = () => {
                 <Field.Hint>
                   {formatMessage({ id: getTranslation('setting.field.backUrls.hint') })}
                 </Field.Hint>
+                {fieldErrors.backUrls && <Field.Error />}
               </Field.Root>
             </Grid.Item>
 
             <Grid.Item col={6} s={12}>
-              <Field.Root style={{ width: '100%' }}>
+              <Field.Root style={{ width: '100%' }} error={fieldErrors.notificationUrl}>
                 <Field.Label>
                   {formatMessage({ id: getTranslation('setting.field.notificationUrl.label') })}
                 </Field.Label>
@@ -256,6 +321,7 @@ const SettingsPage = () => {
                 <Field.Hint>
                   {formatMessage({ id: getTranslation('setting.field.notificationUrl.hint') })}
                 </Field.Hint>
+                {fieldErrors.notificationUrl && <Field.Error />}
               </Field.Root>
             </Grid.Item>
           </Grid.Root>
@@ -282,7 +348,7 @@ const SettingsPage = () => {
 
           <Grid.Root gap={6}>
             <Grid.Item col={8} s={12}>
-              <Field.Root style={{ width: '100%' }}>
+              <Field.Root style={{ width: '100%' }} error={fieldErrors.webhookPass}>
                 <Field.Label>
                   {formatMessage({ id: getTranslation('setting.field.webhookPass.label') })}
                 </Field.Label>
@@ -304,6 +370,7 @@ const SettingsPage = () => {
                 <Field.Hint>
                   {formatMessage({ id: getTranslation('setting.field.webhookPass.hint') })}
                 </Field.Hint>
+                {fieldErrors.webhookPass && <Field.Error />}
               </Field.Root>
             </Grid.Item>
 

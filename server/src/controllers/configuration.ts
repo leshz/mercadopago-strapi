@@ -44,9 +44,11 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         stripUnknown: true,
       });
     } catch (error) {
-      return ctx.badRequest('Invalid configuration data', {
-        errors: error.errors,
-      });
+      // error.inner contiene los errores individuales con path cuando abortEarly: false
+      const fieldErrors = error.inner?.length
+        ? error.inner.map((e: any) => ({ path: e.path, message: e.message }))
+        : [{ path: null, message: error.message }];
+      return ctx.badRequest('Invalid configuration data', { errors: fieldErrors });
     }
 
     const {
@@ -66,6 +68,11 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       name: 'strapi-mercadopago',
     });
 
+    // Normalizar backUrls: si viene como string, expandir al objeto que MercadoPago espera
+    const normalizedBackUrls = backUrls
+      ? { success: backUrls, failure: backUrls, pending: backUrls }
+      : undefined;
+
     // Cifrar secretos antes de guardar
     const response = await pluginStore.set({
       key: 'mercadopagoSetting',
@@ -75,7 +82,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           ? encrypt(mercadoPagoToken, strapi)
           : '',
         defaultCurrency,
-        backUrls,
+        backUrls: normalizedBackUrls,
         webhookPass: webhookPass
           ? encrypt(webhookPass, strapi)
           : '',

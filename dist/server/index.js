@@ -846,11 +846,7 @@ const configurationSchema = yup__namespace.object({
   isActive: yup__namespace.boolean().required("isActive is required"),
   mercadoPagoToken: yup__namespace.string().required("MercadoPago token is required").max(500, "Token too long").trim(),
   defaultCurrency: yup__namespace.string().required("Currency is required").max(10, "Currency code too long").matches(/^[A-Z]{3}$/, "Currency must be a 3-letter ISO code"),
-  backUrls: yup__namespace.object({
-    success: yup__namespace.string().url("Invalid success URL").max(2e3).required(),
-    failure: yup__namespace.string().url("Invalid failure URL").max(2e3).required(),
-    pending: yup__namespace.string().url("Invalid pending URL").max(2e3).required()
-  }).required("Back URLs are required"),
+  backUrls: yup__namespace.string().url("Invalid back URL").max(2e3, "Back URL too long"),
   webhookPass: yup__namespace.string().max(500, "Webhook password too long").trim(),
   notificationUrl: yup__namespace.string().url("Invalid notification URL").max(2e3, "Notification URL too long"),
   bussinessDescription: yup__namespace.string().max(500, "Business description too long").trim(),
@@ -883,9 +879,8 @@ const configuration$1 = ({ strapi: strapi2 }) => ({
         stripUnknown: true
       });
     } catch (error2) {
-      return ctx.badRequest("Invalid configuration data", {
-        errors: error2.errors
-      });
+      const fieldErrors = error2.inner?.length ? error2.inner.map((e) => ({ path: e.path, message: e.message })) : [{ path: null, message: error2.message }];
+      return ctx.badRequest("Invalid configuration data", { errors: fieldErrors });
     }
     const {
       isActive,
@@ -902,13 +897,14 @@ const configuration$1 = ({ strapi: strapi2 }) => ({
       type: "plugin",
       name: "strapi-mercadopago"
     });
+    const normalizedBackUrls = backUrls ? { success: backUrls, failure: backUrls, pending: backUrls } : void 0;
     const response = await pluginStore.set({
       key: "mercadopagoSetting",
       value: {
         isActive,
         mercadoPagoToken: mercadoPagoToken ? encrypt(mercadoPagoToken, strapi2) : "",
         defaultCurrency,
-        backUrls,
+        backUrls: normalizedBackUrls,
         webhookPass: webhookPass ? encrypt(webhookPass, strapi2) : "",
         notificationUrl,
         bussinessDescription,
@@ -26846,3 +26842,4 @@ const index = {
   middlewares
 };
 module.exports = index;
+//# sourceMappingURL=index.js.map

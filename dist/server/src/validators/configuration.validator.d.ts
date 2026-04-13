@@ -7,11 +7,7 @@ export declare const configurationSchema: yup.ObjectSchema<{
     isActive: boolean;
     mercadoPagoToken: string;
     defaultCurrency: string;
-    backUrls: {
-        pending?: string;
-        success?: string;
-        failure?: string;
-    };
+    backUrls: string;
     webhookPass: string;
     notificationUrl: string;
     bussinessDescription: string;
@@ -20,11 +16,7 @@ export declare const configurationSchema: yup.ObjectSchema<{
     isActive: undefined;
     mercadoPagoToken: undefined;
     defaultCurrency: undefined;
-    backUrls: {
-        success: undefined;
-        failure: undefined;
-        pending: undefined;
-    };
+    backUrls: undefined;
     webhookPass: undefined;
     notificationUrl: undefined;
     bussinessDescription: undefined;

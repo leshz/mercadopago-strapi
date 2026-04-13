@@ -1,20 +1,43 @@
 import { jsxs, jsx } from "react/jsx-runtime";
+import * as React from "react";
 import { useState, useEffect } from "react";
 import { useIntl } from "react-intl";
 import { Main, Button, Box, Typography, Divider, Grid, Field, Toggle, SingleSelect, SingleSelectOption } from "@strapi/design-system";
 import "react-dom/client";
 import { Check, Eye, EyeStriked } from "@strapi/icons";
-import { b as getConfig, L as Layouts, s as setConfig } from "./index-C4jVHAl2.mjs";
+import { b as getConfig, L as Layouts, s as setConfig } from "./index-BSjFQn-a.mjs";
 import "react-router-dom";
 import "@strapi/icons/symbols";
 import "yup";
 import "styled-components";
-import { g as getTranslation } from "./index-RZuWfDRJ.mjs";
+import { g as getTranslation } from "./index-C8UrJ5XS.mjs";
+const NotificationsContext = /* @__PURE__ */ React.createContext({
+  toggleNotification: () => {
+  }
+});
+/**
+* @preserve
+* @description Returns an object to interact with the notification
+* system. The callbacks are wrapped in `useCallback` for a stable
+* identity.
+*
+* @example
+* ```tsx
+* import { useNotification } from '@strapi/strapi/admin';
+*
+* const MyComponent = () => {
+*  const { toggleNotification } = useNotification();
+*
+*  return <button onClick={() => toggleNotification({ message: 'Hello world!' })}>Click me</button>;
+*/
+const useNotification = () => React.useContext(NotificationsContext);
 const SettingsPage = () => {
   const { formatMessage } = useIntl();
+  const { toggleNotification } = useNotification();
   const [isLoading, setIsLoading] = useState(true);
   const [showToken, setShowToken] = useState(false);
   const [showWebhookSecret, setShowWebhookSecret] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
   const [data, setData] = useState({
     isActive: false,
     mercadoPagoToken: "",
@@ -31,11 +54,61 @@ const SettingsPage = () => {
       setData((prev) => ({ ...prev, ...res.data }));
     });
   }, []);
-  const handleSubmit = () => {
+  const validateClient = () => {
+    const errors = {};
+    if (!data.backUrls?.trim()) {
+      errors.backUrls = "La URL de retorno es requerida";
+    } else {
+      try {
+        new URL(data.backUrls);
+      } catch {
+        errors.backUrls = "Debe ser una URL válida (ej: https://mitienda.com/retorno)";
+      }
+    }
+    if (!data.mercadoPagoToken?.trim()) {
+      errors.mercadoPagoToken = "El token de MercadoPago es requerido";
+    }
+    if (!data.defaultCurrency) {
+      errors.defaultCurrency = "Selecciona una moneda";
+    }
+    if (data.notificationUrl?.trim()) {
+      try {
+        new URL(data.notificationUrl);
+      } catch {
+        errors.notificationUrl = "Debe ser una URL válida";
+      }
+    }
+    return errors;
+  };
+  const handleSubmit = async () => {
+    const clientErrors = validateClient();
+    if (Object.keys(clientErrors).length) {
+      setFieldErrors(clientErrors);
+      toggleNotification({ type: "warning", message: "Revisa los campos marcados en rojo" });
+      return;
+    }
     setIsLoading(true);
-    setConfig(data).then(() => {
+    setFieldErrors({});
+    try {
+      await setConfig(data);
+      toggleNotification({ type: "success", message: "Configuración guardada correctamente" });
+    } catch (err) {
+      const strapiError = err?.response?.data?.error;
+      const errors = {};
+      if (Array.isArray(strapiError?.details?.errors)) {
+        for (const e of strapiError.details.errors) {
+          if (e.path) errors[e.path] = e.message;
+        }
+      }
+      setFieldErrors(errors);
+      toggleNotification({
+        type: "danger",
+        title: "Error al guardar",
+        message: Object.keys(errors).length ? "Revisa los campos marcados en rojo" : strapiError?.message ?? "Error al guardar la configuración"
+      });
+    } finally {
       setIsLoading(false);
-    });
+    }
   };
   return /* @__PURE__ */ jsxs(Main, { children: [
     /* @__PURE__ */ jsx(
@@ -84,13 +157,14 @@ const SettingsPage = () => {
                 ),
                 /* @__PURE__ */ jsx(Field.Hint, { children: formatMessage({ id: getTranslation("setting.field.isActive.hint") }) })
               ] }) }),
-              /* @__PURE__ */ jsx(Grid.Item, { col: 6, s: 12, children: /* @__PURE__ */ jsxs(Field.Root, { style: { width: "100%" }, children: [
+              /* @__PURE__ */ jsx(Grid.Item, { col: 6, s: 12, children: /* @__PURE__ */ jsxs(Field.Root, { style: { width: "100%" }, error: fieldErrors.defaultCurrency, children: [
                 /* @__PURE__ */ jsx(Field.Label, { children: formatMessage({ id: getTranslation("setting.field.currency.label") }) }),
                 /* @__PURE__ */ jsxs(
                   SingleSelect,
                   {
                     value: data.defaultCurrency,
                     onChange: (value) => setData({ ...data, defaultCurrency: value }),
+                    error: fieldErrors.defaultCurrency,
                     children: [
                       /* @__PURE__ */ jsx(SingleSelectOption, { value: "ARS", children: "ARS - Peso argentino" }),
                       /* @__PURE__ */ jsx(SingleSelectOption, { value: "BRL", children: "BRL - Real brasileño" }),
@@ -101,9 +175,10 @@ const SettingsPage = () => {
                       /* @__PURE__ */ jsx(SingleSelectOption, { value: "UYU", children: "UYU - Peso uruguayo" })
                     ]
                   }
-                )
+                ),
+                fieldErrors.defaultCurrency && /* @__PURE__ */ jsx(Field.Error, {})
               ] }) }),
-              /* @__PURE__ */ jsx(Grid.Item, { col: 12, s: 12, children: /* @__PURE__ */ jsxs(Field.Root, { style: { width: "100%" }, children: [
+              /* @__PURE__ */ jsx(Grid.Item, { col: 12, s: 12, children: /* @__PURE__ */ jsxs(Field.Root, { style: { width: "100%" }, error: fieldErrors.bussinessDescription, children: [
                 /* @__PURE__ */ jsx(Field.Label, { children: formatMessage({ id: getTranslation("setting.field.description.label") }) }),
                 /* @__PURE__ */ jsx(
                   Field.Input,
@@ -114,7 +189,8 @@ const SettingsPage = () => {
                     onChange: (ev) => setData({ ...data, bussinessDescription: ev.target.value })
                   }
                 ),
-                /* @__PURE__ */ jsx(Field.Hint, { children: formatMessage({ id: getTranslation("setting.field.description.hint") }) })
+                /* @__PURE__ */ jsx(Field.Hint, { children: formatMessage({ id: getTranslation("setting.field.description.hint") }) }),
+                fieldErrors.bussinessDescription && /* @__PURE__ */ jsx(Field.Error, {})
               ] }) })
             ] })
           ]
@@ -134,7 +210,7 @@ const SettingsPage = () => {
           children: [
             /* @__PURE__ */ jsx(Typography, { variant: "delta", tag: "h2", children: formatMessage({ id: getTranslation("setting.section.credentials") }) }),
             /* @__PURE__ */ jsx(Box, { paddingTop: 4, paddingBottom: 4, children: /* @__PURE__ */ jsx(Divider, {}) }),
-            /* @__PURE__ */ jsx(Grid.Root, { gap: 6, children: /* @__PURE__ */ jsx(Grid.Item, { col: 12, s: 12, children: /* @__PURE__ */ jsxs(Field.Root, { style: { width: "100%" }, children: [
+            /* @__PURE__ */ jsx(Grid.Root, { gap: 6, children: /* @__PURE__ */ jsx(Grid.Item, { col: 12, s: 12, children: /* @__PURE__ */ jsxs(Field.Root, { style: { width: "100%" }, error: fieldErrors.mercadoPagoToken, children: [
               /* @__PURE__ */ jsx(Field.Label, { children: formatMessage({ id: getTranslation("setting.field.token.label") }) }),
               /* @__PURE__ */ jsx(
                 Field.Input,
@@ -146,7 +222,8 @@ const SettingsPage = () => {
                   endAction: showToken ? /* @__PURE__ */ jsx(Eye, { onClick: () => setShowToken(false) }) : /* @__PURE__ */ jsx(EyeStriked, { onClick: () => setShowToken(true) })
                 }
               ),
-              /* @__PURE__ */ jsx(Field.Hint, { children: formatMessage({ id: getTranslation("setting.field.token.hint") }) })
+              /* @__PURE__ */ jsx(Field.Hint, { children: formatMessage({ id: getTranslation("setting.field.token.hint") }) }),
+              fieldErrors.mercadoPagoToken && /* @__PURE__ */ jsx(Field.Error, {})
             ] }) }) })
           ]
         }
@@ -166,7 +243,7 @@ const SettingsPage = () => {
             /* @__PURE__ */ jsx(Typography, { variant: "delta", tag: "h2", children: formatMessage({ id: getTranslation("setting.section.urls") }) }),
             /* @__PURE__ */ jsx(Box, { paddingTop: 4, paddingBottom: 4, children: /* @__PURE__ */ jsx(Divider, {}) }),
             /* @__PURE__ */ jsxs(Grid.Root, { gap: 6, children: [
-              /* @__PURE__ */ jsx(Grid.Item, { col: 6, s: 12, children: /* @__PURE__ */ jsxs(Field.Root, { style: { width: "100%" }, children: [
+              /* @__PURE__ */ jsx(Grid.Item, { col: 6, s: 12, children: /* @__PURE__ */ jsxs(Field.Root, { style: { width: "100%" }, error: fieldErrors.backUrls, children: [
                 /* @__PURE__ */ jsx(Field.Label, { children: formatMessage({ id: getTranslation("setting.field.backUrls.label") }) }),
                 /* @__PURE__ */ jsx(
                   Field.Input,
@@ -177,9 +254,10 @@ const SettingsPage = () => {
                     onChange: (ev) => setData({ ...data, backUrls: ev.target.value })
                   }
                 ),
-                /* @__PURE__ */ jsx(Field.Hint, { children: formatMessage({ id: getTranslation("setting.field.backUrls.hint") }) })
+                /* @__PURE__ */ jsx(Field.Hint, { children: formatMessage({ id: getTranslation("setting.field.backUrls.hint") }) }),
+                fieldErrors.backUrls && /* @__PURE__ */ jsx(Field.Error, {})
               ] }) }),
-              /* @__PURE__ */ jsx(Grid.Item, { col: 6, s: 12, children: /* @__PURE__ */ jsxs(Field.Root, { style: { width: "100%" }, children: [
+              /* @__PURE__ */ jsx(Grid.Item, { col: 6, s: 12, children: /* @__PURE__ */ jsxs(Field.Root, { style: { width: "100%" }, error: fieldErrors.notificationUrl, children: [
                 /* @__PURE__ */ jsx(Field.Label, { children: formatMessage({ id: getTranslation("setting.field.notificationUrl.label") }) }),
                 /* @__PURE__ */ jsx(
                   Field.Input,
@@ -190,7 +268,8 @@ const SettingsPage = () => {
                     onChange: (ev) => setData({ ...data, notificationUrl: ev.target.value })
                   }
                 ),
-                /* @__PURE__ */ jsx(Field.Hint, { children: formatMessage({ id: getTranslation("setting.field.notificationUrl.hint") }) })
+                /* @__PURE__ */ jsx(Field.Hint, { children: formatMessage({ id: getTranslation("setting.field.notificationUrl.hint") }) }),
+                fieldErrors.notificationUrl && /* @__PURE__ */ jsx(Field.Error, {})
               ] }) })
             ] })
           ]
@@ -212,7 +291,7 @@ const SettingsPage = () => {
             /* @__PURE__ */ jsx(Typography, { variant: "delta", tag: "h2", children: formatMessage({ id: getTranslation("setting.section.webhook") }) }),
             /* @__PURE__ */ jsx(Box, { paddingTop: 4, paddingBottom: 4, children: /* @__PURE__ */ jsx(Divider, {}) }),
             /* @__PURE__ */ jsxs(Grid.Root, { gap: 6, children: [
-              /* @__PURE__ */ jsx(Grid.Item, { col: 8, s: 12, children: /* @__PURE__ */ jsxs(Field.Root, { style: { width: "100%" }, children: [
+              /* @__PURE__ */ jsx(Grid.Item, { col: 8, s: 12, children: /* @__PURE__ */ jsxs(Field.Root, { style: { width: "100%" }, error: fieldErrors.webhookPass, children: [
                 /* @__PURE__ */ jsx(Field.Label, { children: formatMessage({ id: getTranslation("setting.field.webhookPass.label") }) }),
                 /* @__PURE__ */ jsx(
                   Field.Input,
@@ -224,7 +303,8 @@ const SettingsPage = () => {
                     endAction: showWebhookSecret ? /* @__PURE__ */ jsx(Eye, { onClick: () => setShowWebhookSecret(false) }) : /* @__PURE__ */ jsx(EyeStriked, { onClick: () => setShowWebhookSecret(true) })
                   }
                 ),
-                /* @__PURE__ */ jsx(Field.Hint, { children: formatMessage({ id: getTranslation("setting.field.webhookPass.hint") }) })
+                /* @__PURE__ */ jsx(Field.Hint, { children: formatMessage({ id: getTranslation("setting.field.webhookPass.hint") }) }),
+                fieldErrors.webhookPass && /* @__PURE__ */ jsx(Field.Error, {})
               ] }) }),
               /* @__PURE__ */ jsx(Grid.Item, { col: 4, s: 12, children: /* @__PURE__ */ jsxs(Field.Root, { children: [
                 /* @__PURE__ */ jsx(Field.Label, { children: formatMessage({
