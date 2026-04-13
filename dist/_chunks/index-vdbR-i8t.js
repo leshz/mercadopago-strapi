@@ -57,7 +57,7 @@ const index = {
         defaultMessage: "Mercado Pago"
       },
       Component: async () => {
-        const { App } = await Promise.resolve().then(() => require("./App-eWvn2MIM.js"));
+        const { App } = await Promise.resolve().then(() => require("./App-pXh447kl.js"));
         return App;
       }
     });
@@ -78,7 +78,7 @@ const index = {
             defaultMessage: "Configuration"
           },
           Component: async () => {
-            const { SettingsPage } = await Promise.resolve().then(() => require("./Settings-CbSYV-Fs.js"));
+            const { SettingsPage } = await Promise.resolve().then(() => require("./Settings-C6ubB8fJ.js"));
             return SettingsPage;
           }
         }
@@ -108,4 +108,3 @@ const index = {
 };
 exports.getTranslation = getTranslation;
 exports.index = index;
-//# sourceMappingURL=index-lVwVgdyK.js.map

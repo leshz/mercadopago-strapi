@@ -6,12 +6,12 @@ const reactIntl = require("react-intl");
 const designSystem = require("@strapi/design-system");
 require("react-dom/client");
 const icons = require("@strapi/icons");
-const index = require("./index-Cdpa_RqF.js");
+const index = require("./index-Cw1Nmnp2.js");
 require("react-router-dom");
 require("@strapi/icons/symbols");
 require("yup");
 require("styled-components");
-const index$1 = require("./index-lVwVgdyK.js");
+const index$1 = require("./index-vdbR-i8t.js");
 function _interopNamespace(e) {
   if (e && e.__esModule) return e;
   const n = Object.create(null, { [Symbol.toStringTag]: { value: "Module" } });
@@ -350,4 +350,3 @@ const SettingsPage = () => {
   ] });
 };
 exports.SettingsPage = SettingsPage;
-//# sourceMappingURL=Settings-CbSYV-Fs.js.map

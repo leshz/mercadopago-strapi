@@ -832,8 +832,23 @@ const configuration$1 = ({ strapi: strapi2 }) => ({
     if (!config2) {
       return ctx.send({ ok: true, data: null });
     }
+    const rawBackUrls = config2.backUrls;
+    let backUrlsFlat = "";
+    if (rawBackUrls) {
+      if (typeof rawBackUrls === "string") {
+        try {
+          const parsed = JSON.parse(rawBackUrls);
+          backUrlsFlat = parsed?.success ?? rawBackUrls;
+        } catch {
+          backUrlsFlat = rawBackUrls;
+        }
+      } else if (typeof rawBackUrls === "object") {
+        backUrlsFlat = rawBackUrls.success ?? "";
+      }
+    }
     const decryptedConfig = {
       ...config2,
+      backUrls: backUrlsFlat,
       mercadoPagoToken: config2.mercadoPagoToken ? decrypt(config2.mercadoPagoToken, strapi2) : "",
       webhookPass: config2.webhookPass ? decrypt(config2.webhookPass, strapi2) : ""
     };
@@ -26813,4 +26828,3 @@ const index = {
 export {
   index as default
 };
-//# sourceMappingURL=index.mjs.map

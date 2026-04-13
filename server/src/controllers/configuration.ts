@@ -20,9 +20,26 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       return ctx.send({ ok: true, data: null });
     }
 
+    // Aplanar backUrls: si está guardado como objeto {success,failure,pending}, devolver solo success
+    const rawBackUrls = config.backUrls;
+    let backUrlsFlat = '';
+    if (rawBackUrls) {
+      if (typeof rawBackUrls === 'string') {
+        try {
+          const parsed = JSON.parse(rawBackUrls);
+          backUrlsFlat = parsed?.success ?? rawBackUrls;
+        } catch {
+          backUrlsFlat = rawBackUrls;
+        }
+      } else if (typeof rawBackUrls === 'object') {
+        backUrlsFlat = rawBackUrls.success ?? '';
+      }
+    }
+
     // Descifrar secretos antes de enviar al admin
     const decryptedConfig = {
       ...config,
+      backUrls: backUrlsFlat,
       mercadoPagoToken: config.mercadoPagoToken
         ? decrypt(config.mercadoPagoToken, strapi)
         : '',
